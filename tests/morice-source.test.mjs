@@ -14,7 +14,11 @@ test("Morice exposes the persistent application and notification routes", async 
 
   assert.match(page, /Activer et tester/);
   assert.match(page, /PushManager/);
+  assert.match(page, /beforeinstallprompt/);
   assert.match(serviceWorker, /showNotification\("Morice"/);
-  assert.match(manifest, /"name"\s*:\s*"Morice"/);
+  assert.match(serviceWorker, /addEventListener\("fetch"/);
+  assert.equal(JSON.parse(manifest).display, "standalone");
+  assert.equal(JSON.parse(manifest).id, "/");
+  assert.ok(JSON.parse(manifest).icons.some((icon) => icon.sizes === "512x512" && icon.purpose === "maskable"));
   assert.match(migration, /CREATE TABLE `morice_push_subscriptions`/);
 });

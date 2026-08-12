@@ -14,6 +14,11 @@ type Item = {
 
 type State = { items: Item[]; settings: Record<string, unknown> };
 
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
 const starterModules = [
   ["chat", "Parler à Morice", "✦"],
   ["mail", "Mail & Brouillons", "✉"],
@@ -51,6 +56,7 @@ export default function MoriceApp() {
   const [message, setMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [newValue, setNewValue] = useState("");
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
 
   const modules = useMemo(() => state.items.filter((item) => item.kind === "module" && item.status === "active").sort((a, b) => a.position - b.position), [state]);
   const tasks = state.items.filter((item) => item.kind === "task");
@@ -68,7 +74,37 @@ export default function MoriceApp() {
     }
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(registration => registration.update()).catch(() => undefined);
+    }
+
+    const rememberInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPromptEvent);
+    };
+    const installationFinished = () => {
+      setInstallPrompt(null);
+      setNotice("Morice est maintenant installé comme application.");
+    };
+    window.addEventListener("beforeinstallprompt", rememberInstallPrompt);
+    window.addEventListener("appinstalled", installationFinished);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", rememberInstallPrompt);
+      window.removeEventListener("appinstalled", installationFinished);
+    };
+  }, []);
+
+  async function installMorice() {
+    if (!installPrompt) {
+      setNotice("Actualise cette page une fois, puis touche de nouveau Installer Morice.");
+      return;
+    }
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === "accepted") setInstallPrompt(null);
+  }
 
   async function addItem(kind: Item["kind"], title: string, content = "") {
     if (!title.trim()) return;
@@ -123,6 +159,7 @@ export default function MoriceApp() {
       <aside className="sidebar">
         <button className="brand" onClick={() => setView("home")}><img src="/morice-logo.png" alt="Logo Rottweiler Morice" /><span><b>Morice</b><small>Assistant personnel</small></span></button>
         <nav>{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
+        {installPrompt && <button className="notify" onClick={installMorice}>Installer Morice</button>}
         <button className="notify" onClick={enableNotifications}>Activer les notifications</button>
         <p className="online"><span /> {ready ? "Morice en ligne" : "Connexion…"}</p>
       </aside>
@@ -143,7 +180,7 @@ export default function MoriceApp() {
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
         {view === "approvals" && <section className="panel"><p className="eyebrow">CONTRÔLE HUMAIN</p><h2>Validations</h2>{approvals.length ? approvals.map(item => <article className="row" key={item.id}><div><b>{item.title}</b><p>{item.content}</p></div><button onClick={() => updateItem(item.id, "approved")}>Valider</button><button className="secondary" onClick={() => updateItem(item.id, "rejected")}>Refuser</button></article>) : <div className="empty">Aucune validation en attente.</div>}</section>}
-        {view === "settings" && <section className="panel"><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
+        {view === "settings" && <section className="panel"><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante de Chrome.</p><button onClick={installMorice}>{installPrompt ? "Installer Morice maintenant" : "Vérifier l’installation"}</button><hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
         {view === "mail" && <InfoPanel title="Mail & Brouillons" text="Outlook sera relié à cette version par une autorisation Microsoft 365 unique. Aucun message ne sera envoyé sans validation." />}
         {view === "hubspot" && <InfoPanel title="HubSpot" text="Le pont Android → Tasker → Make → Microsoft To Do reste actif. La prochaine notification réelle servira de validation finale." />}
         {view === "calendar" && <InfoPanel title="Agenda" text="Les calendriers Outlook ont été vérifiés. La connexion directe à cette application sera ajoutée avec Microsoft 365." />}

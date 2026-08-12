@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 
+export const viewport = {
+  themeColor: "#111316",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") ?? "morice-alan-assistant";
@@ -13,7 +20,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Morice — Assistant personnel",
     description: "L'espace personnel de Morice : tâches, mémoire, validations, connexions et notifications.",
     manifest: "/manifest.webmanifest",
-    icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
+    applicationName: "Morice",
+    appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Morice" },
+    icons: {
+      icon: [{ url: "/icon-192.png", type: "image/png", sizes: "192x192" }],
+      shortcut: "/icon-192.png",
+      apple: "/icon-192.png",
+    },
     openGraph: {
       title: "Morice — Assistant personnel",
       description: "Votre assistant personnel privé, toujours disponible.",
