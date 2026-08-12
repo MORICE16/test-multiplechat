@@ -1,0 +1,2 @@
+self.addEventListener("push", event => { event.waitUntil(self.registration.showNotification("Morice", { body:"Notification Morice reçue. Les alertes sont correctement activées.", icon:"/icon-192.png", badge:"/icon-192.png", tag:"morice-test", data:{url:"/"} })); });
+self.addEventListener("notificationclick", event => { event.notification.close(); event.waitUntil(clients.matchAll({type:"window",includeUncontrolled:true}).then(list => list[0] ? list[0].focus() : clients.openWindow(event.notification.data?.url || "/"))); });
