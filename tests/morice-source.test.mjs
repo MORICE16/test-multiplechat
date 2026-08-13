@@ -28,6 +28,8 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(actionRoute, /runMicrosoftAction/);
   assert.match(actionRoute, /runMakeAction/);
   assert.match(microsoftRoute, /graph\.microsoft\.com\/v1\.0/);
+  assert.match(microsoftRoute, /Morice Online/);
+  assert.match(assistantRoute, /makeHandlesTodo/);
   assert.match(connectionsRoute, /hubspot: \{ configured: false, disabled: true/);
   assert.match(page, /Valider et exécuter/);
   assert.match(page, /HubSpot indisponible/);

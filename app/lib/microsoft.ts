@@ -137,7 +137,19 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
 export async function runMakeAction(payload: ActionPayload) {
   const webhook = runtimeValue("MAKE_WEBHOOK_URL");
   if (!webhook) throw new Error("Le webhook Make n’est pas encore configuré.");
-  const response = await fetch(webhook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ source: "Morice", event: payload.webhookEvent || "morice.action", payload }) });
+  const response = await fetch(webhook, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      source: "Morice Online",
+      package: "morice-online",
+      title: payload.subject || "Action demandée à Morice",
+      text: payload.body || payload.notes || "Créer une tâche Microsoft To Do à partir de cette demande Morice.",
+      timestamp: now(),
+      event: payload.webhookEvent || "todo_create",
+      payload,
+    }),
+  });
   if (!response.ok) throw new Error(`Make a refusé l’action (${response.status}).`);
   return "L’automatisation Make a été déclenchée.";
 }

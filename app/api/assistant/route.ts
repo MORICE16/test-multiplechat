@@ -127,7 +127,12 @@ export async function POST(request: Request) {
   }
 
   if (writeIntents.has(plan.intent)) {
-    const provider = plan.intent === "make_trigger" ? "make" : "microsoft";
+    const makeHandlesTodo = plan.intent === "todo_create" && Boolean(runtimeValue("MAKE_WEBHOOK_URL")) && !runtimeValue("MICROSOFT_CLIENT_ID");
+    const provider = plan.intent === "make_trigger" || makeHandlesTodo ? "make" : "microsoft";
+    if (makeHandlesTodo) {
+      plan.payload.webhookEvent = "todo_create";
+      plan.payload.body ||= plan.payload.subject || message;
+    }
     const id = await insertItem(uid, "approval", plan.title, message, "pending");
     await env.DB.prepare("INSERT INTO morice_action_payloads(item_id,user_id,provider,operation,payload,result,created_at) VALUES(?,?,?,?,?,'',?)")
       .bind(id, uid, provider, plan.intent, JSON.stringify(plan.payload), now()).run();

@@ -309,7 +309,7 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
   return <section className="panel"><p className="eyebrow">SERVICES AUTORISÉS</p><h2>Connexions</h2><p>Les secrets restent côté serveur. Les actions externes sensibles attendent toujours ta validation.</p><div className="connection-grid">
     <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Active · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
     <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Connecté · ${state.microsoft.account}` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
-    <article><div><b>Make</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook actif" : "Webhook à ajouter"}</span></div></article>
+    <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook actif · création de tâches prête" : "Webhook à ajouter"}</span></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>
   </div><button className="secondary refresh-connection" onClick={refresh}>Actualiser les états</button></section>;
 }
