@@ -19,8 +19,22 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+type InstallState = "checking" | "available" | "manual" | "installed";
+
+type AssistantAction = {
+  id: string;
+  kind: "task" | "memory" | "approval";
+  title: string;
+  content: string;
+  status: string;
+  label: string;
+  view: string;
+};
+
+type AssistantResult = { reply: string; action: AssistantAction };
+
 const starterModules = [
-  ["chat", "Parler à Morice", "✦"],
+  ["chat", "Agir avec Morice", "✦"],
   ["mail", "Mail & Brouillons", "✉"],
   ["hubspot", "HubSpot", "◎"],
   ["tasks", "Tâches", "✓"],
@@ -57,6 +71,12 @@ export default function MoriceApp() {
   const [notice, setNotice] = useState("");
   const [newValue, setNewValue] = useState("");
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const [installState, setInstallState] = useState<InstallState>("checking");
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+  const [assistantMode, setAssistantMode] = useState("auto");
+  const [assistantResult, setAssistantResult] = useState<AssistantResult | null>(null);
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const [isIos, setIsIos] = useState(false);
 
   const modules = useMemo(() => state.items.filter((item) => item.kind === "module" && item.status === "active").sort((a, b) => a.position - b.position), [state]);
   const tasks = state.items.filter((item) => item.kind === "task");
@@ -76,16 +96,32 @@ export default function MoriceApp() {
 
   useEffect(() => {
     refresh();
+    setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    if (standalone) setInstallState("installed");
+
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(registration => registration.update()).catch(() => undefined);
+      navigator.serviceWorker.register("/sw.js", { scope: "/" })
+        .then(async registration => {
+          await registration.update();
+          await navigator.serviceWorker.ready;
+          setInstallState(current => current === "checking" ? "manual" : current);
+        })
+        .catch(() => setInstallState(current => current === "installed" ? current : "manual"));
+    } else {
+      setInstallState(current => current === "installed" ? current : "manual");
     }
 
     const rememberInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
+      setInstallState("available");
+      setShowInstallHelp(false);
     };
     const installationFinished = () => {
       setInstallPrompt(null);
+      setInstallState("installed");
+      setShowInstallHelp(false);
       setNotice("Morice est maintenant installé comme application.");
     };
     window.addEventListener("beforeinstallprompt", rememberInstallPrompt);
@@ -97,13 +133,41 @@ export default function MoriceApp() {
   }, []);
 
   async function installMorice() {
-    if (!installPrompt) {
-      setNotice("Actualise cette page une fois, puis touche de nouveau Installer Morice.");
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    if (standalone || installState === "installed") {
+      setInstallState("installed");
+      setNotice("Morice est déjà installé sur cet appareil.");
       return;
     }
-    await installPrompt.prompt();
-    const choice = await installPrompt.userChoice;
-    if (choice.outcome === "accepted") setInstallPrompt(null);
+    if (installPrompt) {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      if (choice.outcome === "accepted") {
+        setInstallPrompt(null);
+        setInstallState("installed");
+      } else {
+        setNotice("Installation annulée. Tu peux la relancer quand tu veux.");
+      }
+      return;
+    }
+    setShowInstallHelp(true);
+    setNotice("");
+  }
+
+  async function askMorice() {
+    if (!message.trim() || assistantBusy) return;
+    setAssistantBusy(true);
+    setAssistantResult(null);
+    try {
+      const result = await api("/api/assistant", { method: "POST", body: JSON.stringify({ message, mode: assistantMode }) }) as AssistantResult;
+      setAssistantResult(result);
+      setMessage("");
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Morice n’a pas pu exécuter cette action.");
+    } finally {
+      setAssistantBusy(false);
+    }
   }
 
   async function addItem(kind: Item["kind"], title: string, content = "") {
@@ -159,7 +223,7 @@ export default function MoriceApp() {
       <aside className="sidebar">
         <button className="brand" onClick={() => setView("home")}><img src="/morice-logo.png" alt="Logo Rottweiler Morice" /><span><b>Morice</b><small>Assistant personnel</small></span></button>
         <nav>{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
-        {installPrompt && <button className="notify" onClick={installMorice}>Installer Morice</button>}
+        {installState !== "installed" && <button className="notify" onClick={installMorice}>Installer Morice</button>}
         <button className="notify" onClick={enableNotifications}>Activer les notifications</button>
         <p className="online"><span /> {ready ? "Morice en ligne" : "Connexion…"}</p>
       </aside>
@@ -175,12 +239,12 @@ export default function MoriceApp() {
           <section className="module-grid">{modules.map(module => <button key={module.id} onClick={() => setView(module.id)}><i>{module.content}</i><b>{module.title}</b><span>Ouvrir ce module</span></button>)}</section>
         </>}
 
-        {view === "chat" && <section className="panel chat"><p className="eyebrow">CONVERSATION</p><h2>Parler à Morice</h2><div className="assistant-message">Bonjour Alan. La nouvelle base en ligne est prête. Le moteur conversationnel OpenAI sera activé sur cette adresse dès que sa connexion sécurisée sera ajoutée.</div><textarea value={message} onChange={event => setMessage(event.target.value)} placeholder="Écris ou dicte ce que tu veux organiser…" /><div className="actions"><button onClick={() => { if (message.trim()) { addItem("memory", "Message d'Alan", message); setNotice("Message mémorisé dans Morice."); setMessage(""); } }}>Mémoriser</button><button className="round" onClick={dictate}>⌁</button><button className="secondary" onClick={() => speak("Morice est prêt. Dis-moi ce que tu veux organiser.")}>Réponse vocale</button></div></section>}
+        {view === "chat" && <section className="panel chat"><p className="eyebrow">CENTRE D’ACTIONS</p><h2>Demander à Morice</h2><div className="assistant-message"><b>Donne-moi une consigne, je m’en occupe.</b><span>Je crée une tâche, mémorise une information ou place toute action sensible dans Validations avant qu’elle puisse partir.</span></div><div className="mode-row" role="group" aria-label="Type d’action"><button className={assistantMode === "auto" ? "selected" : ""} onClick={() => setAssistantMode("auto")}>Automatique</button><button className={assistantMode === "task" ? "selected" : ""} onClick={() => setAssistantMode("task")}>Tâche</button><button className={assistantMode === "memory" ? "selected" : ""} onClick={() => setAssistantMode("memory")}>Mémoire</button><button className={assistantMode === "approval" ? "selected" : ""} onClick={() => setAssistantMode("approval")}>À valider</button></div><textarea value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") askMorice(); }} placeholder="Ex. Rappelle-moi d’appeler Martin demain matin…" /><div className="examples"><button onClick={() => setMessage("Rappelle-moi d’appeler Martin demain matin")}>Créer un rappel</button><button onClick={() => setMessage("Mémorise que le dossier Morice est prioritaire")}>Mémoriser une info</button><button onClick={() => setMessage("Prépare un mail de suivi à Martin")}>Préparer une action</button></div><div className="actions"><button onClick={askMorice} disabled={!message.trim() || assistantBusy}>{assistantBusy ? "Morice agit…" : "Exécuter avec Morice"}</button><button className="round" onClick={dictate} aria-label="Dicter une demande">⌁</button></div>{assistantResult && <article className="action-result"><p className="eyebrow">ACTION TERMINÉE</p><strong>{assistantResult.action.label}</strong><h3>{assistantResult.action.title}</h3><p>{assistantResult.reply}</p><div className="actions"><button onClick={() => setView(assistantResult.action.view)}>Voir l’action</button><button className="secondary" onClick={() => speak(assistantResult.reply)}>Écouter la réponse</button></div></article>}</section>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
         {view === "approvals" && <section className="panel"><p className="eyebrow">CONTRÔLE HUMAIN</p><h2>Validations</h2>{approvals.length ? approvals.map(item => <article className="row" key={item.id}><div><b>{item.title}</b><p>{item.content}</p></div><button onClick={() => updateItem(item.id, "approved")}>Valider</button><button className="secondary" onClick={() => updateItem(item.id, "rejected")}>Refuser</button></article>) : <div className="empty">Aucune validation en attente.</div>}</section>}
-        {view === "settings" && <section className="panel"><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante de Chrome.</p><button onClick={installMorice}>{installPrompt ? "Installer Morice maintenant" : "Vérifier l’installation"}</button><hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
+        {view === "settings" && <section className="panel"><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante du navigateur.</p><div className={`install-status ${installState}`}><span />{installState === "installed" ? "Morice est installé sur cet appareil" : installState === "available" ? "Morice est prêt à être installé" : installState === "checking" ? "Vérification de l’installation…" : "Installation disponible depuis le menu du navigateur"}</div><button onClick={installMorice}>{installState === "installed" ? "Vérifier l’installation" : installState === "available" ? "Installer Morice maintenant" : "Afficher comment l’installer"}</button>{showInstallHelp && <div className="install-help"><b>Installation en deux gestes</b>{isIos ? <p>Dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>.</p> : <p>Ouvre le menu <strong>⋮</strong> en haut à droite, puis choisis <strong>Installer Morice</strong> ou <strong>Ajouter à l’écran d’accueil</strong>.</p>}<p>Aucun rechargement de la page n’est nécessaire.</p></div>}<hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
         {view === "mail" && <InfoPanel title="Mail & Brouillons" text="Outlook sera relié à cette version par une autorisation Microsoft 365 unique. Aucun message ne sera envoyé sans validation." />}
         {view === "hubspot" && <InfoPanel title="HubSpot" text="Le pont Android → Tasker → Make → Microsoft To Do reste actif. La prochaine notification réelle servira de validation finale." />}
         {view === "calendar" && <InfoPanel title="Agenda" text="Les calendriers Outlook ont été vérifiés. La connexion directe à cette application sera ajoutée avec Microsoft 365." />}

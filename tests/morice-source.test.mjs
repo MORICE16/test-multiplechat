@@ -5,8 +5,9 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 
 test("Morice exposes the persistent application and notification routes", async () => {
-  const [page, serviceWorker, manifest, migration] = await Promise.all([
+  const [page, assistantRoute, serviceWorker, manifest, migration] = await Promise.all([
     readFile(new URL("app/morice-app.tsx", root), "utf8"),
+    readFile(new URL("app/api/assistant/route.ts", root), "utf8"),
     readFile(new URL("public/sw.js", root), "utf8"),
     readFile(new URL("public/manifest.webmanifest", root), "utf8"),
     readFile(new URL("drizzle/0000_morice.sql", root), "utf8"),
@@ -15,6 +16,10 @@ test("Morice exposes the persistent application and notification routes", async 
   assert.match(page, /Activer et tester/);
   assert.match(page, /PushManager/);
   assert.match(page, /beforeinstallprompt/);
+  assert.match(page, /Aucun rechargement de la page n’est nécessaire/);
+  assert.match(page, /Exécuter avec Morice/);
+  assert.match(assistantRoute, /detectKind/);
+  assert.match(assistantRoute, /Validation demandée/);
   assert.match(serviceWorker, /showNotification\("Morice"/);
   assert.match(serviceWorker, /addEventListener\("fetch"/);
   assert.equal(JSON.parse(manifest).display, "standalone");
