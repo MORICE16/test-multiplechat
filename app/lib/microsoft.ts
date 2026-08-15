@@ -134,7 +134,7 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
   throw new Error("Cette action Microsoft n’est pas encore prise en charge.");
 }
 
-export async function runMakeAction(payload: ActionPayload) {
+export async function runMakeAction(payload: ActionPayload, requestId = "") {
   const webhook = runtimeValue("MAKE_WEBHOOK_URL");
   if (!webhook) throw new Error("Le webhook Make n’est pas encore configuré.");
   const response = await fetch(webhook, {
@@ -143,6 +143,7 @@ export async function runMakeAction(payload: ActionPayload) {
     body: JSON.stringify({
       source: "Morice Online",
       package: "morice-online",
+      requestId,
       title: payload.subject || "Action demandée à Morice",
       text: payload.body || payload.notes || "Créer une tâche Microsoft To Do à partir de cette demande Morice.",
       timestamp: now(),

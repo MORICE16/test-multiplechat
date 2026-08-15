@@ -46,7 +46,10 @@ function localPlan(message: string, mode: string): Plan {
 async function intelligentPlan(message: string, mode: string): Promise<Plan> {
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
   const key = runtimeValue("OPENAI_API_KEY");
-  if (!key) return localPlan(message, mode);
+  if (!key) {
+    if (mode === "approval") return localPlan(message, mode);
+    throw new Error("OPENAI_NOT_CONFIGURED");
+  }
   const schema = {
     type: "object",
     additionalProperties: false,
@@ -109,7 +112,7 @@ export async function POST(request: Request) {
   try {
     plan = await intelligentPlan(message, mode);
   } catch {
-    plan = localPlan(message, mode);
+    return Response.json({ error: "L’analyse OpenAI est momentanément indisponible. Aucune tâche ni action n’a été créée." }, { status: 502 });
   }
 
   if (plan.intent === "task" || plan.intent === "memory") {

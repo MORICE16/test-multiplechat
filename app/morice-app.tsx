@@ -73,7 +73,7 @@ async function api(path: string, init?: RequestInit) {
 export default function MoriceApp() {
   const [state, setState] = useState<State>(defaultState);
   const [view, setView] = useState("home");
-  const [ready, setReady] = useState(false);
+  const [storageStatus, setStorageStatus] = useState<"checking" | "online" | "error">("checking");
   const [message, setMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [newValue, setNewValue] = useState("");
@@ -96,10 +96,10 @@ export default function MoriceApp() {
     try {
       const data = await api("/api/state");
       setState(data);
+      setStorageStatus("online");
     } catch {
+      setStorageStatus("error");
       setNotice("Connexion temporaire au stockage. Réessaie dans quelques secondes.");
-    } finally {
-      setReady(true);
     }
   }
 
@@ -108,21 +108,24 @@ export default function MoriceApp() {
   }
 
   useEffect(() => {
-    refresh();
-    refreshConnections();
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("microsoft") === "connected") {
-      setView("connections");
-      setNotice("Microsoft 365 est connecté à Morice.");
-      history.replaceState({}, "", window.location.pathname);
-    } else if (params.get("microsoft") === "error") {
-      setView("connections");
-      setNotice(params.get("reason") || "La connexion Microsoft n’a pas abouti.");
-      history.replaceState({}, "", window.location.pathname);
-    }
-    setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
-    const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
-    if (standalone) setInstallState("installed");
+    const initialLoadTimer = window.setTimeout(() => {
+      void refresh();
+      void refreshConnections();
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("microsoft") === "connected") {
+        setView("connections");
+        setNotice("Microsoft 365 est connecté à Morice.");
+        history.replaceState({}, "", window.location.pathname);
+      } else if (params.get("microsoft") === "error") {
+        setView("connections");
+        setNotice(params.get("reason") || "La connexion Microsoft n’a pas abouti.");
+        history.replaceState({}, "", window.location.pathname);
+      }
+      setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
+      const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+      if (standalone) setInstallState("installed");
+      else if (!("serviceWorker" in navigator)) setInstallState("manual");
+    }, 0);
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js", { scope: "/" })
@@ -132,8 +135,6 @@ export default function MoriceApp() {
           setInstallState(current => current === "checking" ? "manual" : current);
         })
         .catch(() => setInstallState(current => current === "installed" ? current : "manual"));
-    } else {
-      setInstallState(current => current === "installed" ? current : "manual");
     }
 
     const rememberInstallPrompt = (event: Event) => {
@@ -151,6 +152,7 @@ export default function MoriceApp() {
     window.addEventListener("beforeinstallprompt", rememberInstallPrompt);
     window.addEventListener("appinstalled", installationFinished);
     return () => {
+      window.clearTimeout(initialLoadTimer);
       window.removeEventListener("beforeinstallprompt", rememberInstallPrompt);
       window.removeEventListener("appinstalled", installationFinished);
     };
@@ -236,8 +238,8 @@ export default function MoriceApp() {
       let subscription = await registration.pushManager.getSubscription();
       if (!subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey) });
       await api("/api/push/subscribe", { method: "POST", body: JSON.stringify(subscription.toJSON()) });
-      await api("/api/push/test", { method: "POST" });
-      setNotice("Notification Morice envoyée. Elle peut prendre quelques secondes.");
+      const result = await api("/api/push/test", { method: "POST" }) as { sent: number };
+      setNotice(`${result.sent} notification Morice envoyée. Elle peut prendre quelques secondes.`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Notification impossible.");
     }
@@ -269,7 +271,7 @@ export default function MoriceApp() {
         <nav>{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
         {installState !== "installed" && <button className="notify" onClick={installMorice}>Installer Morice</button>}
         <button className="notify" onClick={enableNotifications}>Activer les notifications</button>
-        <p className="online"><span /> {ready ? "Morice en ligne" : "Connexion…"}</p>
+        <p className="online"><span /> {storageStatus === "online" ? "Morice en ligne" : storageStatus === "error" ? "Stockage indisponible" : "Connexion…"}</p>
       </aside>
 
       <section className="content">
@@ -278,7 +280,7 @@ export default function MoriceApp() {
 
         {view === "home" && <>
           <section className="hero"><div><span className="live">● Morice est prêt</span><h2>Qu’est-ce qu’on règle maintenant&nbsp;?</h2><p>Tout est désormais enregistré en ligne et disponible sur le téléphone comme sur l’ordinateur.</p><div className="actions"><button onClick={() => setView("chat")}>Écrire à Morice</button><button className="round" onClick={dictate}>⌁</button></div></div><img src="/morice-logo.png" alt="Rottweiler Morice" /></section>
-          <section className="stats"><button onClick={() => setView("approvals")}><small>À valider</small><b>{approvals.length}</b><span>Décisions sensibles</span></button><button onClick={() => setView("tasks")}><small>En cours</small><b>{tasks.filter(t => t.status !== "done").length}</b><span>Tâches ouvertes</span></button><button onClick={enableNotifications}><small>Notifications</small><b>✓</b><span>Test réel disponible</span></button></section>
+          <section className="stats"><button onClick={() => setView("approvals")}><small>À valider</small><b>{approvals.length}</b><span>Décisions sensibles</span></button><button onClick={() => setView("tasks")}><small>En cours</small><b>{tasks.filter(t => t.status !== "done").length}</b><span>Tâches ouvertes</span></button><button onClick={enableNotifications}><small>Notifications</small><b>✓</b><span>Test après autorisation</span></button></section>
           <div className="section-title"><div><p className="eyebrow">ESPACE DE TRAVAIL</p><h2>Mes modules</h2></div></div>
           <section className="module-grid">{modules.map(module => <button key={module.id} onClick={() => setView(module.id)}><i>{module.content}</i><b>{module.title}</b><span>Ouvrir ce module</span></button>)}</section>
         </>}
@@ -307,9 +309,9 @@ function InfoPanel({ title, text }: { title: string; text: string }) {
 
 function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: ConnectionState | null; refresh: () => Promise<void>; disconnectMicrosoft: () => Promise<void> }) {
   return <section className="panel"><p className="eyebrow">SERVICES AUTORISÉS</p><h2>Connexions</h2><p>Les secrets restent côté serveur. Les actions externes sensibles attendent toujours ta validation.</p><div className="connection-grid">
-    <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Active · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
+    <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Configurée · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
     <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Connecté · ${state.microsoft.account}` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
-    <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook actif · création de tâches prête" : "Webhook à ajouter"}</span></div></article>
+    <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook configuré · vérifié lors de l’exécution" : "Webhook à ajouter"}</span></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>
   </div><button className="secondary refresh-connection" onClick={refresh}>Actualiser les états</button></section>;
 }

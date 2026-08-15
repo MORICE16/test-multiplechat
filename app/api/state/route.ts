@@ -1,7 +1,5 @@
 import { env } from "cloudflare:workers";
-
-function userId(request: Request) { return request.headers.get("oai-authenticated-user-id") || "alan"; }
-const now = () => new Date().toISOString();
+import { now, userId } from "@/app/lib/runtime";
 
 export async function GET(request: Request) {
   const uid = userId(request);
@@ -26,13 +24,26 @@ export async function POST(request: Request) {
   const uid = userId(request);
   const body = await request.json() as Record<string, string>;
   if (body.action === "add") {
+    const allowedKinds = new Set(["module", "task", "memory", "approval"]);
+    const title = body.title?.trim() || "";
+    if (!allowedKinds.has(body.kind) || !title || title.length > 200 || (body.content || "").length > 4_000) {
+      return Response.json({ error: "Élément Morice invalide." }, { status: 400 });
+    }
     const id = crypto.randomUUID();
     const position = Number((await env.DB.prepare("SELECT COALESCE(MAX(position), -1) + 1 AS value FROM morice_items WHERE user_id = ? AND kind = ?").bind(uid, body.kind).first<{value:number}>())?.value || 0);
-    await env.DB.prepare("INSERT INTO morice_items (id,user_id,kind,title,content,status,priority,position,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)").bind(id,uid,body.kind,body.title,body.content || "",body.kind === "module" ? "active" : body.kind === "approval" ? "pending" : "open","normal",position,now(),now()).run();
+    await env.DB.prepare("INSERT INTO morice_items (id,user_id,kind,title,content,status,priority,position,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)").bind(id,uid,body.kind,title,body.content || "",body.kind === "module" ? "active" : body.kind === "approval" ? "pending" : "open","normal",position,now(),now()).run();
     return Response.json({ ok: true, id });
   }
   if (body.action === "status") {
-    await env.DB.prepare("UPDATE morice_items SET status = ?, updated_at = ? WHERE id = ? AND user_id = ?").bind(body.status,now(),body.id,uid).run();
+    let result;
+    if (body.status === "rejected") {
+      result = await env.DB.prepare("UPDATE morice_items SET status='rejected', updated_at=? WHERE id=? AND user_id=? AND kind='approval' AND status='pending'").bind(now(), body.id, uid).run();
+    } else if (body.status === "open" || body.status === "done") {
+      result = await env.DB.prepare("UPDATE morice_items SET status=?, updated_at=? WHERE id=? AND user_id=? AND kind IN ('task','memory') AND status IN ('open','done')").bind(body.status, now(), body.id, uid).run();
+    } else {
+      return Response.json({ error: "État Morice invalide." }, { status: 400 });
+    }
+    if ((result.meta.changes || 0) !== 1) return Response.json({ error: "Cet élément ne peut plus être modifié." }, { status: 409 });
     return Response.json({ ok: true });
   }
   if (body.action === "setting") {
