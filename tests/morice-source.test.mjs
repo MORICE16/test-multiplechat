@@ -34,7 +34,10 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.doesNotMatch(assistantRoute, /catch \{\s*plan = localPlan/);
   assert.match(connectionsRoute, /hubspot: \{ configured: false, disabled: true/);
   assert.match(page, /Valider et exécuter/);
+  assert.match(page, /function moduleView/);
+  assert.match(page, /setView\(moduleView\(module\.id\)\)/);
   assert.match(page, /HubSpot indisponible/);
+  assert.match(await readFile(new URL("app/api/state/route.ts", root), "utf8"), /`\$\{uid\}:\$\{id\}`/);
   assert.match(serviceWorker, /showNotification\("Morice"/);
   assert.match(serviceWorker, /addEventListener\("fetch"/);
   assert.equal(JSON.parse(manifest).display, "standalone");
