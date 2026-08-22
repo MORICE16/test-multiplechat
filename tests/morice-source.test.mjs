@@ -21,7 +21,13 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(page, /PushManager/);
   assert.match(page, /beforeinstallprompt/);
   assert.match(page, /Aucun rechargement de la page n’est nécessaire/);
-  assert.match(page, /Exécuter avec Morice/);
+  assert.match(page, /"Envoyer"/);
+  assert.match(page, /recognition\.continuous = true/);
+  assert.match(page, /recognition\.interimResults = true/);
+  assert.match(page, /function pauseDictation/);
+  assert.match(page, /function stopDictation/);
+  assert.match(page, /L’envoi reste toujours manuel/);
+  assert.match(page, /\/morice-3d\.png/);
   assert.match(assistantRoute, /api\.openai\.com\/v1\/responses/);
   assert.match(assistantRoute, /json_schema/);
   assert.match(assistantRoute, /Validation demandée/);

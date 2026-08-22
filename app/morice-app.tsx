@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Item = {
   id: string;
@@ -20,6 +20,7 @@ type InstallPromptEvent = Event & {
 };
 
 type InstallState = "checking" | "available" | "manual" | "installed";
+type DictationState = "idle" | "listening" | "paused";
 
 type AssistantAction = {
   id: string;
@@ -91,6 +92,11 @@ export default function MoriceApp() {
   const [isIos, setIsIos] = useState(false);
   const [connections, setConnections] = useState<ConnectionState | null>(null);
   const [executingId, setExecutingId] = useState("");
+  const [dictationState, setDictationState] = useState<DictationState>("idle");
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const keepDictatingRef = useRef(false);
+  const dictationTextRef = useRef("");
+  const restartTimerRef = useRef<number | null>(null);
 
   const modules = useMemo(() => state.items.filter((item) => item.kind === "module" && item.status === "active").sort((a, b) => a.position - b.position), [state]);
   const tasks = state.items.filter((item) => item.kind === "task");
@@ -163,6 +169,12 @@ export default function MoriceApp() {
     };
   }, []);
 
+  useEffect(() => () => {
+    keepDictatingRef.current = false;
+    if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
+    recognitionRef.current?.abort();
+  }, []);
+
   async function installMorice() {
     const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
     if (standalone || installState === "installed") {
@@ -186,13 +198,16 @@ export default function MoriceApp() {
   }
 
   async function askMorice() {
-    if (!message.trim() || assistantBusy) return;
+    const textToSend = message.trim();
+    if (!textToSend || assistantBusy) return;
+    stopDictation();
     setAssistantBusy(true);
     setAssistantResult(null);
     try {
-      const result = await api("/api/assistant", { method: "POST", body: JSON.stringify({ message, mode: assistantMode }) }) as AssistantResult;
+      const result = await api("/api/assistant", { method: "POST", body: JSON.stringify({ message: textToSend, mode: assistantMode }) }) as AssistantResult;
       setAssistantResult(result);
       setMessage("");
+      dictationTextRef.current = "";
       await refresh();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Morice n’a pas pu exécuter cette action.");
@@ -256,13 +271,73 @@ export default function MoriceApp() {
     speechSynthesis.speak(new SpeechSynthesisUtterance(text));
   }
 
-  function dictate() {
+  function beginDictation(resetText = true) {
     const SpeechRecognition = (window as unknown as { SpeechRecognition?: new () => SpeechRecognition; webkitSpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition;
     if (!SpeechRecognition) return setNotice("La dictée n'est pas disponible dans ce navigateur.");
+    if (recognitionRef.current) return;
+    if (resetText) dictationTextRef.current = message.trim();
+    keepDictatingRef.current = true;
+    setDictationState("listening");
+
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = "fr-FR";
-    recognition.onresult = (event: SpeechRecognitionEvent) => setMessage(event.results[0][0].transcript);
-    recognition.start();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let finalText = "";
+      let interimText = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const transcript = event.results[index][0]?.transcript?.trim() || "";
+        if (event.results[index].isFinal) finalText += `${transcript} `;
+        else interimText += `${transcript} `;
+      }
+      if (finalText.trim()) dictationTextRef.current = [dictationTextRef.current.trim(), finalText.trim()].filter(Boolean).join(" ");
+      setMessage([dictationTextRef.current.trim(), interimText.trim()].filter(Boolean).join(" "));
+    };
+    recognition.onerror = event => {
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        keepDictatingRef.current = false;
+        setDictationState("idle");
+        setNotice("Autorise le micro pour parler à Morice.");
+      } else if (event.error !== "no-speech" && event.error !== "aborted") {
+        setNotice("Le micro a rencontré un problème. Tu peux reprendre la dictée.");
+      }
+    };
+    recognition.onend = () => {
+      if (recognitionRef.current === recognition) recognitionRef.current = null;
+      if (!keepDictatingRef.current || recognitionRef.current) return;
+      restartTimerRef.current = window.setTimeout(() => {
+        restartTimerRef.current = null;
+        beginDictation(false);
+      }, 250);
+    };
+    try {
+      recognition.start();
+    } catch {
+      recognitionRef.current = null;
+      keepDictatingRef.current = false;
+      setDictationState("idle");
+      setNotice("Le micro n’a pas pu démarrer. Réessaie dans quelques secondes.");
+    }
+  }
+
+  function pauseDictation() {
+    keepDictatingRef.current = false;
+    if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
+    restartTimerRef.current = null;
+    dictationTextRef.current = message.trim();
+    recognitionRef.current?.abort();
+    setDictationState("paused");
+  }
+
+  function stopDictation() {
+    keepDictatingRef.current = false;
+    if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
+    restartTimerRef.current = null;
+    dictationTextRef.current = message.trim();
+    recognitionRef.current?.abort();
+    setDictationState("idle");
   }
 
   const nav = [
@@ -272,7 +347,7 @@ export default function MoriceApp() {
   return (
     <main className="shell">
       <aside className="sidebar">
-        <button className="brand" onClick={() => setView("home")}><img src="/morice-logo.png" alt="Logo Rottweiler Morice" /><span><b>Morice</b><small>Assistant personnel</small></span></button>
+        <button className="brand" onClick={() => setView("home")}><img src="/morice-3d.png" alt="Portrait 3D de Maurice" /><span><b>Morice</b><small>Assistant personnel</small></span></button>
         <nav>{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
         {installState !== "installed" && <button className="notify" onClick={installMorice}>Installer Morice</button>}
         <button className="notify" onClick={enableNotifications}>Activer les notifications</button>
@@ -280,17 +355,17 @@ export default function MoriceApp() {
       </aside>
 
       <section className="content">
-        <header><div><p className="eyebrow">MORICE — ESPACE PRIVÉ</p><h1>{view === "home" ? "Bonjour Alan" : nav.find(([id]) => id === view)?.[1] || "Morice"}</h1></div><img src="/icon-192.png" alt="Morice" /></header>
+        <header><div><p className="eyebrow">MORICE — ESPACE PRIVÉ</p><h1>{view === "home" ? "Bonjour Alan" : nav.find(([id]) => id === view)?.[1] || "Morice"}</h1></div><img src="/morice-3d.png" alt="Maurice" /></header>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === "home" && <>
-          <section className="hero"><div><span className="live">● Morice est prêt</span><h2>Qu’est-ce qu’on règle maintenant&nbsp;?</h2><p>Tout est désormais enregistré en ligne et disponible sur le téléphone comme sur l’ordinateur.</p><div className="actions"><button onClick={() => setView("chat")}>Écrire à Morice</button><button className="round" onClick={dictate}>⌁</button></div></div><img src="/morice-logo.png" alt="Rottweiler Morice" /></section>
+          <section className="hero"><div><span className="live">● Morice est prêt</span><h2>Qu’est-ce qu’on règle maintenant&nbsp;?</h2><p>Tout est désormais enregistré en ligne et disponible sur le téléphone comme sur l’ordinateur.</p><div className="actions"><button onClick={() => setView("chat")}>Écrire à Morice</button><button className="round voice-launch" onClick={() => { setView("chat"); beginDictation(); }} aria-label="Parler à Morice">●</button></div></div><img src="/morice-3d.png" alt="Maurice, le Rottweiler de l’application" /></section>
           <section className="stats"><button onClick={() => setView("approvals")}><small>À valider</small><b>{approvals.length}</b><span>Décisions sensibles</span></button><button onClick={() => setView("tasks")}><small>En cours</small><b>{tasks.filter(t => t.status !== "done").length}</b><span>Tâches ouvertes</span></button><button onClick={enableNotifications}><small>Notifications</small><b>✓</b><span>Test après autorisation</span></button></section>
           <div className="section-title"><div><p className="eyebrow">ESPACE DE TRAVAIL</p><h2>Mes modules</h2></div></div>
           <section className="module-grid">{modules.map(module => <button key={module.id} onClick={() => setView(moduleView(module.id))}><i>{module.content}</i><b>{module.title}</b><span>Ouvrir ce module</span></button>)}</section>
         </>}
 
-        {view === "chat" && <section className="panel chat"><p className="eyebrow">CENTRE D’ACTIONS</p><h2>Demander à Morice</h2><div className="assistant-message"><b>Donne-moi une consigne, je m’en occupe.</b><span>Je crée une tâche, mémorise une information ou place toute action sensible dans Validations avant qu’elle puisse partir.</span></div><div className="mode-row" role="group" aria-label="Type d’action"><button className={assistantMode === "auto" ? "selected" : ""} onClick={() => setAssistantMode("auto")}>Automatique</button><button className={assistantMode === "task" ? "selected" : ""} onClick={() => setAssistantMode("task")}>Tâche</button><button className={assistantMode === "memory" ? "selected" : ""} onClick={() => setAssistantMode("memory")}>Mémoire</button><button className={assistantMode === "approval" ? "selected" : ""} onClick={() => setAssistantMode("approval")}>À valider</button></div><textarea value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") askMorice(); }} placeholder="Ex. Rappelle-moi d’appeler Martin demain matin…" /><div className="examples"><button onClick={() => setMessage("Rappelle-moi d’appeler Martin demain matin")}>Créer un rappel</button><button onClick={() => setMessage("Mémorise que le dossier Morice est prioritaire")}>Mémoriser une info</button><button onClick={() => setMessage("Prépare un mail de suivi à Martin")}>Préparer une action</button></div><div className="actions"><button onClick={askMorice} disabled={!message.trim() || assistantBusy}>{assistantBusy ? "Morice agit…" : "Exécuter avec Morice"}</button><button className="round" onClick={dictate} aria-label="Dicter une demande">⌁</button></div>{assistantResult && <article className="action-result"><p className="eyebrow">ACTION TERMINÉE</p><strong>{assistantResult.action.label}</strong><h3>{assistantResult.action.title}</h3><p>{assistantResult.reply}</p><div className="actions"><button onClick={() => setView(assistantResult.action.view)}>Voir l’action</button><button className="secondary" onClick={() => speak(assistantResult.reply)}>Écouter la réponse</button></div></article>}</section>}
+        {view === "chat" && <section className="panel chat"><p className="eyebrow">CENTRE D’ACTIONS</p><h2>Demander à Morice</h2><div className="assistant-message"><b>Donne-moi une consigne, je m’en occupe.</b><span>Je crée une tâche, mémorise une information ou place toute action sensible dans Validations avant qu’elle puisse partir.</span></div><div className="mode-row" role="group" aria-label="Type d’action"><button className={assistantMode === "auto" ? "selected" : ""} onClick={() => setAssistantMode("auto")}>Automatique</button><button className={assistantMode === "task" ? "selected" : ""} onClick={() => setAssistantMode("task")}>Tâche</button><button className={assistantMode === "memory" ? "selected" : ""} onClick={() => setAssistantMode("memory")}>Mémoire</button><button className={assistantMode === "approval" ? "selected" : ""} onClick={() => setAssistantMode("approval")}>À valider</button></div><textarea value={message} onChange={event => { setMessage(event.target.value); dictationTextRef.current = event.target.value.trim(); }} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") askMorice(); }} placeholder="Ex. Rappelle-moi d’appeler Martin demain matin…" /><div className={`voice-console ${dictationState}`}><div className="voice-status"><span /><b>{dictationState === "listening" ? "Je vous écoute…" : dictationState === "paused" ? "Dictée en pause" : "Micro arrêté"}</b><small>{dictationState === "listening" ? "Parlez librement, même avec des silences." : dictationState === "paused" ? "Votre texte est conservé." : "L’envoi reste toujours manuel."}</small></div><div className="voice-buttons"><button onClick={() => beginDictation()} disabled={dictationState === "listening"}>{dictationState === "paused" ? "Reprendre" : "Démarrer"}</button><button className="secondary" onClick={pauseDictation} disabled={dictationState !== "listening"}>Pause</button><button className="secondary" onClick={stopDictation} disabled={dictationState === "idle"}>Arrêt</button><button className="send" onClick={askMorice} disabled={!message.trim() || assistantBusy}>{assistantBusy ? "Morice agit…" : "Envoyer"}</button></div></div><div className="examples"><button onClick={() => setMessage("Rappelle-moi d’appeler Martin demain matin")}>Créer un rappel</button><button onClick={() => setMessage("Mémorise que le dossier Morice est prioritaire")}>Mémoriser une info</button><button onClick={() => setMessage("Prépare un mail de suivi à Martin")}>Préparer une action</button></div>{assistantResult && <article className="action-result"><p className="eyebrow">ACTION TERMINÉE</p><strong>{assistantResult.action.label}</strong><h3>{assistantResult.action.title}</h3><p>{assistantResult.reply}</p><div className="actions"><button onClick={() => setView(assistantResult.action.view)}>Voir l’action</button><button className="secondary" onClick={() => speak(assistantResult.reply)}>Écouter la réponse</button></div></article>}</section>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
