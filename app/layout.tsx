@@ -23,9 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: "Morice",
     appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Morice" },
     icons: {
-      icon: [{ url: "/icon-192.png", type: "image/png", sizes: "192x192" }],
-      shortcut: "/icon-192.png",
-      apple: "/icon-192.png",
+      icon: [{ url: "/icon-192.png?v=maurice-3d", type: "image/png", sizes: "192x192" }],
+      shortcut: "/icon-192.png?v=maurice-3d",
+      apple: "/icon-192.png?v=maurice-3d",
     },
     openGraph: {
       title: "Morice — Assistant personnel",

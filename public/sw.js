@@ -1,4 +1,4 @@
-const MORICE_VERSION = "morice-v2";
+const MORICE_VERSION = "morice-v3-maurice";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
@@ -13,8 +13,8 @@ self.addEventListener("fetch", event => {
 self.addEventListener("push", event => {
   event.waitUntil(self.registration.showNotification("Morice", {
     body: "Notification Morice reçue. Les alertes sont correctement activées.",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
+    icon: "/icon-192.png?v=maurice-3d",
+    badge: "/icon-192.png?v=maurice-3d",
     tag: MORICE_VERSION,
     data: { url: "/" }
   }));
