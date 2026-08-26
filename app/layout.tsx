@@ -23,21 +23,21 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: "Morice",
     appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Morice" },
     icons: {
-      icon: [{ url: "/icon-192.png?v=maurice-3d", type: "image/png", sizes: "192x192" }],
-      shortcut: "/icon-192.png?v=maurice-3d",
-      apple: "/icon-192.png?v=maurice-3d",
+      icon: [{ url: "/icon-192.png?v=morice-logo-44fce869-20260823", type: "image/png", sizes: "192x192" }],
+      shortcut: "/icon-192.png?v=morice-logo-44fce869-20260823",
+      apple: "/icon-192.png?v=morice-logo-44fce869-20260823",
     },
     openGraph: {
       title: "Morice — Assistant personnel",
       description: "Votre assistant personnel privé, toujours disponible.",
-      images: [{ url: "/og.png", width: 1734, height: 907, alt: "Morice" }],
+      images: [{ url: "/og.png?v=morice-logo-44fce869-20260823", width: 1254, height: 1254, alt: "Logo officiel de Morice" }],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: "Morice — Assistant personnel",
       description: "Votre assistant personnel privé, toujours disponible.",
-      images: ["/og.png"],
+      images: ["/og.png?v=morice-logo-44fce869-20260823"],
     },
   };
 }

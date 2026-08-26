@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Item = {
   id: string;
@@ -20,7 +20,7 @@ type InstallPromptEvent = Event & {
 };
 
 type InstallState = "checking" | "available" | "manual" | "installed";
-type DictationState = "idle" | "listening" | "paused";
+type DictationState = "idle" | "listening" | "transcribing" | "ready";
 
 type AssistantAction = {
   id: string;
@@ -41,6 +41,32 @@ type ConnectionState = {
   hubspot: { configured: false; disabled: true; reason: string };
 };
 
+const MORICE_LOGO_SRC = "/morice-3d.png?v=morice-logo-44fce869-20260823";
+
+const navigation = [
+  ["home", "Accueil", "⌂"],
+  ["chat", "Nouvelle idée", "✦"],
+  ["tasks", "Tâches", "✓"],
+  ["projects", "Projets", "▰"],
+  ["memory", "Notes & mémoire", "◉"],
+  ["search", "Recherche", "⌕"],
+  ["mail", "Emails", "✉"],
+  ["clients", "Clients", "♙"],
+  ["crypto", "Crypto", "₿"],
+  ["estate", "Immobilier", "⌂"],
+  ["bmac", "B-MAC Conseil", "◆"],
+  ["house", "Maison & Maurice", "●"],
+  ["tools", "Outils", "⌁"],
+  ["settings", "Paramètres", "⚙"],
+] as const;
+
+const quickActions = [
+  ["mail", "Préparer un email", "Outlook"],
+  ["tasks", "Voir mes tâches", "Morice"],
+  ["calendar", "Consulter l’agenda", "Microsoft 365"],
+  ["documents", "Chercher un document", "OneDrive"],
+] as const;
+
 const starterModules = [
   ["chat", "Agir avec Morice", "✦"],
   ["mail", "Mail & Brouillons", "✉"],
@@ -57,11 +83,6 @@ const defaultState: State = {
   items: starterModules.map(([id, title, content], position) => ({ id, kind: "module", title, content, status: "active", priority: "normal", position })),
   settings: { digest_times: ["08:00", "13:00", "18:30"], voice_enabled: false, urgent_notifications: true },
 };
-
-function moduleView(id: string) {
-  const separator = id.lastIndexOf(":");
-  return separator >= 0 ? id.slice(separator + 1) : id;
-}
 
 function urlBase64ToUint8Array(value: string) {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -93,15 +114,19 @@ export default function MoriceApp() {
   const [connections, setConnections] = useState<ConnectionState | null>(null);
   const [executingId, setExecutingId] = useState("");
   const [dictationState, setDictationState] = useState<DictationState>("idle");
+  const [clock, setClock] = useState<Date | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const keepDictatingRef = useRef(false);
   const dictationTextRef = useRef("");
   const restartTimerRef = useRef<number | null>(null);
+  const transcriptionTimerRef = useRef<number | null>(null);
 
-  const modules = useMemo(() => state.items.filter((item) => item.kind === "module" && item.status === "active").sort((a, b) => a.position - b.position), [state]);
   const tasks = state.items.filter((item) => item.kind === "task");
   const memories = state.items.filter((item) => item.kind === "memory");
   const approvals = state.items.filter((item) => item.kind === "approval" && item.status === "pending");
+  const recentItems = state.items.filter((item) => item.kind !== "module").slice(0, 5);
+  const currentView = navigation.find(([id]) => id === view);
+  const voicePhase = assistantBusy ? "thinking" : assistantResult ? "response" : dictationState;
 
   async function refresh() {
     try {
@@ -172,7 +197,15 @@ export default function MoriceApp() {
   useEffect(() => () => {
     keepDictatingRef.current = false;
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
+    if (transcriptionTimerRef.current !== null) window.clearTimeout(transcriptionTimerRef.current);
     recognitionRef.current?.abort();
+  }, []);
+
+  useEffect(() => {
+    const updateClock = () => setClock(new Date());
+    updateClock();
+    const timer = window.setInterval(updateClock, 1_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   async function installMorice() {
@@ -275,6 +308,9 @@ export default function MoriceApp() {
     const SpeechRecognition = (window as unknown as { SpeechRecognition?: new () => SpeechRecognition; webkitSpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition;
     if (!SpeechRecognition) return setNotice("La dictée n'est pas disponible dans ce navigateur.");
     if (recognitionRef.current) return;
+    if (transcriptionTimerRef.current !== null) window.clearTimeout(transcriptionTimerRef.current);
+    transcriptionTimerRef.current = null;
+    setAssistantResult(null);
     if (resetText) dictationTextRef.current = message.trim();
     keepDictatingRef.current = true;
     setDictationState("listening");
@@ -322,50 +358,79 @@ export default function MoriceApp() {
     }
   }
 
-  function pauseDictation() {
-    keepDictatingRef.current = false;
-    if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
-    restartTimerRef.current = null;
-    dictationTextRef.current = message.trim();
-    recognitionRef.current?.abort();
-    setDictationState("paused");
-  }
-
   function stopDictation() {
+    const wasListening = dictationState === "listening";
     keepDictatingRef.current = false;
     if (restartTimerRef.current !== null) window.clearTimeout(restartTimerRef.current);
     restartTimerRef.current = null;
     dictationTextRef.current = message.trim();
     recognitionRef.current?.abort();
-    setDictationState("idle");
+    if (wasListening) {
+      setDictationState("transcribing");
+      if (transcriptionTimerRef.current !== null) window.clearTimeout(transcriptionTimerRef.current);
+      transcriptionTimerRef.current = window.setTimeout(() => {
+        transcriptionTimerRef.current = null;
+        setDictationState("ready");
+      }, 550);
+    } else if (dictationState !== "ready") {
+      setDictationState("idle");
+    }
   }
 
-  const nav = [
-    ["home", "Accueil", "⌂"], ["chat", "Morice", "✦"], ["mail", "Mail", "✉"], ["approvals", "Valider", "◆"], ["settings", "Réglages", "⚙"],
-  ];
+  function toggleDictation() {
+    if (dictationState === "listening") stopDictation();
+    else beginDictation();
+  }
+
+  const dateText = clock ? new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(clock) : "Aujourd’hui";
+  const timeText = clock ? new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(clock) : "--:--";
 
   return (
-    <main className="shell">
-      <aside className="sidebar">
-        <button className="brand" onClick={() => setView("home")}><img src="/morice-3d.png" alt="Portrait 3D de Maurice" /><span><b>Morice</b><small>Assistant personnel</small></span></button>
-        <nav>{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
-        {installState !== "installed" && <button className="notify" onClick={installMorice}>Installer Morice</button>}
-        <button className="notify" onClick={enableNotifications}>Activer les notifications</button>
-        <p className="online"><span /> {storageStatus === "online" ? "Morice en ligne" : storageStatus === "error" ? "Stockage indisponible" : "Connexion…"}</p>
+    <main className="morice-shell">
+      <aside className="morice-sidebar">
+        <button className="brand" onClick={() => setView("home")}>
+          <img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" />
+          <span><b>MORICE</b><small>Assistant personnel</small></span>
+        </button>
+        <nav className="side-navigation" aria-label="Navigation principale">
+          {navigation.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
+        </nav>
+        <div className="sidebar-footer">
+          {installState !== "installed" && <button className="outline-action" onClick={installMorice}>Installer l’application</button>}
+          <button className="outline-action" onClick={enableNotifications}>Activer les notifications</button>
+          <p className={`online ${storageStatus}`}><span /> {storageStatus === "online" ? "Données Morice en ligne" : storageStatus === "error" ? "Stockage indisponible" : "Connexion aux données…"}</p>
+        </div>
       </aside>
 
-      <section className="content">
-        <header><div><p className="eyebrow">MORICE — ESPACE PRIVÉ</p><h1>{view === "home" ? "Bonjour Alan" : nav.find(([id]) => id === view)?.[1] || "Morice"}</h1></div><img src="/morice-3d.png" alt="Maurice" /></header>
+      <section className="morice-content">
+        <header className="topbar"><div><p className="eyebrow">MORICE — ESPACE PRIVÉ D’ALAN</p><h1>{view === "home" ? "Tableau de bord" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === "home" && <>
-          <section className="hero"><div><span className="live">● Morice est prêt</span><h2>Qu’est-ce qu’on règle maintenant&nbsp;?</h2><p>Tout est désormais enregistré en ligne et disponible sur le téléphone comme sur l’ordinateur.</p><div className="actions"><button onClick={() => setView("chat")}>Écrire à Morice</button><button className="round voice-launch" onClick={() => { setView("chat"); beginDictation(); }} aria-label="Parler à Morice">●</button></div></div><img src="/morice-3d.png" alt="Maurice, le Rottweiler de l’application" /></section>
-          <section className="stats"><button onClick={() => setView("approvals")}><small>À valider</small><b>{approvals.length}</b><span>Décisions sensibles</span></button><button onClick={() => setView("tasks")}><small>En cours</small><b>{tasks.filter(t => t.status !== "done").length}</b><span>Tâches ouvertes</span></button><button onClick={enableNotifications}><small>Notifications</small><b>✓</b><span>Test après autorisation</span></button></section>
-          <div className="section-title"><div><p className="eyebrow">ESPACE DE TRAVAIL</p><h2>Mes modules</h2></div></div>
-          <section className="module-grid">{modules.map(module => <button key={module.id} onClick={() => setView(moduleView(module.id))}><i>{module.content}</i><b>{module.title}</b><span>Ouvrir ce module</span></button>)}</section>
+          <section className="welcome-card">
+            <div className="welcome-identity"><div className="portrait-wrap"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div><div><p className="eyebrow">BONJOUR ALAN</p><h2>Bienvenue dans Morice.</h2><p>Une seule interface pour comprendre, préparer, exécuter et vérifier.</p></div></div>
+            <div className="welcome-meta"><article><small>{dateText}</small><strong>{timeText}</strong><span>Heure locale</span></article><article><small>Météo</small><strong>À connecter</strong><span>Aucune donnée inventée</span></article></div>
+          </section>
+
+          <div className="dashboard-grid">
+            <div className="dashboard-main">
+              <CommandPanel message={message} setMessage={(value) => { setMessage(value); dictationTextRef.current = value.trim(); setAssistantResult(null); }} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantResult={assistantResult} assistantBusy={assistantBusy} voicePhase={voicePhase} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
+
+              <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">ACCÈS RAPIDE</p><h2>Aller à l’essentiel</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source]) => <button key={id} onClick={() => setView(id)}><i>{id === "mail" ? "✉" : id === "tasks" ? "✓" : id === "calendar" ? "□" : "⌕"}</i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
+
+              <section className="activity-panel"><div className="panel-heading"><div><p className="eyebrow">JOURNAL RÉEL</p><h2>Activité récente</h2></div><span>{recentItems.length} élément{recentItems.length > 1 ? "s" : ""}</span></div>{recentItems.length ? <div className="activity-list">{recentItems.map(item => <article key={item.id}><i>{item.kind === "task" ? "✓" : item.kind === "memory" ? "◉" : "◆"}</i><div><b>{item.title}</b><p>{item.content || (item.kind === "task" ? "Tâche enregistrée dans Morice" : "Élément enregistré dans Morice")}</p></div><span>{item.kind === "approval" ? "À valider" : item.status === "done" ? "Terminé" : "En cours"}</span></article>)}</div> : <div className="empty">Aucune activité enregistrée pour le moment.</div>}</section>
+            </div>
+
+            <aside className="context-rail">
+              <section><div className="panel-heading"><div><p className="eyebrow">AUJOURD’HUI</p><h2>Agenda</h2></div><button onClick={() => setView("calendar")}>Ouvrir</button></div><div className="empty compact">{connections?.microsoft.connected ? "Microsoft 365 est connecté. Demande à Morice de lire les prochains rendez-vous." : "Connectez Microsoft 365 pour afficher les vrais rendez-vous."}</div></section>
+              <section><div className="panel-heading"><div><p className="eyebrow">ÉTAT RÉEL</p><h2>Connexions</h2></div><button onClick={() => setView("connections")}>Détails</button></div><div className="service-list"><ServiceStatus name="OpenAI" ok={Boolean(connections?.openai.configured)} detail={connections?.openai.configured ? connections.openai.model : "À configurer"} /><ServiceStatus name="Microsoft 365" ok={Boolean(connections?.microsoft.connected)} detail={connections?.microsoft.connected ? connections.microsoft.account : "Non connecté"} /><ServiceStatus name="Make" ok={Boolean(connections?.make.configured)} detail={connections?.make.configured ? "Webhook configuré" : "À configurer"} /><ServiceStatus name="OpenClaw" ok={false} detail="Passerelle à relier au site" /></div></section>
+              <section><div className="panel-heading"><div><p className="eyebrow">CONTRÔLE HUMAIN</p><h2>À valider</h2></div><button onClick={() => setView("approvals")}>Tout voir</button></div>{approvals.length ? approvals.slice(0, 3).map(item => <button className="approval-preview" key={item.id} onClick={() => setView("approvals")}><span>◆</span><div><b>{item.title}</b><small>Action bloquée jusqu’à votre accord</small></div></button>) : <div className="empty compact">Aucune action sensible en attente.</div>}</section>
+              <section className="device-card"><p className="eyebrow">APPAREILS</p><h2>Téléphone & PC</h2><p>{installState === "installed" ? "Morice est installé sur cet appareil." : "L’application Morice est prête à être installée."}</p>{installState !== "installed" && <button onClick={installMorice}>Installer Morice</button>}<small>Z Fold 7 : l’approbation OpenClaw reste à finaliser.</small></section>
+            </aside>
+          </div>
         </>}
 
-        {view === "chat" && <section className="panel chat"><p className="eyebrow">CENTRE D’ACTIONS</p><h2>Demander à Morice</h2><div className="assistant-message"><b>Donne-moi une consigne, je m’en occupe.</b><span>Je crée une tâche, mémorise une information ou place toute action sensible dans Validations avant qu’elle puisse partir.</span></div><div className="mode-row" role="group" aria-label="Type d’action"><button className={assistantMode === "auto" ? "selected" : ""} onClick={() => setAssistantMode("auto")}>Automatique</button><button className={assistantMode === "task" ? "selected" : ""} onClick={() => setAssistantMode("task")}>Tâche</button><button className={assistantMode === "memory" ? "selected" : ""} onClick={() => setAssistantMode("memory")}>Mémoire</button><button className={assistantMode === "approval" ? "selected" : ""} onClick={() => setAssistantMode("approval")}>À valider</button></div><textarea value={message} onChange={event => { setMessage(event.target.value); dictationTextRef.current = event.target.value.trim(); }} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") askMorice(); }} placeholder="Ex. Rappelle-moi d’appeler Martin demain matin…" /><div className={`voice-console ${dictationState}`}><div className="voice-status"><span /><b>{dictationState === "listening" ? "Je vous écoute…" : dictationState === "paused" ? "Dictée en pause" : "Micro arrêté"}</b><small>{dictationState === "listening" ? "Parlez librement, même avec des silences." : dictationState === "paused" ? "Votre texte est conservé." : "L’envoi reste toujours manuel."}</small></div><div className="voice-buttons"><button onClick={() => beginDictation()} disabled={dictationState === "listening"}>{dictationState === "paused" ? "Reprendre" : "Enregistrer"}</button><button className="secondary" onClick={pauseDictation} disabled={dictationState !== "listening"}>Pause</button><button className="secondary" onClick={stopDictation} disabled={dictationState === "idle"}>Arrêt</button><button className="send" onClick={askMorice} disabled={!message.trim() || assistantBusy}>{assistantBusy ? "Morice agit…" : "Envoyer"}</button></div></div><div className="examples"><button onClick={() => setMessage("Rappelle-moi d’appeler Martin demain matin")}>Créer un rappel</button><button onClick={() => setMessage("Mémorise que le dossier Morice est prioritaire")}>Mémoriser une info</button><button onClick={() => setMessage("Prépare un mail de suivi à Martin")}>Préparer une action</button></div>{assistantResult && <article className="action-result"><p className="eyebrow">ACTION TERMINÉE</p><strong>{assistantResult.action.label}</strong><h3>{assistantResult.action.title}</h3><p>{assistantResult.reply}</p><div className="actions"><button onClick={() => setView(assistantResult.action.view)}>Voir l’action</button><button className="secondary" onClick={() => speak(assistantResult.reply)}>Écouter la réponse</button></div></article>}</section>}
+        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={(value) => { setMessage(value); dictationTextRef.current = value.trim(); setAssistantResult(null); }} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantResult={assistantResult} assistantBusy={assistantBusy} voicePhase={voicePhase} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} /></div>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
@@ -376,11 +441,53 @@ export default function MoriceApp() {
         {view === "calendar" && <InfoPanel title="Agenda" text="Morice peut consulter les rendez-vous Outlook. Toute création ou modification d’événement passe d’abord par Validations." />}
         {view === "documents" && <InfoPanel title="Documents & OneDrive" text="Morice peut rechercher des documents OneDrive après la connexion Microsoft 365, sans exposer les jetons d’accès." />}
         {view === "connections" && <ConnectionsPanel state={connections} refresh={refreshConnections} disconnectMicrosoft={disconnectMicrosoft} />}
+        {view === "projects" && <InfoPanel title="Projets" text="L’espace projets est prêt. Il n’affichera que des projets réellement enregistrés ou connectés." />}
+        {view === "search" && <InfoPanel title="Recherche" text="La recherche unifiée sera branchée sur les sources autorisées. Aucune source n’est simulée." />}
+        {view === "clients" && <InfoPanel title="Clients" text="Aucun accès HubSpot direct n’est disponible. Ce module attendra une passerelle professionnelle autorisée." />}
+        {view === "crypto" && <InfoPanel title="Crypto" text="Le module reste en lecture et surveillance uniquement tant qu’aucune source de marché n’est connectée. Aucune action sur Ledger n’est autorisée." />}
+        {view === "estate" && <InfoPanel title="Immobilier" text="Espace prévu pour les dossiers, échéances, documents et suivis immobiliers réellement enregistrés." />}
+        {view === "bmac" && <InfoPanel title="B-MAC Conseil" text="Espace professionnel prêt à recevoir les données et outils explicitement autorisés." />}
+        {view === "house" && <InfoPanel title="Maison & Maurice" text="La domotique et le suivi de Maurice seront affichés ici après connexion vérifiée des appareils." />}
+        {view === "tools" && <InfoPanel title="Outils" text="Les outils apparaîtront ici seulement après installation et test réel de leur connexion." />}
       </section>
 
-      <nav className="bottom">{nav.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i>{label}</button>)}</nav>
+      <nav className="mobile-navigation" aria-label="Navigation mobile"><button className={view === "home" ? "active" : ""} onClick={() => setView("home")}><i>⌂</i><span>Accueil</span></button><button className={view === "tasks" ? "active" : ""} onClick={() => setView("tasks")}><i>✓</i><span>Tâches</span></button><button className={`mobile-mic ${dictationState === "listening" ? "listening" : ""}`} onClick={() => { setView("home"); toggleDictation(); }} aria-label={dictationState === "listening" ? "Arrêter l’écoute" : "Parler à Morice"}><i>{dictationState === "listening" ? "■" : "●"}</i><span>{dictationState === "listening" ? "Arrêter" : "Parler"}</span></button><button className={view === "approvals" ? "active" : ""} onClick={() => setView("approvals")}><i>◆</i><span>Valider</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><button className={view === "settings" ? "active" : ""} onClick={() => setView("settings")}><i>⚙</i><span>Réglages</span></button></nav>
     </main>
   );
+}
+
+function CommandPanel({ message, setMessage, assistantMode, setAssistantMode, assistantResult, assistantBusy, voicePhase, onMic, onSend, onOpenAction, onSpeak }: {
+  message: string;
+  setMessage: (value: string) => void;
+  assistantMode: string;
+  setAssistantMode: (value: string) => void;
+  assistantResult: AssistantResult | null;
+  assistantBusy: boolean;
+  voicePhase: DictationState | "thinking" | "response";
+  onMic: () => void;
+  onSend: () => void;
+  onOpenAction: (view: string) => void;
+  onSpeak: (text: string) => void;
+}) {
+  const listening = voicePhase === "listening";
+  const phaseLabel = voicePhase === "listening" ? "Écoute…" : voicePhase === "transcribing" ? "Transcription…" : voicePhase === "thinking" ? "Morice réfléchit…" : voicePhase === "response" ? "Réponse" : voicePhase === "ready" ? "Transcription prête" : "Prêt à vous écouter";
+  const phaseDetail = voicePhase === "listening" ? "Cliquez une seconde fois sur le micro pour arrêter." : voicePhase === "transcribing" ? "Votre voix est transformée en texte." : voicePhase === "thinking" ? "Analyse de la demande et choix de l’action utile." : voicePhase === "response" ? "Le résultat est affiché et enregistré quand nécessaire." : voicePhase === "ready" ? "Relisez le texte puis envoyez-le à Morice." : "Un clic démarre l’écoute. Aucun maintien appuyé.";
+
+  return <section className="command-panel">
+    <div className="command-heading"><div><span className="command-mark">✦</span><div><p className="eyebrow">CENTRE DE COMMANDE</p><h2>Parler à Morice</h2><p>Dites ce que vous voulez faire. Morice choisit le bon chemin et vous montre le résultat.</p></div></div><span className="auto-route">Routage automatique</span></div>
+    <div className={`voice-progress ${voicePhase}`}><div className="voice-indicator"><span /><span /><span /><span /></div><div><b>{phaseLabel}</b><small>{phaseDetail}</small></div></div>
+    <textarea value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") onSend(); }} placeholder={'Ex. « Prépare un brouillon pour mon client », « Ajoute une tâche », « Cherche mon document »…'} />
+    <div className="command-actions">
+      <div className="mode-row" role="group" aria-label="Type d’action"><button className={assistantMode === "auto" ? "selected" : ""} onClick={() => setAssistantMode("auto")}>Automatique</button><button className={assistantMode === "task" ? "selected" : ""} onClick={() => setAssistantMode("task")}>Tâche</button><button className={assistantMode === "memory" ? "selected" : ""} onClick={() => setAssistantMode("memory")}>Mémoire</button><button className={assistantMode === "approval" ? "selected" : ""} onClick={() => setAssistantMode("approval")}>À valider</button></div>
+      <div className="primary-controls"><button className={`main-mic ${listening ? "listening" : ""}`} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span>{listening ? "■" : "●"}</span></button><button className="send-command" onClick={onSend} disabled={!message.trim() || assistantBusy}>{assistantBusy ? "Morice agit…" : "Envoyer"}</button></div>
+    </div>
+    <div className="examples"><button onClick={() => setMessage("Rappelle-moi d’appeler Martin demain matin")}>Créer un rappel</button><button onClick={() => setMessage("Mémorise que le dossier Morice est prioritaire")}>Mémoriser une information</button><button onClick={() => setMessage("Prépare un mail de suivi à Martin")}>Préparer un email</button></div>
+    {assistantResult && <article className="action-result"><p className="eyebrow">RÉSULTAT DE MORICE</p><strong>{assistantResult.action.label}</strong><h3>{assistantResult.action.title}</h3><p>{assistantResult.reply}</p><div className="actions"><button onClick={() => onOpenAction(assistantResult.action.view)}>Voir le résultat</button><button className="secondary" onClick={() => onSpeak(assistantResult.reply)}>Écouter la réponse</button></div></article>}
+  </section>;
+}
+
+function ServiceStatus({ name, ok, detail }: { name: string; ok: boolean; detail: string }) {
+  return <article><span className={ok ? "status-dot ok" : "status-dot"} /><div><b>{name}</b><small>{detail}</small></div><em>{ok ? "Actif" : "Attente"}</em></article>;
 }
 
 function InfoPanel({ title, text }: { title: string; text: string }) {
