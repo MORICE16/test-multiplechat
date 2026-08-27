@@ -57,6 +57,10 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(page, /B-MAC Conseil/);
   assert.match(page, /Maison & Maurice/);
   assert.match(page, /HubSpot indisponible/);
+  for (const asset of ["hubspot.svg", "outlook.svg", "todo.svg", "samsung-notes.png", "bitcoin.svg"]) {
+    assert.ok((await readFile(new URL(`public/brand-icons/${asset}`, root))).byteLength > 500, `${asset} doit être un vrai visuel local`);
+    assert.match(page, new RegExp(`/brand-icons/${asset.replace(".", "\\.")}`));
+  }
   assert.match(await readFile(new URL("app/api/state/route.ts", root), "utf8"), /`\$\{uid\}:\$\{id\}`/);
   assert.match(serviceWorker, /showNotification\("Morice"/);
   assert.match(serviceWorker, /addEventListener\("fetch"/);

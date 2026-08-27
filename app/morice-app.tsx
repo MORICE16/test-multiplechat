@@ -34,6 +34,8 @@ type AssistantAction = {
 
 type AssistantResult = { reply: string; action: AssistantAction };
 
+type BrandIconName = "hubspot" | "outlook" | "todo" | "notes" | "onedrive" | "bitcoin";
+
 type ConnectionState = {
   openai: { configured: boolean; model: string };
   microsoft: { configured: boolean; connected: boolean; account: string };
@@ -60,11 +62,20 @@ const navigation = [
   ["settings", "Paramètres", "⚙"],
 ] as const;
 
+const brandIcons: Record<BrandIconName, string> = {
+  hubspot: "/brand-icons/hubspot.svg",
+  outlook: "/brand-icons/outlook.svg",
+  todo: "/brand-icons/todo.svg",
+  notes: "/brand-icons/samsung-notes.png",
+  onedrive: "/brand-icons/onedrive.svg",
+  bitcoin: "/brand-icons/bitcoin.svg",
+};
+
 const quickActions = [
-  ["mail", "Préparer un email", "Outlook"],
-  ["tasks", "Voir mes tâches", "Morice"],
-  ["calendar", "Consulter l’agenda", "Microsoft 365"],
-  ["documents", "Chercher un document", "OneDrive"],
+  ["hubspot", "Devis clients", "HubSpot · non connecté", "hubspot"],
+  ["mail", "Ma boîte mail", "Outlook", "outlook"],
+  ["tasks", "Mes tâches", "Microsoft To Do", "todo"],
+  ["memory", "Notes rapides", "Samsung Notes · raccourci", "notes"],
 ] as const;
 
 const starterModules = [
@@ -393,7 +404,7 @@ export default function MoriceApp() {
           <span><b>MORICE</b><small>Assistant personnel</small></span>
         </button>
         <nav className="side-navigation" aria-label="Navigation principale">
-          {navigation.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i>{icon}</i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
+          {navigation.map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
         </nav>
         <div className="sidebar-footer">
           {installState !== "installed" && <button className="outline-action" onClick={installMorice}>Installer l’application</button>}
@@ -416,15 +427,15 @@ export default function MoriceApp() {
 
               <CommandPanel message={message} setMessage={(value) => { setMessage(value); dictationTextRef.current = value.trim(); setAssistantResult(null); }} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantResult={assistantResult} assistantBusy={assistantBusy} voicePhase={voicePhase} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
 
-              <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">RACCOURCIS</p><h2>Accès rapide</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source]) => <button key={id} onClick={() => setView(id)}><i>{id === "mail" ? "✉" : id === "tasks" ? "✓" : id === "calendar" ? "□" : "⌕"}</i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
+              <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">RACCOURCIS</p><h2>Accès rapide</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source, brand]) => <button key={id} className={`quick-${brand}`} onClick={() => setView(id)}><i><BrandIcon name={brand} /></i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
 
-              <section className="activity-panel"><div className="panel-heading"><div><p className="eyebrow">JOURNAL RÉEL</p><h2>Activité récente</h2></div><span>{recentItems.length} élément{recentItems.length > 1 ? "s" : ""}</span></div>{recentItems.length ? <div className="activity-list">{recentItems.map(item => <article key={item.id}><i>{item.kind === "task" ? "✓" : item.kind === "memory" ? "◉" : "◆"}</i><div><b>{item.title}</b><p>{item.content || (item.kind === "task" ? "Tâche enregistrée dans Morice" : "Élément enregistré dans Morice")}</p></div><span>{item.kind === "approval" ? "À valider" : item.status === "done" ? "Terminé" : "En cours"}</span></article>)}</div> : <div className="empty">Aucune activité enregistrée pour le moment.</div>}</section>
+              <section className="activity-panel"><div className="panel-heading"><div><p className="eyebrow">JOURNAL RÉEL</p><h2>Activité récente</h2></div><span>{recentItems.length} élément{recentItems.length > 1 ? "s" : ""}</span></div>{recentItems.length ? <div className="activity-list">{recentItems.map(item => <article className={`activity-${item.kind}`} key={item.id}><i>{item.kind === "task" ? "✓" : item.kind === "memory" ? "◉" : "◆"}</i><div><b>{item.title}</b><p>{item.content || (item.kind === "task" ? "Tâche enregistrée dans Morice" : "Élément enregistré dans Morice")}</p></div><span>{item.kind === "approval" ? "À valider" : item.status === "done" ? "Terminé" : "En cours"}</span></article>)}</div> : <div className="empty">Aucune activité enregistrée pour le moment.</div>}</section>
             </div>
 
             <aside className="context-rail">
               <section className="agenda-card"><div className="panel-heading"><div><p className="eyebrow">AUJOURD’HUI</p><h2>Mon agenda</h2></div><button onClick={() => setView("calendar")}>Voir tout</button></div><div className="empty compact">{connections?.microsoft.connected ? "Microsoft 365 est connecté. Demandez à Morice d’afficher les vrais rendez-vous." : "Connectez Microsoft 365 pour afficher les vrais rendez-vous."}</div></section>
               <section className="device-card"><div className="panel-heading"><div><p className="eyebrow">ÉTAT RÉEL</p><h2>Mes appareils</h2></div><button onClick={() => setView("settings")}>Voir</button></div><div className="device-list"><article><span>▣</span><div><b>Cet appareil</b><small>{installState === "installed" ? "Application Morice installée" : "Installation disponible"}</small></div><em className={installState === "installed" ? "ok" : ""}>{installState === "installed" ? "Installé" : "À installer"}</em></article><article><span>▯</span><div><b>Z Fold 7</b><small>OpenClaw à finaliser</small></div><em>En attente</em></article></div>{installState !== "installed" && <button onClick={installMorice}>Installer Morice</button>}</section>
-              <section className="shortcut-card"><div className="panel-heading"><div><p className="eyebrow">NAVIGATION</p><h2>Raccourcis</h2></div></div><div className="shortcut-list"><button onClick={() => setView("bmac")}><span>◆</span><b>B-MAC Conseil</b><em>›</em></button><button onClick={() => setView("crypto")}><span>₿</span><b>Suivi crypto</b><em>›</em></button><button onClick={() => setView("house")}><span>●</span><b>Maison & Maurice</b><em>›</em></button><button onClick={() => setView("approvals")}><span>✓</span><b>Validations</b><em>{approvals.length || "›"}</em></button></div></section>
+              <section className="shortcut-card"><div className="panel-heading"><div><p className="eyebrow">NAVIGATION</p><h2>Raccourcis</h2></div></div><div className="shortcut-list"><button className="shortcut-bmac" onClick={() => setView("bmac")}><span>◆</span><b>B-MAC Conseil</b><em>›</em></button><button className="shortcut-crypto" onClick={() => setView("crypto")}><span><BrandIcon name="bitcoin" /></span><b>Suivi crypto</b><em>›</em></button><button className="shortcut-house" onClick={() => setView("house")}><span>●</span><b>Maison & Maurice</b><em>›</em></button><button className="shortcut-approval" onClick={() => setView("approvals")}><span>✓</span><b>Validations</b><em>{approvals.length || "›"}</em></button></div></section>
               <section className="connection-card"><div className="panel-heading"><div><p className="eyebrow">SERVICES</p><h2>Connexions</h2></div><button onClick={() => setView("connections")}>Détails</button></div><div className="service-list"><ServiceStatus name="OpenAI" ok={Boolean(connections?.openai.configured)} detail={connections?.openai.configured ? connections.openai.model : "À configurer"} /><ServiceStatus name="Microsoft 365" ok={Boolean(connections?.microsoft.connected)} detail={connections?.microsoft.connected ? connections.microsoft.account : "Non connecté"} /><ServiceStatus name="Make" ok={Boolean(connections?.make.configured)} detail={connections?.make.configured ? "Webhook configuré" : "À configurer"} /><ServiceStatus name="OpenClaw" ok={false} detail="Passerelle à relier au site" /></div></section>
             </aside>
           </div>
@@ -454,6 +465,22 @@ export default function MoriceApp() {
       <nav className="mobile-navigation" aria-label="Navigation mobile"><button className={view === "home" ? "active" : ""} onClick={() => setView("home")}><i>⌂</i><span>Accueil</span></button><button className={view === "tasks" ? "active" : ""} onClick={() => setView("tasks")}><i>✓</i><span>Tâches</span></button><button className={`mobile-mic ${dictationState === "listening" ? "listening" : ""}`} onClick={() => { setView("home"); toggleDictation(); }} aria-label={dictationState === "listening" ? "Arrêter l’écoute" : "Parler à Morice"}><i>{dictationState === "listening" ? "■" : "●"}</i><span>{dictationState === "listening" ? "Arrêter" : "Parler"}</span></button><button className={view === "approvals" ? "active" : ""} onClick={() => setView("approvals")}><i>◆</i><span>Valider</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><button className={view === "settings" ? "active" : ""} onClick={() => setView("settings")}><i>⚙</i><span>Réglages</span></button></nav>
     </main>
   );
+}
+
+function BrandIcon({ name }: { name: BrandIconName }) {
+  return <img className={`brand-icon brand-${name}`} src={brandIcons[name]} alt="" aria-hidden="true" />;
+}
+
+function NavigationIcon({ id, fallback }: { id: string; fallback: string }) {
+  const branded: Partial<Record<string, BrandIconName>> = {
+    mail: "outlook",
+    tasks: "todo",
+    memory: "notes",
+    clients: "hubspot",
+    crypto: "bitcoin",
+  };
+  const brand = branded[id];
+  return brand ? <BrandIcon name={brand} /> : <>{fallback}</>;
 }
 
 function CommandPanel({ message, setMessage, assistantMode, setAssistantMode, assistantResult, assistantBusy, voicePhase, onMic, onSend, onOpenAction, onSpeak }: {
