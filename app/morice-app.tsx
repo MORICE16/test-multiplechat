@@ -327,6 +327,7 @@ export default function MoriceApp() {
     setDictationState("listening");
 
     const recognition = new SpeechRecognition();
+    const recognitionBase = dictationTextRef.current.trim();
     recognitionRef.current = recognition;
     recognition.lang = "fr-FR";
     recognition.continuous = true;
@@ -334,13 +335,14 @@ export default function MoriceApp() {
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalText = "";
       let interimText = "";
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      for (let index = 0; index < event.results.length; index += 1) {
         const transcript = event.results[index][0]?.transcript?.trim() || "";
         if (event.results[index].isFinal) finalText += `${transcript} `;
         else interimText += `${transcript} `;
       }
-      if (finalText.trim()) dictationTextRef.current = [dictationTextRef.current.trim(), finalText.trim()].filter(Boolean).join(" ");
-      setMessage([dictationTextRef.current.trim(), interimText.trim()].filter(Boolean).join(" "));
+      const committedText = [recognitionBase, finalText.trim()].filter(Boolean).join(" ");
+      dictationTextRef.current = committedText;
+      setMessage([committedText, interimText.trim()].filter(Boolean).join(" "));
     };
     recognition.onerror = event => {
       if (event.error === "not-allowed" || event.error === "service-not-allowed") {
