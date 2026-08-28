@@ -28,7 +28,8 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(page, /Aucun rechargement de la page n’est nécessaire/);
   assert.match(page, /"Envoyer"/);
   assert.match(page, /Un clic démarre l’écoute\. Aucun maintien appuyé/);
-  assert.match(page, /recognition\.continuous = true/);
+  assert.match(page, /recognition\.continuous = false/);
+  assert.match(page, /function mergeSpeechSegments/);
   assert.match(page, /recognition\.interimResults = true/);
   assert.match(page, /function stopDictation/);
   assert.match(page, /function toggleDictation/);

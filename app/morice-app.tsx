@@ -101,6 +101,29 @@ function urlBase64ToUint8Array(value: string) {
   return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
 }
 
+function mergeSpeechSegments(segments: string[]) {
+  return segments.reduce((merged, segment) => {
+    const next = segment.trim().replace(/\s+/g, " ");
+    if (!next) return merged;
+    if (!merged) return next;
+
+    const mergedLower = merged.toLocaleLowerCase("fr-FR");
+    const nextLower = next.toLocaleLowerCase("fr-FR");
+    if (nextLower === mergedLower || mergedLower.endsWith(` ${nextLower}`)) return merged;
+    if (nextLower.startsWith(mergedLower)) return next;
+
+    const previousWords = merged.split(" ");
+    const nextWords = next.split(" ");
+    const maxOverlap = Math.min(previousWords.length, nextWords.length);
+    for (let overlap = maxOverlap; overlap > 0; overlap -= 1) {
+      const previousEnd = previousWords.slice(-overlap).join(" ").toLocaleLowerCase("fr-FR");
+      const nextStart = nextWords.slice(0, overlap).join(" ").toLocaleLowerCase("fr-FR");
+      if (previousEnd === nextStart) return [...previousWords, ...nextWords.slice(overlap)].join(" ");
+    }
+    return `${merged} ${next}`;
+  }, "");
+}
+
 async function api(path: string, init?: RequestInit) {
   const response = await fetch(path, { headers: { "Content-Type": "application/json", ...(init?.headers || {}) }, ...init });
   const payload = await response.json();
@@ -330,19 +353,21 @@ export default function MoriceApp() {
     const recognitionBase = dictationTextRef.current.trim();
     recognitionRef.current = recognition;
     recognition.lang = "fr-FR";
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalText = "";
-      let interimText = "";
+      const finalSegments: string[] = [];
+      const interimSegments: string[] = [];
       for (let index = 0; index < event.results.length; index += 1) {
         const transcript = event.results[index][0]?.transcript?.trim() || "";
-        if (event.results[index].isFinal) finalText += `${transcript} `;
-        else interimText += `${transcript} `;
+        if (event.results[index].isFinal) finalSegments.push(transcript);
+        else interimSegments.push(transcript);
       }
-      const committedText = [recognitionBase, finalText.trim()].filter(Boolean).join(" ");
+      const finalText = mergeSpeechSegments(finalSegments);
+      const interimText = mergeSpeechSegments(interimSegments);
+      const committedText = mergeSpeechSegments([recognitionBase, finalText]);
       dictationTextRef.current = committedText;
-      setMessage([committedText, interimText.trim()].filter(Boolean).join(" "));
+      setMessage(mergeSpeechSegments([committedText, interimText]));
     };
     recognition.onerror = event => {
       if (event.error === "not-allowed" || event.error === "service-not-allowed") {
@@ -355,11 +380,9 @@ export default function MoriceApp() {
     };
     recognition.onend = () => {
       if (recognitionRef.current === recognition) recognitionRef.current = null;
-      if (!keepDictatingRef.current || recognitionRef.current) return;
-      restartTimerRef.current = window.setTimeout(() => {
-        restartTimerRef.current = null;
-        beginDictation(false);
-      }, 250);
+      if (!keepDictatingRef.current) return;
+      keepDictatingRef.current = false;
+      setDictationState("ready");
     };
     try {
       recognition.start();

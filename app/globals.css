@@ -98,4 +98,12 @@ body{background:radial-gradient(circle at 18% -5%,rgba(209,138,73,.14),transpare
 .activity-list article{border-left-width:2px}.activity-list .activity-task{border-left-color:#399cf4}.activity-list .activity-task i{background:rgba(35,126,214,.18);color:#62b2fb}.activity-list .activity-memory{border-left-color:#ef4e58}.activity-list .activity-memory i{background:rgba(239,78,88,.16);color:#ff7a82}.activity-list .activity-approval{border-left-color:#9b72ef}.activity-list .activity-approval i{background:rgba(142,103,222,.17);color:#c3a5ff}
 .device-list article:first-child>span{background:rgba(26,132,240,.16);color:#52adff}.device-list article:nth-child(2)>span{background:rgba(44,190,167,.14);color:#5bd8bd}.shortcut-bmac>span{background:rgba(55,132,229,.16)!important;color:#65aef4!important}.shortcut-crypto>span{padding:4px;background:rgba(247,147,26,.13)!important}.shortcut-house>span{background:rgba(47,193,151,.14)!important;color:#61d3ad!important}.shortcut-approval>span{background:rgba(159,109,230,.16)!important;color:#c7a6ff!important}.shortcut-list button:hover{transform:translateX(2px)}
 .service-list article:nth-child(1) .status-dot.ok{background:#37d39c;box-shadow:0 0 10px rgba(55,211,156,.8)}.service-list article:nth-child(2) .status-dot.ok{background:#1689f8;box-shadow:0 0 10px rgba(22,137,248,.75)}.service-list article:nth-child(3) .status-dot.ok{background:#8c62e8;box-shadow:0 0 10px rgba(140,98,232,.72)}
+
+/* Le journal reste dans la largeur réelle du Fold, même avec un texte très long. */
+html,body{max-width:100%;overflow-x:hidden}
+.activity-list{grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%}
+.activity-list article{width:100%;min-width:0;max-width:100%;overflow:hidden}
+.activity-list article>div{min-width:0;max-width:100%;overflow:hidden}
+.activity-list b,.activity-list p{max-width:100%}
+.activity-list article>span{flex:none}
 .mobile-navigation button:nth-child(2) i{color:#55aef6}.mobile-navigation button:nth-child(4) i{color:#b48af2}.mobile-navigation button:nth-child(5) i{color:#e3a160}
