@@ -42,6 +42,7 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.deepEqual(logo, portrait);
   assert.deepEqual(socialPreview, portrait);
   assert.match(layout, /og\.png\?v=morice-logo-44fce869-20260823/);
+  assert.match(layout, /rel="manifest" href="\/manifest\.webmanifest" crossOrigin="use-credentials"/);
   assert.match(assistantRoute, /api\.openai\.com\/v1\/responses/);
   assert.match(assistantRoute, /json_schema/);
   assert.match(assistantRoute, /Validation demandée/);
