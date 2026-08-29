@@ -7,8 +7,7 @@ const scopes = [
   "offline_access",
   "User.Read",
   "Mail.ReadWrite",
-  "Mail.Send",
-  "Calendars.ReadWrite",
+  "Calendars.Read",
   "Tasks.ReadWrite",
   "Files.Read",
 ].join(" ");
