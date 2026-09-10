@@ -41,3 +41,17 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+
+# Local credentials and private data
+tokens
+tokens.*
+credentials
+credentials.*
+passwords
+passwords.*
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
