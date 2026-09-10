@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase,
     title: "Morice — Assistant personnel",
     description: "L'espace personnel de Morice : tâches, mémoire, validations, connexions et notifications.",
+    manifest: "/manifest.webmanifest",
     applicationName: "Morice",
     appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Morice" },
     icons: {
@@ -42,5 +43,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="fr"><head><link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials" /></head><body>{children}</body></html>;
+  return <html lang="fr"><body>{children}</body></html>;
 }

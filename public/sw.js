@@ -1,4 +1,4 @@
-const MORICE_VERSION = "morice-v4-logo-20260823";
+const MORICE_VERSION = "morice-v5-conversation-20260910";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));

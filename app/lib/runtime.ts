@@ -1,7 +1,10 @@
 import { env } from "cloudflare:workers";
+import { requestUserId } from "./identity";
 
 export function userId(request: Request) {
-  return request.headers.get("oai-authenticated-user-id") || "alan";
+  const id = requestUserId(request, import.meta.env.DEV);
+  if (!id) throw new Error("Authentification requise.");
+  return id;
 }
 
 export function runtimeValue(name: string) {

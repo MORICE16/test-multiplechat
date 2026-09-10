@@ -31,6 +31,8 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+.dev.vars*
+*.log
 
 # vercel
 .vercel
@@ -39,3 +41,24 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+
+# Local credentials and private data
+tokens
+tokens.*
+credentials
+credentials.*
+passwords
+passwords.*
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+
+# Preserved archival copies and local aggregate export
+/morice/
+/morice-source.txt
+*.tsbuildinfo
+# npm lockfile preserved locally; pnpm-lock.yaml is the canonical source lock
+/package-lock.json
