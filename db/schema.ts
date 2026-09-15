@@ -1,4 +1,4 @@
-import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const items = sqliteTable("morice_items", {
   id: text("id").primaryKey(), userId: text("user_id").notNull(), kind: text("kind").notNull(), title: text("title").notNull(), content: text("content").notNull().default(""), status: text("status").notNull().default("open"), priority: text("priority").notNull().default("normal"), position: integer("position").notNull().default(0), createdAt: text("created_at").notNull(), updatedAt: text("updated_at").notNull(),
@@ -27,3 +27,12 @@ export const actionPayloads = sqliteTable("morice_action_payloads", {
   createdAt: text("created_at").notNull(),
   executedAt: text("executed_at"),
 });
+
+export const messages = sqliteTable("morice_messages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
+  role: text("role").notNull(),
+  text: text("text").notNull(),
+  action: text("action").notNull().default(""),
+  createdAt: text("created_at").notNull(),
+}, table => [index("idx_morice_messages_user_id").on(table.userId, table.id)]);

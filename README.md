@@ -1,135 +1,140 @@
-# Morice — sources
+# Morice — version du 16 septembre 2026
 
-Export du projet local MoriceOnline du 7 septembre 2026, y compris les modifications
-locales non commitées. Ce ZIP n'est pas une sauvegarde des données de production et
-ne garantit pas que chaque fichier correspond à la dernière version publiée.
+## Fiabilité et continuité de conversation
 
-L'application utilise React 19, TypeScript, Vinext/Vite, Tailwind et les API
-Cloudflare Workers avec une base D1. Ce n'est pas une simple application React
-statique : son serveur et ses migrations sont inclus.
+- Les échanges réussis sont sauvegardés dans D1 et restaurés après rechargement
+  sur les appareils du même compte. L’interface charge les 40 derniers messages ;
+  le modèle reçoit au plus 16 messages récents et 30 mémoires (16 000 caractères).
+- Les mémoires enregistrées servent de contexte, pas d’autorisation d’exécution.
+  Les tâches et actions restent pilotées par les contrôles côté serveur.
+- Une perte de réponse externe classe l’action « Résultat à vérifier » et bloque
+  sa relance. Seul un échec certain avant envoi ou un refus HTTP explicite peut
+  rendre une action à nouveau validable. Une confirmation perdue en base laisse
+  l’action verrouillée et visible, sans relance automatique.
+- Les validations affichent les paramètres exacts et le résultat enregistré.
+  Outlook/Make peuvent accepter une demande sans avoir terminé son traitement ;
+  l’interface distingue cette acceptation du résultat final.
+- Connexions permet de vérifier la lecture Microsoft directement, sans dépendre
+  de l’analyse IA. Cette vérification ne crée aucun objet externe.
+- La migration additive `0002_conversation_history.sql` crée seulement l’historique.
+  Les deux migrations déployées précédemment restent inchangées.
+- Les tests backend utilisent les vraies routes et une base SQLite, avec des
+  réponses fournisseurs simulées : concurrence, isolation, panne réseau,
+  confirmation perdue, historique et absence d’action sur erreur IA.
 
-## Démarrage local
+Références d’implémentation : [Responses et historique](https://developers.openai.com/api/docs/guides/text),
+[acceptation Outlook](https://learn.microsoft.com/en-us/graph/api/user-sendmail?view=graph-rest-1.0),
+[API OpenClaw](https://docs.openclaw.ai/gateway/openresponses-http-api).
 
-Prérequis : Node.js 22.13 ou supérieur (le contrôle des sources a utilisé Node.js 24),
-npm, et un accès Internet pour télécharger les dépendances. Décompresser le ZIP,
-puis ouvrir un terminal dans le dossier `morice`, qui contient `package.json`.
+Les tests historiques ci-dessous décrivent la campagne du 10 septembre.
 
-```bash
-npm install
-npm run dev
+Projet applicatif réel : `C:\Users\alan_\Documents\morice`. React 19, TypeScript,
+Vinext/Vite, Tailwind et Cloudflare Workers/D1. L’interface conserve le logo
+rottweiler original et l’identité sombre et orange.
+
+## Développement
+
+Node.js 22.13 ou supérieur et **pnpm 11.19.0**. Le dépôt d’origine suit
+`pnpm-lock.yaml` et `pnpm-workspace.yaml` ; `packageManager` fixe cette version.
+Le verrou npm de l’installation précédente est sauvegardé hors du projet actif.
+Les dépendances applicatives n’ont pas été changées par cette révision.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev --port 3431
 ```
 
-Le script `predev` applique automatiquement les migrations SQL à la base D1
-**locale**, puis lance Vinext. Ouvrir l'adresse Local affichée dans le terminal
-(généralement `http://localhost:5173`). Arrêter avec Ctrl+C.
+Le démarrage applique les migrations à D1 **localement**. Le serveur est limité
+à la boucle locale et conserve son état dans `.wrangler/`. Le moteur Cloudflare
+de développement est nécessaire ; un serveur Node sans bindings ne suffit pas.
+Les anciennes copies `morice/` et `morice/morice/` restent sur disque, exclues
+de Git, TypeScript, ESLint et de la détection des classes CSS.
 
-Aucun compte Cloudflare ni aucune clé API n'est nécessaire pour ouvrir l'interface
-et utiliser son stockage local. Les services externes restent non configurés sans
-vos propres identifiants. La base locale est conservée dans `.wrangler/` ; elle est
-neuve et ne contient aucun e-mail, jeton OAuth ou historique du site en ligne.
-
-Le projet original emploie pnpm : son `pnpm-lock.yaml` et sa configuration sont
-conservés. Un `package-lock.json`, s'il est présent, correspond à la résolution npm
-testée pour cet export. Éviter d'alterner les gestionnaires dans la même installation.
-
-## Variables d'environnement — facultatif
-
-Le modèle `.env.example` contient uniquement les noms des variables, des valeurs
-publiques de configuration et des champs vides. Pour le serveur Cloudflare local,
-copier ce fichier vers `.dev.vars`, puis renseigner uniquement les services souhaités.
-
-PowerShell :
-
-```powershell
-Copy-Item .env.example .dev.vars
+```sh
+pnpm run cf:types
+pnpm run typecheck
+pnpm run lint
+pnpm test
 ```
 
-macOS / Linux :
+`pnpm test` compile puis exécute les tests ; `pnpm run test:unit` lance seulement
+les tests. Les types Cloudflare sont générés dans `worker-configuration.d.ts`
+depuis `wrangler.types.jsonc`, une configuration sans variables applicatives.
 
-```bash
-cp .env.example .dev.vars
-```
+## Interface et dictée
 
-Redémarrer le serveur après modification. Ne jamais mettre ces secrets dans les
-composants React, le dossier `public`, ou des variables `VITE_*` / `NEXT_PUBLIC_*`.
-`.dev.vars` et les fichiers `.env` privés sont ignorés par Git.
+Accueil, conversation, messages, navigation ordinateur/mobile et bouton
+Dicter/Arrêter ont été repris. L’historique de conversation affiché vit dans
+la session de la page ; ce n’est pas une mémoire conversationnelle persistante.
 
-| Variable | Usage |
-| --- | --- |
-| `OPENAI_API_KEY` | Appels serveur à l'API OpenAI. |
-| `OPENAI_MODEL` | Modèle demandé par le code actuel ; à adapter aux modèles accessibles à votre compte. |
-| `MORICE_ENCRYPTION_KEY` | Clé AES-GCM de 32 octets en base64 pour chiffrer les jetons Microsoft en base. |
-| `MICROSOFT_CLIENT_ID` | Identifiant de votre propre application Microsoft. |
-| `MICROSOFT_CLIENT_SECRET` | Secret serveur de cette application. |
-| `MICROSOFT_TENANT_ID` | `common` par défaut dans les sources. |
-| `MAKE_WEBHOOK_URL` | Webhook Make facultatif ; à traiter comme un secret. |
+La dictée utilise `SpeechRecognition`/`webkitSpeechRecognition`, avec résultats
+provisoires et définitifs. Elle n’utilise pas `MediaRecorder` et ne téléverse pas
+d’enregistrement vers les routes Morice. Le service vocal du navigateur peut
+néanmoins dépendre de son fournisseur et d’une connexion Internet.
 
-Pour Microsoft, configurer dans votre application Entra l'URI de retour exacte
-`http://localhost:PORT/api/microsoft/callback`, avec le port réellement utilisé.
-Les autorisations OAuth et les comptes ne sont pas transférés par ce ZIP.
-Ne jamais remplacer une clé de chiffrement existante sans plan de migration des
-jetons qu'elle protège.
+- Un clic démarre ; l’arrêt manuel attend les derniers résultats du navigateur.
+- Une fin automatique relance l’écoute. Des sessions silencieuses répétées
+  espacent progressivement les reprises de 0,5 à 8 secondes.
+- Un onglet masqué ou un passage hors ligne suspend la session. Le retour au
+  premier plan avec réseau reprend une écoute demandée, sauf après arrêt manuel.
+- Les résultats utiles déjà reçus sont conservés après erreur ou interruption.
+  Une session sans démarrage expire après 15 secondes ; trois échecs réseau
+  consécutifs affichent une erreur explicite et demandent de relancer.
+- Les clics répétés et callbacks d’anciennes sessions ne créent pas de sessions
+  concurrentes. Les permissions refusées sont signalées près du microphone.
 
-## Commandes complémentaires
+## Identité et hébergement
 
-```bash
-npm run build
-npm test
-npm run lint
-npm run db:migrate:local
-```
+L’hébergement existant est Sites, identifié par `.openai/hosting.json`. Son
+contrôle d’accès privé est conservé. Les en-têtes d’identité sont ceux de cette
+passerelle authentifiée ; ils ne constituent pas une authentification autonome
+sur un autre hébergement.
 
-`npm test` compile l'application puis lance les tests de sources existants. Ces
-tests ne prouvent pas à eux seuls une connexion réelle à Microsoft, OpenAI,
-OpenClaw, Make ou au téléphone. `npm run start` est le script original de lancement
-après compilation ; le parcours de développement prévu est `npm run dev`.
+Le middleware refuse les API sans identité avec HTTP 401. Le secours `alan`
+existe uniquement en développement, pour une URL et un hôte de boucle locale,
+sans transfert externe (l’en-tête local ajouté par Vinext doit correspondre
+exactement à l’hôte). Il est interdit en production. Chaque identité
+authentifiée conserve son propre espace de données. `app/chatgpt-auth.ts`
+conserve ses redirections de connexion limitées aux chemins du site.
 
-## Contenu
+La connexion Microsoft demande les mêmes permissions que la version déjà
+hébergée : `Mail.Send` et `Calendars.ReadWrite` ont été retirées de la copie
+locale avant publication ; `Calendars.Read` est conservée. L’envoi de mails et
+la création de rendez-vous ne sont donc pas validés par cette livraison.
 
-- `app/` : pages, composant principal, styles, utilitaires et routes API.
-- `public/` : logos et icônes, manifeste PWA et service worker.
-- `worker/`, `build/`, `vite.config.ts` : serveur et compilation Cloudflare/Vinext.
-- `db/`, `drizzle/` : schéma et migrations SQL, sans données de production.
-- `tests/` : tests existants.
-- `.openai/hosting.json` : métadonnées d'origine Sites et binding `DB` ; aucun secret.
-- `wrangler.local.jsonc` : configuration de migration D1 exclusivement locale.
+Les fichiers privés `.env*`, `.dev.vars*`, jetons, bases locales et clés restent
+exclus de Git et de la publication. Ils ne doivent pas être copiés dans `public/`
+ni dans les variables publiques du navigateur. Cette révision ne lit ni ne
+modifie leurs valeurs. Changer d’hébergeur exige une passerelle d’authentification
+adaptée, avant toute exposition de données.
 
-L'identifiant Sites conservé est une métadonnée, pas un identifiant de connexion.
-Cet export n'autorise ni ne déclenche aucune republication du site d'origine.
+## Vérifications du 10 septembre 2026
 
-## Sécurité et limites
+Les tests automatisés couvrent les résultats vocaux simulés, la reprise, l’arrêt,
+les erreurs, les clics rapides, la pause et l’isolation de l’identité. Ils ne
+constituent pas une dictée humaine. Le test de sources contrôle aussi les PNG
+du logo et la présence des routes ; il ne prouve pas la connexion aux services.
 
-Le site hébergé repose sur son environnement d'authentification Sites. Les sources
-emploient des en-têtes d'identité fournis par cet environnement et un utilisateur
-de secours local. **Ne pas exposer directement ce serveur de développement sur
-Internet ou sur un réseau non fiable.** Un hébergement différent nécessite une
-authentification et une vérification d'accès adaptées avant toute utilisation réelle.
+Lors de l’essai réel dans le navigateur intégré, le microphone a atteint
+« Écoute en cours » et l’arrêt manuel a répondu. Le service vocal a aussi renvoyé
+des erreurs réseau ; un nouvel essai n’a pas démarré et a affiché son erreur
+après 15 secondes en conservant le texte. **Aucun essai vocal humain prolongé
+réussi n’est attesté.**
+La transcription effective, les silences et la dernière phrase restent à
+essayer en parlant dans Chrome ou Edge sur le poste et sur le téléphone.
 
-Les menus et routes présents ne signifient pas que tous les connecteurs fonctionnent.
-L'accès hébergé à OpenClaw, les intégrations Android et les connexions aux comptes
-nécessitent leur configuration et des tests dédiés ; rien n'a été raccordé par cet export.
+Aucune action Microsoft, Make ou OpenAI réelle n’est déclenchée par cette
+campagne. Les menus existants ne prouvent pas que les connecteurs sont reliés.
+Les résultats exacts de compilation, tests, types, contrôle visuel et routes
+ont été vérifiés : compilation réussie, TypeScript sans erreur, 15 tests réussis
+sur 15, ESLint sans erreur avec 5 avertissements sur les balises `img`. Vinext
+signale également la convention `middleware` dépréciée, encore prise en charge.
+Accueil et API locales `state`/`connections` répondent HTTP 200 ; une requête
+avec transfert externe est refusée HTTP 401. Le site privé refuse également
+HTTP 401 les accès anonymes et les en-têtes d’identité forgés. Contrôle visuel
+effectué à 1440 et 390 pixels, sans débordement horizontal ; six PNG du logo
+comparés par SHA-256, aucun changement.
 
-Exclus du ZIP : `.git/`, `node_modules/`, `.env.local`, autres fichiers de secrets,
-état `.wrangler/`, bases de données locales, journaux, caches et sorties compilées.
-Le contrôle de l'export recherche les formats usuels de clés/jetons, les mots de
-passe littéraux et les valeurs secrètes présentes dans les fichiers d'environnement
-locaux. Aucun secret détecté n'est accepté dans l'archive ; ce contrôle n'est pas
-un audit de sécurité exhaustif de l'application.
-
-Les ajouts de cet export concernent uniquement ce README, le modèle d'environnement,
-la règle d'exclusion `.dev.vars`, la commande d'initialisation D1 locale et sa
-configuration. Les fichiers applicatifs et les assets sont conservés sans modification.
-
-## Vérifications effectuées sur cet export
-
-- Contrôle des secrets : aucun résultat détecté dans les fichiers exportés.
-- Comparaison avec les fichiers applicatifs locaux d'origine : identiques.
-- `node --test tests/morice-source.test.mjs` : 1 test réussi, 0 échec.
-- `npm install` : non validé, accès au registre npm refusé par l'environnement
-  d'export (`EACCES`). Le téléchargement a été arrêté ; aucune dépendance partielle
-  ni aucun dossier `node_modules` n'est inclus.
-- Compilation, migrations locales et `npm run dev` : non validés dans cet
-  environnement ; les dépendances locales de secours n'étaient pas utilisables.
-
-Les commandes ci-dessus constituent les instructions de démarrage, pas une preuve
-d'installation déjà réussie. Aucune connexion externe n'a été testée ou modifiée.
+Références : [écoute continue](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/continuous),
+[fin d’une session](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/end_event),
+[types Cloudflare](https://developers.cloudflare.com/workers/languages/typescript/).

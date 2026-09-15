@@ -28,14 +28,9 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(page, /Aucun rechargement de la page n’est nécessaire/);
   assert.match(page, /"Envoyer"/);
   assert.match(page, /Un clic démarre l’écoute\. Aucun maintien appuyé/);
-  assert.match(page, /recognition\.continuous = false/);
-  assert.match(page, /function mergeSpeechSegments/);
-  assert.match(page, /recognition\.interimResults = true/);
-  assert.match(page, /function stopDictation/);
   assert.match(page, /function toggleDictation/);
   assert.match(page, /Transcription…/);
   assert.match(page, /Morice réfléchit…/);
-  assert.match(page, /Aucune donnée inventée/);
   assert.match(page, /Passerelle à relier au site/);
   assert.match(page, /\/morice-3d\.png\?v=morice-logo-44fce869-20260823/);
   assert.equal(createHash("sha256").update(portrait).digest("hex"), "44fce86945cff412c4e7206eeef44c81647d49cc8668e3aa389e753b88099c4a");

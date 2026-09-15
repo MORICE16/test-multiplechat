@@ -6,14 +6,17 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "predev": "npm run db:migrate:local",
+    "predev": "pnpm run db:migrate:local",
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "vinext build && node --test tests/morice-source.test.mjs",
+    "test": "vinext build && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply DB --local --config wrangler.local.jsonc"
+    "db:migrate:local": "wrangler d1 migrations apply DB --local --config wrangler.local.jsonc",
+    "typecheck": "tsc --noEmit --incremental false",
+    "test:unit": "node --test tests/*.test.mjs",
+    "cf:types": "wrangler types worker-configuration.d.ts --config wrangler.types.jsonc --env-interface MoriceBindings --strict-vars false"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
@@ -44,5 +47,6 @@
     "vite": "8.0.13",
     "wrangler": "4.92.0"
   },
-  "type": "module"
+  "type": "module",
+  "packageManager": "pnpm@11.19.0"
 }

@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { decryptSecret, encryptSecret } from "./secret-crypto";
 import { now, runtimeValue } from "./runtime";
+import { ActionError } from "./action-error";
 
 export type ActionPayload = {
   to?: string | null;
@@ -62,16 +63,20 @@ async function accessToken(uid: string) {
 }
 
 async function graph(uid: string, path: string, init?: RequestInit) {
+  let token: string;
+  try { token = await accessToken(uid); }
+  catch { throw new ActionError("Microsoft 365 doit être reconnecté dans Connexions. Aucune action n’a été envoyée.", true); }
   const response = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     ...init,
+    signal: AbortSignal.timeout(30_000),
     headers: {
-      Authorization: `Bearer ${await accessToken(uid)}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       ...(init?.headers || {}),
     },
   });
   const payload = response.status === 204 ? null : await response.json().catch(() => null) as { error?: { message?: string } } | null;
-  if (!response.ok) throw new Error(payload?.error?.message || `Microsoft 365 a refusé l’action (${response.status}).`);
+  if (!response.ok) throw new ActionError(`Microsoft 365 a refusé l’action (${response.status}).`, response.status >= 400 && response.status < 500 && response.status !== 408);
   return payload as Record<string, unknown> | null;
 }
 
@@ -104,16 +109,16 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     return "Le brouillon Outlook a été créé.";
   }
   if (operation === "mail_send") {
-    if (!payload.to) throw new Error("L’adresse du destinataire manque.");
+    if (!payload.to) throw new ActionError("L’adresse du destinataire manque.", true);
     await graph(uid, "/me/sendMail", { method: "POST", body: JSON.stringify({ message: {
       subject: payload.subject || "Message de Morice",
       body: { contentType: "Text", content: payload.body || payload.notes || "" },
       toRecipients: [{ emailAddress: { address: payload.to } }],
     }, saveToSentItems: true }) });
-    return "Le mail a été envoyé par Outlook.";
+    return "Outlook a accepté la demande d’envoi. La livraison au destinataire reste à vérifier.";
   }
   if (operation === "calendar_create") {
-    if (!payload.start || !payload.end) throw new Error("La date de début et la date de fin manquent.");
+    if (!payload.start || !payload.end) throw new ActionError("La date de début et la date de fin manquent.", true);
     await graph(uid, "/me/events", { method: "POST", body: JSON.stringify({
       subject: payload.subject || "Rendez-vous Morice",
       body: { contentType: "Text", content: payload.body || payload.notes || "" },
@@ -127,18 +132,19 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     const lists = await graph(uid, "/me/todo/lists?$top=20&$select=id,displayName") as { value?: Array<{ id?: string; displayName?: string }> };
     const wanted = (payload.list || "Tasks").toLocaleLowerCase("fr");
     const list = (lists?.value || []).find(item => item.displayName?.toLocaleLowerCase("fr") === wanted) || lists?.value?.[0];
-    if (!list?.id) throw new Error("Aucune liste Microsoft To Do n’est disponible.");
+    if (!list?.id) throw new ActionError("Aucune liste Microsoft To Do n’est disponible.", true);
     await graph(uid, `/me/todo/lists/${encodeURIComponent(list.id)}/tasks`, { method: "POST", body: JSON.stringify({ title: payload.subject || payload.body || "Tâche Morice", body: { content: payload.notes || "", contentType: "text" } }) });
     return "La tâche a été créée dans Microsoft To Do.";
   }
-  throw new Error("Cette action Microsoft n’est pas encore prise en charge.");
+  throw new ActionError("Cette action Microsoft n’est pas encore prise en charge.", true);
 }
 
 export async function runMakeAction(payload: ActionPayload, requestId = "") {
   const webhook = runtimeValue("MAKE_WEBHOOK_URL");
-  if (!webhook) throw new Error("Le webhook Make n’est pas encore configuré.");
+  if (!webhook) throw new ActionError("Le webhook Make n’est pas encore configuré.", true);
   const response = await fetch(webhook, {
     method: "POST",
+    signal: AbortSignal.timeout(30_000),
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       source: "Morice Online",
@@ -151,6 +157,6 @@ export async function runMakeAction(payload: ActionPayload, requestId = "") {
       payload,
     }),
   });
-  if (!response.ok) throw new Error(`Make a refusé l’action (${response.status}).`);
-  return "L’automatisation Make a été déclenchée.";
+  if (!response.ok) throw new ActionError(`Make a refusé l’action (${response.status}).`);
+  return "Make a accepté la demande. Le résultat du scénario reste à vérifier dans Make.";
 }

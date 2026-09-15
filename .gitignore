@@ -55,3 +55,10 @@ passwords.*
 *.sqlite
 *.sqlite3
 *.db
+
+# Preserved archival copies and local aggregate export
+/morice/
+/morice-source.txt
+*.tsbuildinfo
+# npm lockfile preserved locally; pnpm-lock.yaml is the canonical source lock
+/package-lock.json

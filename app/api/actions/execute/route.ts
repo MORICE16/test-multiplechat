@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { runMakeAction, runMicrosoftAction, type ActionPayload } from "@/app/lib/microsoft";
 import { now, userId } from "@/app/lib/runtime";
+import { actionFailure } from "@/app/lib/action-error";
 
 type PendingAction = { item_id: string; provider: string; operation: string; payload: string };
 
@@ -25,8 +26,12 @@ export async function POST(request: Request) {
         ? await runMakeAction(payload, action.item_id)
         : (() => { throw new Error("Fournisseur d’action inconnu."); })();
   } catch (error) {
-    await env.DB.prepare("UPDATE morice_items SET status='pending', updated_at=? WHERE id=? AND user_id=? AND status='executing'").bind(now(), id, uid).run();
-    return Response.json({ error: error instanceof Error ? error.message : "Morice n’a pas pu exécuter cette action." }, { status: 502 });
+    const failure = actionFailure(error);
+    await env.DB.batch([
+      env.DB.prepare("UPDATE morice_items SET status=?, updated_at=? WHERE id=? AND user_id=? AND status='executing'").bind(failure.status, now(), id, uid),
+      env.DB.prepare("UPDATE morice_action_payloads SET result=? WHERE item_id=? AND user_id=?").bind(failure.message, id, uid),
+    ]);
+    return Response.json({ error: failure.message, status: failure.status }, { status: 502 });
   }
 
   try {

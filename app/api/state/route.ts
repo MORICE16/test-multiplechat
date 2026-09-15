@@ -17,7 +17,9 @@ export async function GET(request: Request) {
   const settingRows = await env.DB.prepare("SELECT key, value FROM morice_settings WHERE user_id = ?").bind(uid).all();
   const settings: Record<string, unknown> = {};
   for (const row of settingRows.results as Array<{key:string,value:string}>) { try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; } }
-  return Response.json({ items: itemRows.results, settings });
+  const actions = await env.DB.prepare("SELECT item_id,provider,operation,payload,result FROM morice_action_payloads WHERE user_id=?").bind(uid).all();
+  const byId = new Map(actions.results.map(row => [row.item_id, row]));
+  return Response.json({ items: itemRows.results.map(row => ({ ...row, execution: byId.get(row.id) })), settings });
 }
 
 export async function POST(request: Request) {
