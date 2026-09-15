@@ -93,12 +93,13 @@ test('conversation persists across route instances and only owner memory reaches
     const route=await f.route('app/api/assistant/route.ts');
     await route.POST(request({message:'Mon code de test est LILAS',mode:'memory'}));
     await route.POST(request({message:'Secret Bob',mode:'memory'},'bob'));
+    await route.POST(request({message:'Vérifier le suivi projet',mode:'task'}));
     const result=await route.POST(request({message:'Quel est mon code de test ?',mode:'auto'}));
     assert.equal(result.status,200); const sent=JSON.stringify(f.lastInput);
-    assert.match(sent,/LILAS/); assert.doesNotMatch(sent,/Secret Bob/); assert.equal(f.lastInput.store,false);
-    const data=await (await route.GET(new Request('https://morice.test/api'))).json(); assert.equal(data.messages.length,4);
+    assert.match(sent,/LILAS/); assert.match(sent,/task, open/); assert.doesNotMatch(sent,/Secret Bob/); assert.equal(f.lastInput.store,false);
+    const data=await (await route.GET(new Request('https://morice.test/api'))).json(); assert.equal(data.messages.length,6);
     assert.equal(data.messages[0].role,'user'); assert.equal(data.messages[1].role,'assistant');
-    assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_items WHERE user_id='alice' AND kind='task'").get().n,0);
+    assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_items WHERE user_id='alice' AND kind='task'").get().n,1);
   } finally { f.close(); }
 });
 test('incomplete and quota responses create no task, action or successful history', async () => {
@@ -123,5 +124,17 @@ test('Microsoft distinguishes preflight, explicit rejection and ambiguous transp
     await assert.rejects(()=>ms.runMicrosoftAction('alice','mail_send',{to:'test@example.invalid'}),e=>actionFailure(e).status==='needs_review');
     f.fetch=async()=>new Response(null,{status:202});
     assert.match(await ms.runMicrosoftAction('alice','mail_send',{to:'test@example.invalid'}),/accepté.*reste à vérifier/);
+  } finally { f.close(); }
+});
+
+test('direct Microsoft reading forbids write operations and passes only authenticated owner', async () => {
+  const f=await fixture(); try {
+    const route=await f.route('app/api/microsoft/read/route.ts');
+    assert.equal((await route.GET(new Request('https://morice.test/api?operation=mail_send'))).status,400);
+    assert.equal(f.sent,0);
+    f.runMicrosoftAction=async (uid,operation)=>{assert.equal(uid,'bob');assert.equal(operation,'calendar_read');return 'Calendar verified';};
+    const response=await route.GET(new Request('https://morice.test/api',{headers:{'test-user':'bob'}}));
+    assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+    assert.equal((await response.json()).result,'Calendar verified');
   } finally { f.close(); }
 });

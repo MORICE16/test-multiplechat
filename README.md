@@ -4,7 +4,7 @@
 
 - Les échanges réussis sont sauvegardés dans D1 et restaurés après rechargement
   sur les appareils du même compte. L’interface charge les 40 derniers messages ;
-  le modèle reçoit au plus 16 messages récents et 30 mémoires (16 000 caractères).
+  le modèle reçoit au plus 16 messages récents et 30 tâches/mémoires (16 000 caractères).
 - Les mémoires enregistrées servent de contexte, pas d’autorisation d’exécution.
   Les tâches et actions restent pilotées par les contrôles côté serveur.
 - Une perte de réponse externe classe l’action « Résultat à vérifier » et bloque
@@ -16,6 +16,8 @@
   l’interface distingue cette acceptation du résultat final.
 - Connexions permet de vérifier la lecture Microsoft directement, sans dépendre
   de l’analyse IA. Cette vérification ne crée aucun objet externe.
+- Emails et Agenda affichent les données Microsoft réelles avec la date de
+  vérification et un bouton Actualiser. Les messages restent dans leur état lu/non lu.
 - La migration additive `0002_conversation_history.sql` crée seulement l’historique.
   Les deux migrations déployées précédemment restent inchangées.
 - Les tests backend utilisent les vraies routes et une base SQLite, avec des

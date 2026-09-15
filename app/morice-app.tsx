@@ -415,9 +415,9 @@ export default function MoriceApp() {
           {actionHistory.length > 0 && <><h3>Résultats et actions à vérifier</h3>{actionHistory.map(item => <article className="row" key={item.id}><div><b>{item.title} — {actionStatus(item.status)}</b><ActionDetails item={item} />{["needs_review", "executing"].includes(item.status) && <p>Vérifie le service concerné avant de préparer une nouvelle action. La relance automatique est bloquée.</p>}</div></article>)}</>}
         </section>}
         {view === "settings" && <section className="panel"><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante du navigateur.</p><div className={`install-status ${installState}`}><span />{installState === "installed" ? "Morice est installé sur cet appareil" : installState === "available" ? "Morice est prêt à être installé" : installState === "checking" ? "Vérification de l’installation…" : "Installation disponible depuis le menu du navigateur"}</div><button onClick={installMorice}>{installState === "installed" ? "Vérifier l’installation" : installState === "available" ? "Installer Morice maintenant" : "Afficher comment l’installer"}</button>{showInstallHelp && <div className="install-help"><b>Installation en deux gestes</b>{isIos ? <p>Dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>.</p> : <p>Ouvre le menu <strong>⋮</strong> en haut à droite, puis choisis <strong>Installer Morice</strong> ou <strong>Ajouter à l’écran d’accueil</strong>.</p>}<p>Aucun rechargement de la page n’est nécessaire.</p></div>}<hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
-        {view === "mail" && <InfoPanel title="Mail & Brouillons" text="Morice peut lire les mails récents et préparer des brouillons Outlook. Tout brouillon créé ou message envoyé passe d’abord par Validations." />}
+        {view === "mail" && <MicrosoftReadPanel title="Emails récents" operation="mail_read" />}
         {view === "hubspot" && <InfoPanel title="HubSpot indisponible" text="Aucun accès HubSpot supplémentaire n’est disponible. Morice ne simulera jamais une connexion et utilisera Microsoft 365 ou Make pour les actions autorisées." />}
-        {view === "calendar" && <InfoPanel title="Agenda" text="Morice peut consulter les rendez-vous Outlook. Toute création ou modification d’événement passe d’abord par Validations." />}
+        {view === "calendar" && <MicrosoftReadPanel title="Agenda" operation="calendar_read" />}
         {view === "documents" && <InfoPanel title="Documents & OneDrive" text="Morice peut rechercher des documents OneDrive après la connexion Microsoft 365, sans exposer les jetons d’accès." />}
         {view === "connections" && <ConnectionsPanel state={connections} refresh={refreshConnections} disconnectMicrosoft={disconnectMicrosoft} />}
         {view === "projects" && <InfoPanel title="Projets" text="L’espace projets est prêt. Il n’affichera que des projets réellement enregistrés ou connectés." />}
@@ -505,6 +505,26 @@ function ServiceStatus({ name, ok, detail }: { name: string; ok: boolean; detail
 
 function InfoPanel({ title, text }: { title: string; text: string }) {
   return <section className="panel"><p className="eyebrow">MODULE MORICE</p><h2>{title}</h2><p>{text}</p></section>;
+}
+
+function MicrosoftReadPanel({ operation, title }: { operation: "mail_read" | "calendar_read"; title: string }) {
+  const [data, setData] = useState<{ result: string; checkedAt: string } | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      setError("");
+      void api<{ result: string; checkedAt: string }>(`/api/microsoft/read?operation=${operation}`, { signal: controller.signal })
+        .then(result => { if (!controller.signal.aborted) setData(result); })
+        .catch(failure => { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Lecture impossible."); })
+        .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    }, 0);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [operation, revision]);
+  return <section className="panel"><p className="eyebrow">MICROSOFT 365 · LECTURE SEULE</p><h2>{title}</h2><p>{operation === "mail_read" ? "Les cinq messages les plus récents, sans modifier leur état lu ou non lu." : "Les dix prochains rendez-vous sur les sept jours à venir."}</p><button disabled={loading} onClick={() => setRevision(value => value + 1)}>{loading ? "Chargement…" : "Actualiser"}</button>{error && <p role="alert">{error}</p>}{data && <><p>Lecture confirmée le {new Date(data.checkedAt).toLocaleString("fr-FR")}{error ? " · Dernier résultat disponible" : ""}</p><div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{data.result}</div></>}</section>;
 }
 
 function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: ConnectionState | null; refresh: () => Promise<void>; disconnectMicrosoft: () => Promise<void> }) {
