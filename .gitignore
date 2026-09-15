@@ -62,3 +62,14 @@ passwords.*
 *.tsbuildinfo
 # npm lockfile preserved locally; pnpm-lock.yaml is the canonical source lock
 /package-lock.json
+
+# Android local builds and private signing material
+android/**/build/
+android/.gradle/
+android/local.properties
+android/signing/
+*.jks
+*.keystore
+*.apk
+*.aab
+!public/downloads/morice-1.1.0.apk

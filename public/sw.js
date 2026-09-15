@@ -1,4 +1,4 @@
-const MORICE_VERSION = "morice-v5-conversation-20260910";
+const MORICE_VERSION = "morice-v12-azure-20260916";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));

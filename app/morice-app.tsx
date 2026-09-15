@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { readWidgetDraft } from "./lib/widget-draft";
 import { createDictation, type DictationState, type Recognition } from "./lib/dictation";
 
 type Item = {
@@ -51,6 +52,9 @@ const navigation = [
   ["home", "Accueil", "⌂"],
   ["chat", "Conversation", "✦"],
   ["tasks", "Tâches", "✓"],
+  ["calendar", "Agenda", "□"],
+  ["approvals", "Validations", "◆"],
+  ["connections", "Connexions", "⌁"],
   ["projects", "Projets", "▰"],
   ["memory", "Notes & mémoire", "◉"],
   ["search", "Recherche", "⌕"],
@@ -74,10 +78,10 @@ const brandIcons: Record<BrandIconName, string> = {
 };
 
 const quickActions = [
-  ["hubspot", "Devis clients", "HubSpot · non connecté", "hubspot"],
+  ["calendar", "Mon agenda", "Les rendez-vous à venir", "outlook"],
   ["mail", "Ma boîte mail", "Outlook", "outlook"],
-  ["tasks", "Mes tâches", "Microsoft To Do", "todo"],
-  ["memory", "Notes rapides", "Samsung Notes · raccourci", "notes"],
+  ["tasks", "Mes tâches", "Mon suivi dans Morice", "todo"],
+  ["memory", "Mes idées", "Notes et mémoire Morice", "notes"],
 ] as const;
 
 const starterModules = [
@@ -181,6 +185,16 @@ export default function MoriceApp() {
         setNotice(params.get("reason") || "La connexion Microsoft n’a pas abouti.");
         history.replaceState({}, "", window.location.pathname);
       }
+      const widgetDraft = readWidgetDraft(window.location.hash);
+      if (widgetDraft !== null) {
+        setView("chat");
+        setMessage(widgetDraft);
+        setDictationState(widgetDraft ? "ready" : "idle");
+        history.replaceState({}, "", window.location.pathname + window.location.search);
+        if (widgetDraft) setNotice("Votre dictée est prête. Relisez-la, puis touchez Envoyer.");
+      } else if (params.get("view") === "chat") {
+        setView("chat");
+      }
       setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
       const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
       if (standalone) setInstallState("installed");
@@ -219,6 +233,22 @@ export default function MoriceApp() {
   }, []);
 
   useEffect(() => () => { dictationRef.current?.dispose(); dictationRef.current = null; }, []);
+
+  useEffect(() => {
+    const receiveWidgetDraft = () => {
+      const draft = readWidgetDraft(window.location.hash);
+      if (draft === null) return;
+      dictationRef.current?.dispose();
+      dictationRef.current = null;
+      setMessage(draft);
+      setView("chat");
+      setDictationState(draft ? "ready" : "idle");
+      history.replaceState({}, "", window.location.pathname + window.location.search);
+      setNotice("Votre dictée est prête. Relisez-la, puis touchez Envoyer.");
+    };
+    window.addEventListener("hashchange", receiveWidgetDraft);
+    return () => window.removeEventListener("hashchange", receiveWidgetDraft);
+  }, []);
 
   useEffect(() => {
     const updateAvailability = () => dictationRef.current?.setAvailable(navigator.onLine && !document.hidden);
@@ -368,8 +398,9 @@ export default function MoriceApp() {
           <span><b>MORICE</b><small>Assistant personnel</small></span>
         </button>
         <nav className="side-navigation" aria-label="Navigation principale">
-          {navigation.map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
+          {navigation.filter(([id]) => ["home", "chat", "tasks", "memory", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
         </nav>
+        <details className="other-spaces"><summary>Mes autres espaces</summary><nav className="side-navigation" aria-label="Autres espaces">{navigation.filter(([id]) => !["home", "chat", "tasks", "memory", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span></button>)}</nav></details>
         <div className="sidebar-footer">
           {installState !== "installed" && <button className="outline-action" onClick={installMorice}>Installer l’application</button>}
           <button className="outline-action" onClick={enableNotifications}>Activer les notifications</button>
@@ -378,28 +409,28 @@ export default function MoriceApp() {
       </aside>
 
       <section className="morice-content">
-        <header className={`topbar ${view === "home" ? "dashboard-topbar" : ""}`}><div><p className="eyebrow">MORICE — ESPACE PRIVÉ D’ALAN</p><h1>{view === "home" ? "Tableau de bord" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
-        <label className="mobile-sections">Ouvrir un espace<select aria-label="Choisir un espace" value={view} onChange={event => setView(event.target.value)}>{navigation.map(([id, title]) => <option key={id} value={id}>{title}</option>)}<option value="connections">Connexions</option><option value="calendar">Agenda</option><option value="approvals">Validations</option><option value="documents">Documents</option><option value="hubspot">HubSpot</option></select></label>
+        <header className={`topbar ${view === "home" ? "dashboard-topbar" : ""}`}><div><p className="eyebrow">MON ESPACE PERSONNEL</p><h1>{view === "home" ? "Ma journée" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
+        <label className="mobile-sections">Ouvrir un espace<select aria-label="Choisir un espace" value={view} onChange={event => setView(event.target.value)}>{navigation.map(([id, title]) => <option key={id} value={id}>{title}</option>)}<option value="documents">Documents</option><option value="hubspot">HubSpot</option></select></label>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === "home" && <>
           <div className="dashboard-grid">
             <div className="dashboard-main">
               <section className="welcome-card">
-                <div className="welcome-identity"><div className="portrait-wrap"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div><div><p className="eyebrow">BONJOUR ALAN</p><h2>Votre journée, avec Morice.</h2><p>Une idée, une tâche, une question. Commençons par ce qui compte aujourd’hui.</p></div></div>
-                <div className="welcome-meta"><article><small>{dateText}</small><strong>{timeText}</strong><span>Heure locale</span></article><article><small>À suivre</small><strong>{storageStatus === "online" ? `${tasks.filter(item => item.status !== "done").length} tâches` : "À vérifier"}</strong><span>{storageStatus === "online" ? `${approvals.length} validations en attente` : "Données indisponibles"}</span></article></div>
+                <div className="welcome-identity"><div><p className="eyebrow">{dateText}</p><h2>{clock && clock.getHours() >= 18 ? "Bonsoir" : "Bonjour"}, Alan.</h2><p>Une idée, une question, quelque chose à faire ?</p><button className={"welcome-talk " + (voiceActive ? "listening" : "")} disabled={assistantBusy || dictationState === "stopping"} onClick={() => { setView("chat"); toggleDictation(); }}><MicIcon />{voiceActive ? "Arrêter l’écoute" : "Parler à Morice"}</button></div><div className="portrait-wrap"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></div>
+                <div className="welcome-meta"><button onClick={() => setView("tasks")}><strong>{storageStatus === "online" ? tasks.filter(item => item.status !== "done").length : "—"}</strong><span>Tâches à suivre</span></button><button onClick={() => setView("approvals")}><strong>{storageStatus === "online" ? approvals.length : "—"}</strong><span>À valider</span></button><div><strong>{timeText}</strong><span>Heure locale</span></div></div>
               </section>
 
               <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
 
               <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">RACCOURCIS</p><h2>Accès rapide</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source, brand]) => <button key={id} className={`quick-${brand}`} onClick={() => setView(id)}><i><BrandIcon name={brand} /></i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
 
-              <section className="activity-panel"><div className="panel-heading"><div><p className="eyebrow">JOURNAL RÉEL</p><h2>Activité récente</h2></div><span>{recentItems.length} élément{recentItems.length > 1 ? "s" : ""}</span></div>{recentItems.length ? <div className="activity-list">{recentItems.map(item => <article className={`activity-${item.kind}`} key={item.id}><i>{item.kind === "task" ? "✓" : item.kind === "memory" ? "◉" : "◆"}</i><div><b>{item.title}</b><p>{item.content || (item.kind === "task" ? "Tâche enregistrée dans Morice" : "Élément enregistré dans Morice")}</p></div><span>{item.kind === "approval" ? actionStatus(item.status) : item.status === "done" ? "Terminé" : "En cours"}</span></article>)}</div> : <div className="empty">Aucune activité enregistrée pour le moment.</div>}</section>
+              <section className="activity-panel"><div className="panel-heading"><div><p className="eyebrow">VOTRE SUIVI</p><h2>Activité récente</h2></div><span>{recentItems.length} élément{recentItems.length > 1 ? "s" : ""}</span></div>{recentItems.length ? <div className="activity-list">{recentItems.map(item => <article className={`activity-${item.kind}`} key={item.id}><i>{item.kind === "task" ? "✓" : item.kind === "memory" ? "◉" : "◆"}</i><div><b>{item.title}</b><p>{item.content || (item.kind === "task" ? "Tâche enregistrée dans Morice" : "Élément enregistré dans Morice")}</p></div><span>{item.kind === "approval" ? actionStatus(item.status) : item.status === "done" ? "Terminé" : "En cours"}</span></article>)}</div> : <div className="empty">Aucune activité enregistrée pour le moment.</div>}</section>
             </div>
 
             <aside className="context-rail">
-              <section className="agenda-card"><div className="panel-heading"><div><p className="eyebrow">AUJOURD’HUI</p><h2>Mon agenda</h2></div><button onClick={() => setView("calendar")}>Voir tout</button></div><div className="empty compact">{connections?.microsoft.connected ? "Microsoft 365 est connecté. Demandez à Morice d’afficher les vrais rendez-vous." : "Connectez Microsoft 365 pour afficher les vrais rendez-vous."}</div></section>
-              <section className="device-card"><div className="panel-heading"><div><p className="eyebrow">ÉTAT RÉEL</p><h2>Mes appareils</h2></div><button onClick={() => setView("settings")}>Voir</button></div><div className="device-list"><article><span>▣</span><div><b>Cet appareil</b><small>{installState === "installed" ? "Application Morice installée" : "Installation disponible"}</small></div><em className={installState === "installed" ? "ok" : ""}>{installState === "installed" ? "Installé" : "À installer"}</em></article><article><span>▯</span><div><b>Z Fold 7</b><small>OpenClaw à finaliser</small></div><em>En attente</em></article></div>{installState !== "installed" && <button onClick={installMorice}>Installer Morice</button>}</section>
+              <section className="agenda-card"><div className="panel-heading"><div><p className="eyebrow">AUJOURD’HUI</p><h2>Mon agenda</h2></div><button onClick={() => setView("calendar")}>Voir tout</button></div><div className="empty compact">{connections?.microsoft.connected ? "Consultez vos prochains rendez-vous dans l’agenda." : "Connectez Microsoft 365 pour retrouver vos rendez-vous."}</div></section>
+              <section className="device-card"><div className="panel-heading"><div><p className="eyebrow">APPLICATION</p><h2>Mes appareils</h2></div><button onClick={() => setView("settings")}>Voir</button></div><div className="device-list"><article><span>▣</span><div><b>Cet appareil</b><small>{installState === "installed" ? "Application Morice installée" : "Installation disponible"}</small></div><em className={installState === "installed" ? "ok" : ""}>{installState === "installed" ? "Installé" : "À installer"}</em></article><article><span>▯</span><div><b>Z Fold 7</b><small>Liaison au site à finaliser</small></div><em>En attente</em></article></div>{installState !== "installed" && <button onClick={installMorice}>Installer Morice</button>}</section>
               <section className="shortcut-card"><div className="panel-heading"><div><p className="eyebrow">NAVIGATION</p><h2>Raccourcis</h2></div></div><div className="shortcut-list"><button className="shortcut-bmac" onClick={() => setView("bmac")}><span>◆</span><b>B-MAC Conseil</b><em>›</em></button><button className="shortcut-crypto" onClick={() => setView("crypto")}><span><BrandIcon name="bitcoin" /></span><b>Suivi crypto</b><em>›</em></button><button className="shortcut-house" onClick={() => setView("house")}><span>●</span><b>Maison & Maurice</b><em>›</em></button><button className="shortcut-approval" onClick={() => setView("approvals")}><span>✓</span><b>Validations</b><em>{approvals.length || "›"}</em></button></div></section>
               <section className="connection-card"><div className="panel-heading"><div><p className="eyebrow">SERVICES</p><h2>Connexions</h2></div><button onClick={() => setView("connections")}>Détails</button></div><div className="service-list"><ServiceStatus name="OpenAI" ok={Boolean(connections?.openai.configured)} detail={connections?.openai.configured ? connections.openai.model : "À configurer"} /><ServiceStatus name="Microsoft 365" ok={Boolean(connections?.microsoft.connected)} detail={connections?.microsoft.connected ? connections.microsoft.account : "Non connecté"} /><ServiceStatus name="Make" ok={Boolean(connections?.make.configured)} detail={connections?.make.configured ? "Webhook configuré" : "À configurer"} /><ServiceStatus name="OpenClaw" ok={false} detail="Passerelle à relier au site" /></div></section>
             </aside>
@@ -414,7 +445,7 @@ export default function MoriceApp() {
           {approvals.length ? approvals.map(item => <article className="row" key={item.id}><div><b>{item.title}</b><p>{item.content}</p><ActionDetails item={item} /></div><button disabled={Boolean(executingId) || !item.execution} onClick={() => executeApproval(item.id)}>{executingId === item.id ? "Exécution…" : "Valider et exécuter"}</button><button className="secondary" disabled={Boolean(executingId)} onClick={() => updateItem(item.id, "rejected")}>Refuser</button></article>) : <div className="empty">Aucune validation en attente.</div>}
           {actionHistory.length > 0 && <><h3>Résultats et actions à vérifier</h3>{actionHistory.map(item => <article className="row" key={item.id}><div><b>{item.title} — {actionStatus(item.status)}</b><ActionDetails item={item} />{["needs_review", "executing"].includes(item.status) && <p>Vérifie le service concerné avant de préparer une nouvelle action. La relance automatique est bloquée.</p>}</div></article>)}</>}
         </section>}
-        {view === "settings" && <section className="panel"><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante du navigateur.</p><div className={`install-status ${installState}`}><span />{installState === "installed" ? "Morice est installé sur cet appareil" : installState === "available" ? "Morice est prêt à être installé" : installState === "checking" ? "Vérification de l’installation…" : "Installation disponible depuis le menu du navigateur"}</div><button onClick={installMorice}>{installState === "installed" ? "Vérifier l’installation" : installState === "available" ? "Installer Morice maintenant" : "Afficher comment l’installer"}</button>{showInstallHelp && <div className="install-help"><b>Installation en deux gestes</b>{isIos ? <p>Dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>.</p> : <p>Ouvre le menu <strong>⋮</strong> en haut à droite, puis choisis <strong>Installer Morice</strong> ou <strong>Ajouter à l’écran d’accueil</strong>.</p>}<p>Aucun rechargement de la page n’est nécessaire.</p></div>}<hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Trois synthèses quotidiennes</h3><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" defaultValue={time} />)}</div></section>}
+        {view === "settings" && <section className="panel"><div className="widget-install"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><div><p className="eyebrow">SUR TON Z FOLD</p><h2>Morice, à portée de main.</h2><p>La tête de Morice sur ton écran d’accueil. Un appui pour dicter, puis relire et envoyer ta demande.</p><a className="download-app" href="/downloads/morice-1.1.0.apk" download>Installer le widget Android</a><p className="widget-help">Après la mise à jour, ouvre Morice et choisis « Ajouter le widget à l’accueil ».</p></div></div><hr /><p className="eyebrow">APPLICATION</p><h2>Installer Morice</h2><p>Installe Morice avec son icône Rottweiler et une fenêtre indépendante du navigateur.</p><div className={`install-status ${installState}`}><span />{installState === "installed" ? "Morice est installé sur cet appareil" : installState === "available" ? "Morice est prêt à être installé" : installState === "checking" ? "Vérification de l’installation…" : "Installation disponible depuis le menu du navigateur"}</div><button onClick={installMorice}>{installState === "installed" ? "Vérifier l’installation" : installState === "available" ? "Installer Morice maintenant" : "Afficher comment l’installer"}</button>{showInstallHelp && <div className="install-help"><b>Installation en deux gestes</b>{isIos ? <p>Dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>.</p> : <p>Ouvre le menu <strong>⋮</strong> en haut à droite, puis choisis <strong>Installer Morice</strong> ou <strong>Ajouter à l’écran d’accueil</strong>.</p>}<p>Aucun rechargement de la page n’est nécessaire.</p></div>}<hr /><p className="eyebrow">RÉGLAGES</p><h2>Notifications Morice</h2><p>Autorise les notifications une fois sur chaque appareil. Le bouton ci-dessous envoie un vrai test en arrière-plan.</p><button onClick={enableNotifications}>Activer et tester maintenant</button><hr /><h3>Synthèses quotidiennes</h3><p>Horaires envisagés. L’envoi automatique reste à configurer.</p><div className="times">{((state.settings.digest_times as string[]) || ["08:00", "13:00", "18:30"]).map(time => <input key={time} type="time" aria-label="Horaire envisagé" disabled defaultValue={time} />)}</div></section>}
         {view === "mail" && <MicrosoftReadPanel title="Emails récents" operation="mail_read" />}
         {view === "hubspot" && <InfoPanel title="HubSpot indisponible" text="Aucun accès HubSpot supplémentaire n’est disponible. Morice ne simulera jamais une connexion et utilisera Microsoft 365 ou Make pour les actions autorisées." />}
         {view === "calendar" && <MicrosoftReadPanel title="Agenda" operation="calendar_read" />}
@@ -430,9 +461,13 @@ export default function MoriceApp() {
         {view === "tools" && <InfoPanel title="Outils" text="Les outils apparaîtront ici seulement après installation et test réel de leur connexion." />}
       </section>
 
-      <nav className="mobile-navigation" aria-label="Navigation mobile"><button className={view === "home" ? "active" : ""} onClick={() => setView("home")}><i>⌂</i><span>Accueil</span></button><button className={view === "tasks" ? "active" : ""} onClick={() => setView("tasks")}><i>✓</i><span>Tâches</span></button><button disabled={assistantBusy || dictationState === "stopping"} aria-pressed={voiceActive} className={`mobile-mic ${voiceActive ? "listening" : ""}`} onClick={() => { setView("chat"); toggleDictation(); }} aria-label={voiceActive ? "Arrêter l’écoute" : "Parler à Morice"}><i>{voiceActive ? "■" : "●"}</i><span>{voiceActive ? "Arrêter" : "Parler"}</span></button><button className={view === "approvals" ? "active" : ""} onClick={() => setView("approvals")}><i>◆</i><span>Valider</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><button className={view === "settings" ? "active" : ""} onClick={() => setView("settings")}><i>⚙</i><span>Réglages</span></button></nav>
+      <nav className="mobile-navigation" aria-label="Navigation mobile"><button className={view === "home" ? "active" : ""} onClick={() => setView("home")}><i>⌂</i><span>Accueil</span></button><button className={view === "tasks" ? "active" : ""} onClick={() => setView("tasks")}><i>✓</i><span>Tâches</span></button><button disabled={assistantBusy || dictationState === "stopping"} aria-pressed={voiceActive} className={`mobile-mic ${voiceActive ? "listening" : ""}`} onClick={() => { setView("chat"); toggleDictation(); }} aria-label={voiceActive ? "Arrêter l’écoute" : "Parler à Morice"}><i>{voiceActive ? "■" : <MicIcon />}</i><span>{voiceActive ? "Arrêter" : "Parler"}</span></button><button className={view === "approvals" ? "active" : ""} onClick={() => setView("approvals")}><i>◆</i><span>Valider</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><button className={view === "settings" ? "active" : ""} onClick={() => setView("settings")}><i>⚙</i><span>Réglages</span></button></nav>
     </main>
   );
+}
+
+function MicIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg>;
 }
 
 function BrandIcon({ name }: { name: BrandIconName }) {
@@ -470,7 +505,7 @@ function CommandPanel({ dictationError, messages, message, setMessage, assistant
   const logRef = useRef<HTMLDivElement>(null);
   useEffect(() => { const log = logRef.current; if (log) log.scrollTop = log.scrollHeight; }, [messages, assistantBusy]);
   const labels: Record<string, [string, string]> = {
-    idle: ["À votre écoute", "Un clic démarre l’écoute. Aucun maintien appuyé."],
+    idle: ["Microphone éteint", "Un clic démarre l’écoute. Aucun maintien appuyé."],
     starting: ["Ouverture du microphone…", "Autorisez le microphone si le navigateur vous le demande."],
     listening: ["Écoute en cours", "Prenez votre temps. Appuyez sur Arrêter quand vous avez terminé."],
     reconnecting: ["Reprise de l’écoute…", "La session du navigateur a été interrompue. Morice relance le micro."],
@@ -482,18 +517,18 @@ function CommandPanel({ dictationError, messages, message, setMessage, assistant
   };
   const [phaseLabel, phaseDetail] = labels[voicePhase];
   return <section className="command-panel" aria-label="Conversation avec Morice">
-    <div className="command-heading"><div><span className="command-mark">✦</span><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>Parlons-en.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
-    <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
-      {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
-      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><p>{entry.text}</p>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<button disabled={listening || voicePhase === "stopping"} onClick={() => onSpeak(entry.text)}>Écouter la réponse</button></div>}</article>)}
-      {assistantBusy && <article className="chat-message assistant pending"><span className="message-author">Morice</span><p>Je m’occupe de votre demande<span className="thinking-dots" aria-hidden="true">…</span></p></article>}
-    </div>
+    <div className="command-heading"><div><span className="command-mark">✦</span><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>À vous la parole.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
     <div className="composer">
       <div className={"voice-progress " + voicePhase} role="status"><div className="voice-indicator" aria-hidden="true"><span /><span /><span /><span /></div><div><b>{phaseLabel}</b><small>{voicePhase === "error" && dictationError ? dictationError : phaseDetail}</small></div></div>
       <label className="sr-only" htmlFor="morice-message">Votre message à Morice</label>
       <textarea id="morice-message" aria-describedby="composer-help" readOnly={locked} value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); onSend(); } }} placeholder="Écrivez ici, ou démarrez le microphone…" rows={3} />
       <div className="composer-help" id="composer-help"><span>{listening ? "Arrêtez le micro pour corriger ou envoyer." : "Ctrl / ⌘ + Entrée pour envoyer"}</span><span className={message.length > 1200 ? "over-limit" : ""}>{message.length} / 1 200</span></div>
-      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls"><button disabled={assistantBusy || voicePhase === "stopping"} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : "●"}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={onSend} disabled={!message.trim() || message.length > 1200 || locked}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
+      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls"><button disabled={assistantBusy || voicePhase === "stopping"} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={onSend} disabled={!message.trim() || message.length > 1200 || locked}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
+    </div>
+    <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
+      {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
+      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><p>{entry.text}</p>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<button disabled={listening || voicePhase === "stopping"} onClick={() => onSpeak(entry.text)}>Écouter la réponse</button></div>}</article>)}
+      {assistantBusy && <article className="chat-message assistant pending"><span className="message-author">Morice</span><p>Je m’occupe de votre demande<span className="thinking-dots" aria-hidden="true">…</span></p></article>}
     </div>
     {messages.length === 0 && <div className="examples"><button disabled={locked} onClick={() => setMessage("Quelles sont mes tâches prioritaires ?")}>Organiser ma journée</button><button disabled={locked} onClick={() => setMessage("Prépare un mail de suivi à mon client")}>Préparer un email</button><button disabled={locked} onClick={() => setMessage("Mémorise une information importante : ")}>Garder une idée</button></div>}
   </section>;
@@ -524,7 +559,7 @@ function MicrosoftReadPanel({ operation, title }: { operation: "mail_read" | "ca
     }, 0);
     return () => { window.clearTimeout(timer); controller.abort(); };
   }, [operation, revision]);
-  return <section className="panel"><p className="eyebrow">MICROSOFT 365 · LECTURE SEULE</p><h2>{title}</h2><p>{operation === "mail_read" ? "Les cinq messages les plus récents, sans modifier leur état lu ou non lu." : "Les dix prochains rendez-vous sur les sept jours à venir."}</p><button disabled={loading} onClick={() => setRevision(value => value + 1)}>{loading ? "Chargement…" : "Actualiser"}</button>{error && <p role="alert">{error}</p>}{data && <><p>Lecture confirmée le {new Date(data.checkedAt).toLocaleString("fr-FR")}{error ? " · Dernier résultat disponible" : ""}</p><div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{data.result}</div></>}</section>;
+  return <section className="panel"><p className="eyebrow">MICROSOFT 365</p><h2>{title}</h2><p>{operation === "mail_read" ? "Les cinq messages les plus récents, sans modifier leur état lu ou non lu." : "Les dix prochains rendez-vous sur les sept jours à venir."}</p><button disabled={loading} onClick={() => setRevision(value => value + 1)}>{loading ? "Chargement…" : "Actualiser"}</button>{error && <p role="alert">{error}</p>}{data && <><p>Lecture confirmée le {new Date(data.checkedAt).toLocaleString("fr-FR")}{error ? " · Dernier résultat disponible" : ""}</p><div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{data.result}</div></>}</section>;
 }
 
 function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: ConnectionState | null; refresh: () => Promise<void>; disconnectMicrosoft: () => Promise<void> }) {

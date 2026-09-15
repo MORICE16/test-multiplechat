@@ -49,7 +49,7 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.doesNotMatch(assistantRoute, /catch \{\s*plan = localPlan/);
   assert.match(connectionsRoute, /hubspot: \{ configured: false, disabled: true/);
   assert.match(page, /Valider et exécuter/);
-  assert.match(page, /MORICE — ESPACE PRIVÉ D’ALAN/);
+  assert.match(page, /MON ESPACE PERSONNEL/);
   assert.match(page, /B-MAC Conseil/);
   assert.match(page, /Maison & Maurice/);
   assert.match(page, /HubSpot indisponible/);

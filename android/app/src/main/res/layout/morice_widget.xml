@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root"
+ android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
+ android:gravity="center" android:padding="6dp" android:background="@drawable/widget_background" android:contentDescription="@string/widget_description">
+ <ImageView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:src="@drawable/morice_widget" android:scaleType="fitCenter" android:contentDescription="@string/app_name" />
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Parler" android:textSize="14sp" android:textStyle="bold" android:textColor="#194BB9" android:gravity="center" android:paddingTop="3dp" />
+</LinearLayout>

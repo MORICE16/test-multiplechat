@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import "./globals.css";
 
 export const viewport = {
-  themeColor: "#111316",
+  themeColor: "#f3f7fc",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover" as const,
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "L'espace personnel de Morice : tâches, mémoire, validations, connexions et notifications.",
     manifest: "/manifest.webmanifest",
     applicationName: "Morice",
-    appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Morice" },
+    appleWebApp: { capable: true, statusBarStyle: "default", title: "Morice" },
     icons: {
       icon: [{ url: "/icon-192.png?v=morice-logo-44fce869-20260823", type: "image/png", sizes: "192x192" }],
       shortcut: "/icon-192.png?v=morice-logo-44fce869-20260823",

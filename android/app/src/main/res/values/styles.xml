@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Morice" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/morice_black</item>
+        <item name="android:colorAccent">@color/morice_orange</item>
+        <item name="android:navigationBarColor">@color/morice_black</item>
+        <item name="android:statusBarColor">@color/morice_black</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.Morice.Starting" parent="Theme.Morice">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+</resources>
