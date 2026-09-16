@@ -98,7 +98,10 @@ button,input,textarea { -webkit-tap-highlight-color:transparent; }
 .mode-row { display:flex; flex-wrap:wrap; gap:4px; }
 .mode-row button { padding:7px 9px; font-size:14px; color:var(--muted); border:1px solid transparent; background:none; border-radius:7px; }
 .mode-row button.selected { border-color:#c9daf9; background:#e9f0ff; color:var(--blue-ink); }
-.primary-controls { display:flex; align-items:center; gap:8px; margin-left:auto; }
+.primary-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-left:auto; }
+.audio-recovery { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:16px 24px; }
+.audio-recovery p { flex-basis:100%; margin:0; }
+.audio-recovery a { color:var(--primary, #245bea); text-decoration:underline; padding:12px 0; }
 .main-mic,.send-command { display:flex; justify-content:center; align-items:center; gap:8px; min-height:44px; padding:10px 15px; border-radius:10px; font-size:14px; font-weight:650; }
 .main-mic { border:1px solid #bbd6dc; background:#e9f7f6; }
 .main-mic span { color:var(--blue); }

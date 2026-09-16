@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { readWidgetDraft } from "./lib/widget-draft";
-import { createDictation, type DictationState, type Recognition } from "./lib/dictation";
+import { createRecording, type RecordingState as DictationState } from "./lib/recording";
 
 type Item = {
   id: string;
@@ -134,8 +134,11 @@ export default function MoriceApp() {
   const [executingId, setExecutingId] = useState("");
   const [dictationState, setDictationState] = useState<DictationState>("idle");
   const [dictationError, setDictationError] = useState("");
+  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState("");
+  const audioUrlRef = useRef("");
   const [clock, setClock] = useState<Date | null>(null);
-  const dictationRef = useRef<ReturnType<typeof createDictation> | null>(null);
+  const dictationRef = useRef<ReturnType<typeof createRecording> | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const sendingRef = useRef(false);
 
@@ -238,6 +241,9 @@ export default function MoriceApp() {
     const receiveWidgetDraft = () => {
       const draft = readWidgetDraft(window.location.hash);
       if (draft === null) return;
+      if (voiceActive || recordedAudio || dictationState === "stopping") {
+        setNotice("Terminez votre enregistrement avant d’ouvrir une autre dictée."); return;
+      }
       dictationRef.current?.dispose();
       dictationRef.current = null;
       setMessage(draft);
@@ -248,19 +254,21 @@ export default function MoriceApp() {
     };
     window.addEventListener("hashchange", receiveWidgetDraft);
     return () => window.removeEventListener("hashchange", receiveWidgetDraft);
-  }, []);
+  }, [voiceActive, recordedAudio, dictationState]);
+
+  function keepRecordedAudio(audio: Blob | null) {
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = audio ? URL.createObjectURL(audio) : "";
+    setRecordedAudio(audio); setAudioUrl(audioUrlRef.current);
+  }
+  useEffect(() => () => { if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current); }, []);
 
   useEffect(() => {
-    const updateAvailability = () => dictationRef.current?.setAvailable(navigator.onLine && !document.hidden);
-    window.addEventListener("online", updateAvailability);
-    window.addEventListener("offline", updateAvailability);
-    document.addEventListener("visibilitychange", updateAvailability);
-    return () => {
-      window.removeEventListener("online", updateAvailability);
-      window.removeEventListener("offline", updateAvailability);
-      document.removeEventListener("visibilitychange", updateAvailability);
-    };
-  }, []);
+    const protect = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    if (!voiceActive && !recordedAudio && dictationState !== "stopping") return;
+    window.addEventListener("beforeunload", protect);
+    return () => window.removeEventListener("beforeunload", protect);
+  }, [voiceActive, recordedAudio, dictationState]);
 
   useEffect(() => {
     const updateClock = () => setClock(new Date());
@@ -291,9 +299,9 @@ export default function MoriceApp() {
     setNotice("");
   }
 
-  async function askMorice() {
-    const textToSend = message.trim();
-    if (!textToSend || sendingRef.current || voiceActive || dictationState === "stopping") return;
+  async function askMorice(confirmedText?: string) {
+    const textToSend = (confirmedText ?? message).trim();
+    if (!textToSend || sendingRef.current || (!confirmedText && (voiceActive || recordedAudio || dictationState === "stopping"))) return;
     if (textToSend.length > 1200) { setNotice("Votre demande dépasse 1 200 caractères. Raccourcissez-la avant de l’envoyer."); return; }
     sendingRef.current = true;
     setMessages(previous => [...previous, { id: crypto.randomUUID(), role: "user", text: textToSend }]);
@@ -373,18 +381,40 @@ export default function MoriceApp() {
 
   function toggleDictation() {
     if (voiceActive) { dictationRef.current?.stop(); return; }
-    if (assistantBusy || dictationState === "stopping") return;
-    if (!window.isSecureContext) { setNotice("Le microphone nécessite HTTPS ou localhost."); return; }
-    const browser = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
-    const Constructor = browser.SpeechRecognition || browser.webkitSpeechRecognition;
-    if (!Constructor) { setNotice("La dictée est indisponible dans ce navigateur. Ouvrez Morice dans Chrome ou Edge, ou utilisez le clavier."); return; }
-    window.speechSynthesis?.cancel();
-    setNotice("");
+    if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      setNotice("Le microphone nécessite un navigateur compatible en HTTPS. Essayez Chrome ou Edge."); return;
+    }
+    window.speechSynthesis?.cancel(); setNotice(""); setDictationError("");
     dictationRef.current?.dispose();
-    setDictationError("");
-    dictationRef.current = createDictation({ create: () => new Constructor(), onState: setDictationState, onText: setMessage, onError: (error) => { setDictationError(error); setNotice(error); } });
-    dictationRef.current.setAvailable(navigator.onLine && !document.hidden);
-    dictationRef.current.start(message);
+    dictationRef.current = createRecording({
+      acquire: () => navigator.mediaDevices.getUserMedia({ audio: true }),
+      create: stream => {
+        const mimeType = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(type => MediaRecorder.isTypeSupported(type));
+        return new MediaRecorder(stream, { ...(mimeType ? { mimeType } : {}), audioBitsPerSecond: 32000 });
+      },
+      transcribe: async (audio, signal) => {
+        const response = await fetch("/api/transcription", { method: "POST", body: audio, signal: AbortSignal.any([signal, AbortSignal.timeout(100_000)]) });
+        if (!response.headers.get("content-type")?.includes("application/json")) throw new Error("Connexion au site expirée. Téléchargez votre audio avant de vous reconnecter.");
+        const result = await response.json() as { text?: string; error?: string };
+        if (!response.ok || typeof result.text !== "string") throw new Error(result.error || "Transcription impossible. Réessayez ; votre audio reste dans cette page.");
+        return result.text;
+      },
+      onState: setDictationState, onText: setMessage, onAudio: keepRecordedAudio,
+      onError: error => { setDictationError(error); setNotice(error); },
+      onSend: text => { void askMorice(text); },
+    });
+    void dictationRef.current.start(message);
+  }
+
+  function sendMessage() {
+    if (voiceActive) dictationRef.current?.stop(true);
+    else void askMorice();
+  }
+
+  function discardAudio() {
+    dictationRef.current?.dispose(); dictationRef.current = null;
+    keepRecordedAudio(null); setDictationState(message ? "ready" : "idle"); setDictationError(""); setNotice("");
   }
 
   const dateText = clock ? new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(clock) : "Aujourd’hui";
@@ -421,7 +451,7 @@ export default function MoriceApp() {
                 <div className="welcome-meta"><button onClick={() => setView("tasks")}><strong>{storageStatus === "online" ? tasks.filter(item => item.status !== "done").length : "—"}</strong><span>Tâches à suivre</span></button><button onClick={() => setView("approvals")}><strong>{storageStatus === "online" ? approvals.length : "—"}</strong><span>À valider</span></button><div><strong>{timeText}</strong><span>Heure locale</span></div></div>
               </section>
 
-              <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
+              <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
 
               <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">RACCOURCIS</p><h2>Accès rapide</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source, brand]) => <button key={id} className={`quick-${brand}`} onClick={() => setView(id)}><i><BrandIcon name={brand} /></i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
 
@@ -437,7 +467,7 @@ export default function MoriceApp() {
           </div>
         </>}
 
-        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={askMorice} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} /></div>}
+        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} /></div>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
@@ -486,7 +516,12 @@ function NavigationIcon({ id, fallback }: { id: string; fallback: string }) {
   return brand ? <BrandIcon name={brand} /> : <>{fallback}</>;
 }
 
-function CommandPanel({ dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction, onSpeak }: {
+function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction, onSpeak }: {
+  onPause: () => void;
+  audioUrl: string;
+  audioExtension: string;
+  onRetry: () => void;
+  onDiscard: () => void;
   dictationError: string;
   messages: ChatMessage[];
   message: string;
@@ -501,16 +536,16 @@ function CommandPanel({ dictationError, messages, message, setMessage, assistant
   onSpeak: (text: string) => void;
 }) {
   const listening = ["starting", "listening", "reconnecting", "paused"].includes(voicePhase);
-  const locked = listening || voicePhase === "stopping" || assistantBusy;
+  const locked = listening || Boolean(audioUrl) || voicePhase === "stopping" || assistantBusy;
   const logRef = useRef<HTMLDivElement>(null);
   useEffect(() => { const log = logRef.current; if (log) log.scrollTop = log.scrollHeight; }, [messages, assistantBusy]);
   const labels: Record<string, [string, string]> = {
     idle: ["Microphone éteint", "Un clic démarre l’écoute. Aucun maintien appuyé."],
     starting: ["Ouverture du microphone…", "Autorisez le microphone si le navigateur vous le demande."],
-    listening: ["Écoute en cours", "Prenez votre temps. Appuyez sur Arrêter quand vous avez terminé."],
+    listening: ["Enregistrement en cours", "Les silences ne coupent pas le micro. Pause, Arrêter ou Envoyer : vous décidez. Le texte apparaîtra après l’arrêt."],
     reconnecting: ["Reprise de l’écoute…", "La session du navigateur a été interrompue. Morice relance le micro."],
-    paused: ["Écoute en pause", "Reprise automatique au retour dans cet onglet et avec une connexion réseau."],
-    stopping: ["Transcription…", "Finalisation de votre dernière phrase."],
+    paused: ["Enregistrement en pause", "Touchez Reprendre pour continuer. Votre audio est conservé."],
+    stopping: ["Transcription…", "Votre audio est converti en texte. Gardez cette page ouverte."],
     ready: ["Votre texte est prêt", "Relisez, corrigez si nécessaire, puis envoyez."],
     error: ["Microphone interrompu", "Votre texte est conservé. Consultez le message affiché, puis réessayez."],
     thinking: ["Morice réfléchit…", "Votre demande est en cours de traitement."],
@@ -522,9 +557,10 @@ function CommandPanel({ dictationError, messages, message, setMessage, assistant
       <div className={"voice-progress " + voicePhase} role="status"><div className="voice-indicator" aria-hidden="true"><span /><span /><span /><span /></div><div><b>{phaseLabel}</b><small>{voicePhase === "error" && dictationError ? dictationError : phaseDetail}</small></div></div>
       <label className="sr-only" htmlFor="morice-message">Votre message à Morice</label>
       <textarea id="morice-message" aria-describedby="composer-help" readOnly={locked} value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); onSend(); } }} placeholder="Écrivez ici, ou démarrez le microphone…" rows={3} />
-      <div className="composer-help" id="composer-help"><span>{listening ? "Arrêtez le micro pour corriger ou envoyer." : "Ctrl / ⌘ + Entrée pour envoyer"}</span><span className={message.length > 1200 ? "over-limit" : ""}>{message.length} / 1 200</span></div>
-      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls"><button disabled={assistantBusy || voicePhase === "stopping"} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={onSend} disabled={!message.trim() || message.length > 1200 || locked}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
+      <div className="composer-help" id="composer-help"><span>{listening ? "Gardez cette page ouverte pendant la dictée." : "Ctrl / ⌘ + Entrée pour envoyer"}</span><span className={message.length > 1200 ? "over-limit" : ""}>{message.length} / 1 200</span></div>
+      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls">{(voicePhase === "listening" || voicePhase === "paused") && <button className="secondary" onClick={onPause}>{voicePhase === "paused" ? "Reprendre" : "Pause"}</button>}<button disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={onSend} disabled={assistantBusy || voicePhase === "stopping" || voicePhase === "starting" || Boolean(audioUrl) || (!listening && (!message.trim() || message.length > 1200))}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
     </div>
+    {audioUrl && voicePhase !== "stopping" && <div className="audio-recovery" role="group" aria-label="Audio conservé"><p>Votre audio reste disponible dans cette page jusqu’à sa fermeture.</p><button onClick={onRetry}>Réessayer la transcription</button><a href={audioUrl} download={`morice-dictee.${audioExtension}`}>Télécharger l’audio</a><button className="secondary" onClick={onDiscard}>Effacer l’audio</button></div>}
     <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
       {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
       {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><p>{entry.text}</p>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<button disabled={listening || voicePhase === "stopping"} onClick={() => onSpeak(entry.text)}>Écouter la réponse</button></div>}</article>)}
