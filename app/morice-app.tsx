@@ -12,6 +12,7 @@ import { HorizonJournal } from "./components/horizon-journal";
 import { HorizonWeather } from "./components/horizon-weather";
 import { HorizonDay } from "./components/horizon-day";
 import { OpenClawPanel } from "./components/openclaw-panel";
+import { TodoPanel } from "./components/todo-panel";
 import { type Citation } from "./lib/web-result";
 
 type Item = {
@@ -68,6 +69,7 @@ const navigation = [
   ["documents", "Documents", "▤"],
   ["chat", "Conversation", "✦"],
   ["tasks", "Tâches", "✓"],
+  ["todo", "Microsoft To Do", "✓"],
   ["jobs", "Travaux", "↻"],
   ["improvements", "Améliorations", "✧"],
   ["calendar", "Agenda", "□"],
@@ -435,7 +437,7 @@ export default function MoriceApp() {
       <aside className="morice-sidebar">
         <button className="brand" onClick={() => setView("home")}>
           <img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" />
-          <span><b>MORICE</b><small>Horizon · espace privé</small></span>
+          <span><b>MORICE</b><small>Assistant privé</small></span>
         </button>
         <nav className="side-navigation" aria-label="Navigation principale">
           {navigation.filter(([id]) => ["home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
@@ -449,12 +451,12 @@ export default function MoriceApp() {
       </aside>
 
       <section className="morice-content">
-        <header className={`topbar ${view === "home" ? "dashboard-topbar" : ""}`}><div><p className="eyebrow">MON ESPACE PERSONNEL</p><h1>{view === "home" ? "MORICE — Horizon" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
+        <header className={`topbar ${view === "home" ? "dashboard-topbar" : ""}`}><div><p className="eyebrow">VOTRE ASSISTANT</p><h1>{view === "home" ? "Aujourd’hui" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
         <label className="mobile-sections">Ouvrir un espace<select aria-label="Choisir un espace" value={view} onChange={event => setView(event.target.value)}>{navigation.map(([id, title]) => <option key={id} value={id}>{title}</option>)}<option value="hubspot">HubSpot</option></select></label>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === "home" && <div className="horizon-home">
-          <div className="horizon-heading"><div><p className="eyebrow">{dateText}</p><h2>Votre horizon, Alan.</h2><p>Vos idées. Votre journée. Morice à vos côtés.</p></div><HorizonWeather /></div>
+          <div className="horizon-heading"><div><p className="eyebrow">{dateText}</p><p>Vos idées. Votre journée. Morice à vos côtés.</p></div><HorizonWeather /></div>
           <div className="horizon-layout"><div className="horizon-main">
             <HorizonDay connected={Boolean(connections?.microsoft.connected)} onCalendar={() => setView(connections?.microsoft.connected ? "calendar" : "connections")} />
             <HorizonJournal compact messages={messages} memories={memories} jobs={queue.data.jobs} onOpen={() => setView("journal")} onExplore={exploreIdea} onAdd={saveIdea} voiceActive={voiceActive} error={queue.error} />
@@ -462,7 +464,7 @@ export default function MoriceApp() {
               <button onClick={() => setView("mail")} title="Ouvrir mes emails Outlook"><BrandIcon name="outlook" /><span>Outlook</span></button>
               <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" title="Ouvrir Gmail dans un nouvel onglet"><img className="brand-icon" src="/brand-icons/gmail.png" alt="" /><span>Gmail ↗</span></a>
               <a href="https://www.google.com/" target="_blank" rel="noopener noreferrer" title="Ouvrir Google dans un nouvel onglet"><img className="brand-icon" src="/brand-icons/google.png" alt="" /><span>Google ↗</span></a>
-              <button onClick={() => setView("documents")} title="Mes documents OneDrive"><BrandIcon name="onedrive" /><span>Documents</span></button>
+              <button onClick={() => setView("todo")} title="Mes tâches Microsoft To Do"><BrandIcon name="todo" /><span>To Do</span></button>
               <button className="horizon-mascot" onClick={() => setView("chat")} title="Parler avec Morice"><img src={MORICE_LOGO_SRC} alt="Morice, ouvrir la conversation" /></button>
             </div>
             <p className="horizon-caption">Gmail et Google s’ouvrent dans leur application Web. Leur intégration à Morice reste à connecter.</p>
@@ -472,6 +474,7 @@ export default function MoriceApp() {
           </aside></div>
           <button className="horizon-open-chat" onClick={() => setView("chat")}>Ouvrir ma conversation avec Morice →</button>
         </div>}
+        {view === "todo" && <TodoPanel />}
         {view === "journal" && <div className="horizon-layout"><HorizonJournal messages={messages} memories={memories} jobs={queue.data.jobs} onExplore={exploreIdea} onAdd={saveIdea} voiceActive={voiceActive} error={queue.error} /><aside className="context-rail"><HorizonDay connected={Boolean(connections?.microsoft.connected)} onCalendar={() => setView(connections?.microsoft.connected ? "calendar" : "connections")} /></aside></div>}
 
         {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}

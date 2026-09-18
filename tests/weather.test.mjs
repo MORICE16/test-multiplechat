@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cityQuery,cityId,weatherReading} from '../app/lib/weather.ts';
+import {cityQuery,cityId,weatherReading,weatherCoordinates} from '../app/lib/weather.ts';
+test('coordinates are bounded and rounded before provider transmission',()=>{
+  assert.deepEqual(weatherCoordinates(47.21725,-1.55336),{latitude:47.22,longitude:-1.55});
+  for(const pair of [[null,2],['47',2],[NaN,0],[91,0],[0,-181],[0,Infinity]]) assert.throws(()=>weatherCoordinates(...pair));
+});
 test('weather input is bounded and city selection requires a numeric id',()=>{
   assert.equal(cityQuery(' Montréal '),'Montréal');
   for(const q of ['', 'x','x'.repeat(81),'Paris\nX','<Paris>']) assert.throws(()=>cityQuery(q));

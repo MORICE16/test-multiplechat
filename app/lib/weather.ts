@@ -1,5 +1,9 @@
 export type WeatherCity = { id: number; name: string; region: string; country: string };
 export type WeatherResult = { city: WeatherCity; temperature: number; label: string; theme: 'clear'|'cloud'|'rain'|'snow'|'night'; measuredAt: string; fetchedAt: string };
+export function weatherCoordinates(latitude: unknown, longitude: unknown) {
+  if (typeof latitude !== 'number' || typeof longitude !== 'number' || !Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude)>90 || Math.abs(longitude)>180) throw new Error('Position invalide');
+  return { latitude: Math.round(latitude*100)/100, longitude: Math.round(longitude*100)/100 };
+}
 export function cityQuery(value: string) {
   const city = value.trim();
   if (city.length < 2 || city.length > 80 || /[\x00-\x1f<>]/.test(city)) throw new Error('Ville invalide');

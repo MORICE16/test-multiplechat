@@ -1,13 +1,27 @@
 import { userId } from '@/app/lib/runtime';
-import { cityId, cityQuery, weatherReading } from '@/app/lib/weather';
+import { cityId, cityQuery, weatherReading, weatherCoordinates } from '@/app/lib/weather';
 
 const headers = { 'Cache-Control': 'no-store' };
 async function getJson(url: URL) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(10000), redirect: 'error' });
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000), redirect: 'manual' });
   if (!response.ok) throw new Error('Météo indisponible');
   const data = await response.json();
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Réponse invalide');
   return data as Record<string, unknown>;
+}
+
+export async function POST(request: Request) {
+  try { userId(request); } catch { return Response.json({error:'Authentification requise.'},{status:401,headers}); }
+  if (request.headers.get('Origin') !== new URL(request.url).origin) return Response.json({error:'Origine non autorisée.'},{status:403,headers});
+  let coordinates: ReturnType<typeof weatherCoordinates>;
+  try { const body = await request.json() as {latitude?:unknown;longitude?:unknown}; coordinates=weatherCoordinates(body.latitude,body.longitude); }
+  catch { return Response.json({error:'Position invalide.'},{status:400,headers}); }
+  try {
+    const url=new URL('https://api.open-meteo.com/v1/forecast');
+    url.search=new URLSearchParams({latitude:String(coordinates.latitude),longitude:String(coordinates.longitude),current:'temperature_2m,weather_code,is_day',timeformat:'unixtime',forecast_days:'1'}).toString();
+    const data=await getJson(url);
+    return Response.json({city:{id:0,name:'À proximité',region:'',country:''},...weatherReading(data.current && typeof data.current==='object' ? data.current : {}),fetchedAt:new Date().toISOString()},{headers});
+  } catch { return Response.json({error:'Le service météo ne répond pas. Réessayez ou choisissez une ville.'},{status:502,headers}); }
 }
 function city(data: Record<string, unknown>) {
   if (!Number.isSafeInteger(data.id) || typeof data.name !== 'string') throw new Error('Ville non confirmée');

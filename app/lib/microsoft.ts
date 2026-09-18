@@ -90,6 +90,18 @@ export async function reviewMicrosoftMailbox(uid: string) {
   return inspectMailbox(stored.account_email, path => graph(uid, path));
 }
 
+export async function readMicrosoftTodo(uid: string, listId: string) {
+  const stored = await connection(uid);
+  if (!stored) throw new Error("Connectez Microsoft dans Connexions.");
+  if (listId.length>2048) throw new Error("Liste invalide.");
+  if (!listId) {
+    const data=await graph(uid,"/me/todo/lists?$top=100&$select=id,displayName") as {value?:unknown[];"@odata.nextLink"?:string};
+    return {account:stored.account_email,lists:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
+  }
+  const data=await graph(uid,`/me/todo/lists/${encodeURIComponent(listId)}/tasks?$top=100&$select=id,title,status,importance,dueDateTime,isReminderOn,reminderDateTime,createdDateTime`) as {value?:unknown[];"@odata.nextLink"?:string};
+  return {account:stored.account_email,tasks:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
+}
+
 export async function readMicrosoftDay(uid: string, start: string, end: string) {
   validateDayRange(start, end);
   const query = new URLSearchParams({ startDateTime: start, endDateTime: end, "$top": "100", "$orderby": "start/dateTime", "$select": "id,subject,start,end,isAllDay,isCancelled,location" });
