@@ -33,7 +33,7 @@ async function fixture() {
   const sql=new DatabaseSync(':memory:');
   for(const name of ['0002_conversation_history','0003_jobs']) sql.exec(await readFile(new URL(`../drizzle/${name}.sql`,import.meta.url),'utf8'));
   const f={sql,created:0,retrieved:0,failStart:false,failRead:false,response:completed(),webResult};
-  f.env={DB:{prepare(query){return {bind(...args){return {async run(){const r=sql.prepare(query).run(...args);return {meta:{changes:Number(r.changes)}};},async all(){return {results:sql.prepare(query).all(...args)};},async first(){return sql.prepare(query).get(...args)||null;}};}};},async batch(items){sql.exec('BEGIN');try{const out=[];for(const item of items)out.push(await item.run());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
+  f.env={DB:{prepare(query){return {bind(...args){return {run(){const r=sql.prepare(query).run(...args);return {meta:{changes:Number(r.changes)}};},async all(){return {results:sql.prepare(query).all(...args)};},async first(){return sql.prepare(query).get(...args)||null;}};}};},async batch(items){sql.exec('BEGIN');try{const out=items.map(item=>item.run());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
   f.createWebResponse=async()=>{f.created++;if(f.failStart)throw Error('Connection lost');return {id:'resp_test',status:'queued'};};
   f.retrieveWebResponse=async()=>{f.retrieved++;if(f.failRead)throw Error('Network offline');return f.response;};
   const key=crypto.randomUUID();globalThis[key]=f;
@@ -81,4 +81,23 @@ test('completed but unsourced research is blocked rather than marked successful'
     const id=await f.module.createJob('alice','Test','Query','web_search');await f.module.startResearch('alice',id,'Query');
     f.response={status:'completed',output:[]};await f.module.refreshResearch('alice');assert.equal(f.job(id).status,'blocked');assert.equal(f.job(id).result,'');
   }finally{f.close();}
+});
+
+test('failed conversation save rolls back completion and later recovers without another search',async()=>{
+  const f=await fixture();try {
+    const id=await f.module.createJob('alice','Test','Query','web_search');
+    f.sql.prepare("INSERT INTO morice_messages(user_id,role,text,action,created_at) VALUES('alice','assistant','En cours',?,'now')").run(JSON.stringify({jobId:id}));
+    await f.module.startResearch('alice',id,'Query');
+    f.sql.exec("CREATE TRIGGER simulate_write_failure BEFORE UPDATE ON morice_messages BEGIN SELECT RAISE(ABORT,'temporary write failure'); END;");
+    await f.module.refreshResearch('alice');
+    assert.equal(f.job(id).status,'running');
+    assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_job_events WHERE status='done'").get().n,0);
+    assert.equal(f.sql.prepare('SELECT text FROM morice_messages').get().text,'En cours');
+    f.sql.exec('DROP TRIGGER simulate_write_failure');
+    await f.module.refreshResearch('alice');
+    assert.equal(f.job(id).status,'done');
+    assert.equal(f.sql.prepare('SELECT text FROM morice_messages').get().text,'Source officielle.');
+    assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_job_events WHERE status='done'").get().n,1);
+    assert.equal(f.created,1);
+  } finally {f.close();}
 });

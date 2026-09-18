@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { now } from "./runtime";
 import { createWebResponse, retrieveWebResponse } from "./web-search";
-import { type ModelResponse, webResult } from "./web-result";
+import { webResult } from "./web-result";
 
 export type Job = { id: string; user_id: string; title: string; request: string; operation: string; status: string; response_id: string; result: string; evidence: string; error: string; created_at: string; updated_at: string };
 
@@ -20,15 +20,17 @@ export async function transitionJob(uid: string, id: string, status: string, det
     env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) VALUES(?,?,?,?,?)").bind(id, uid, status, detail, date),
   ]);
 }
-async function completeResearch(uid: string, id: string, response: ModelResponse) {
-  const result = webResult(response);
-  const updated = await env.DB.prepare("UPDATE morice_jobs SET status='done',result=?,evidence=?,error='',updated_at=? WHERE id=? AND user_id=? AND status IN ('running','submitting')")
-    .bind(result.text, JSON.stringify(result), now(), id, uid).run();
-  if (!updated.meta.changes) return;
-  await env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) VALUES(?,?,'done','Recherche Web terminée; sources et résultat conservés',?)").bind(id, uid, now()).run();
-  // Update the existing response rather than creating duplicate completion messages.
-  await env.DB.prepare("UPDATE morice_messages SET text=?,action=? WHERE user_id=? AND role='assistant' AND json_valid(action) AND json_extract(action,'$.jobId')=?")
-    .bind(result.text, JSON.stringify({ id, jobId: id, kind: "result", title: "Recherche terminée", content: result.text, status: "done", label: "Recherche Web terminée", view: "jobs", ...result, text: undefined }), uid, id).run();
+async function completeResearch(uid: string, id: string, result: ReturnType<typeof webResult>) {
+  // D1 batches are transactional: keep result, history and conversation together.
+  // The active-state checks also make concurrent retrievals idempotent.
+  const date = now();
+  await env.DB.batch([
+    env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) SELECT id,user_id,'done','Recherche Web terminée; sources et résultat conservés',? FROM morice_jobs WHERE id=? AND user_id=? AND status IN ('running','submitting')").bind(date, id, uid),
+    env.DB.prepare("UPDATE morice_messages SET text=?,action=? WHERE user_id=? AND role='assistant' AND json_valid(action) AND json_extract(action,'$.jobId')=? AND EXISTS (SELECT 1 FROM morice_jobs WHERE id=? AND user_id=? AND status IN ('running','submitting'))")
+      .bind(result.text, JSON.stringify({ id, jobId: id, kind: "result", title: "Recherche terminée", content: result.text, status: "done", label: "Recherche Web terminée", view: "jobs", ...result, text: undefined }), uid, id, id, uid),
+    env.DB.prepare("UPDATE morice_jobs SET status='done',result=?,evidence=?,error='',updated_at=? WHERE id=? AND user_id=? AND status IN ('running','submitting')")
+      .bind(result.text, JSON.stringify(result), date, id, uid),
+  ]);
 }
 export async function startResearch(uid: string, id: string, query: string) {
   // Claim before sending: an interrupted submission must never start a second paid request automatically.
@@ -38,7 +40,12 @@ export async function startResearch(uid: string, id: string, query: string) {
     const response = await createWebResponse(query, true, id);
     if (!response.id || !/^resp_[a-zA-Z0-9_-]+$/.test(response.id)) throw new Error("La recherche n’a pas fourni d’identifiant de suivi.");
     await env.DB.prepare("UPDATE morice_jobs SET response_id=?,updated_at=? WHERE id=? AND user_id=?").bind(response.id, now(), id, uid).run();
-    if (response.status === "completed") await completeResearch(uid, id, response);
+    if (response.status === "completed") {
+      const result = webResult(response);
+      // If saving fails after the provider finished, retain its ID for reconciliation.
+      try { await completeResearch(uid, id, result); }
+      catch { await env.DB.prepare("UPDATE morice_jobs SET error=? WHERE id=? AND user_id=?").bind("Résultat reçu; enregistrement à reprendre à la prochaine synchronisation.", id, uid).run(); }
+    }
     else if (["queued", "in_progress"].includes(response.status || "")) await transitionJob(uid, id, "running", "Recherche acceptée par OpenAI; exécution en arrière-plan", "", { responseId: response.id, tool: "OpenAI · recherche Web" });
     else throw new Error("Le moteur n’a pas accepté cette recherche.");
   } catch (error) {
@@ -61,8 +68,11 @@ export async function refreshResearch(uid: string) {
     try {
       const response = await retrieveWebResponse(job.response_id);
       if (response.status === "completed") {
-        try { await completeResearch(uid, job.id, response); }
-        catch (error) { await transitionJob(uid, job.id, "blocked", error instanceof Error ? error.message : "Résultat incomplet."); }
+        let result: ReturnType<typeof webResult>;
+        try { result = webResult(response); }
+        catch (error) { await transitionJob(uid, job.id, "blocked", error instanceof Error ? error.message : "Résultat incomplet."); continue; }
+        // Database failures are retried as reads, without marking a valid result failed.
+        await completeResearch(uid, job.id, result);
       }
       else if (!["queued", "in_progress"].includes(response.status || "")) await transitionJob(uid, job.id, "blocked", "La recherche s’est arrêtée sans résultat complet. Demande conservée.");
     } catch (error) {

@@ -3,8 +3,8 @@ const thread = "Three Morice upgrades worth testing now";
 const entries: [string, Improvement["status"], string, string][] = [
   ["Mémoire commune et contexte de conversation", "déjà intégré", "Mémoire et historique sauvegardés; le contexte est envoyé au moteur. Test de restitution effectué dans Morice.", "P1"],
   ["Microsoft Outlook et agenda", "déjà intégré", "Lecture réelle Microsoft Graph. Agenda revérifié depuis la conversation le 18 septembre 2026. Une seule connexion; pas encore le classement de plusieurs boîtes.", "P1"],
-  ["Recherche Web avec sources", "à tester", "Recherche externe et suivi développés. Une réponse n’est complète qu’avec appel Web terminé et sources reçues; validation publiée en cours.", "P1"],
-  ["Lecteur vocal avec pause, vitesse et déplacement", "à tester", "Lecteur audio développé; test réel sur le Z Fold encore nécessaire. Voix synthétique, distincte de la dictée.", "P1"],
+  ["Recherche Web avec sources", "déjà intégré", "Recherche réelle vérifiée dans Morice le 18 septembre : outil Web, sources, résultat et historique retrouvés après rechargement. La présence de sources ne garantit pas l’exactitude de chaque affirmation.", "P1"],
+  ["Lecteur vocal avec pause, vitesse et déplacement", "à tester", "Audio réel testé sur ordinateur le 18 septembre : lecture, pause, vitesses et déplacement. Réponses limitées à 4 000 caractères. Test humain sur Z Fold encore nécessaire; voix synthétique distincte de la dictée.", "P1"],
   ["Dictée manuelle et widget Android", "à tester", "Enregistrement manuel et APK signée disponibles. Installation et longue dictée humaine sur le téléphone à confirmer.", "P1"],
   ["File persistante et travaux de nuit", "à développer", "Historique et recherches distantes développés. La récupération reprend à l’ouverture de Morice. Planification autonome, rappels et notifications hors consultation restent à raccorder.", "P1"],
   ["MultipleChat : équipe interne de MORICE", "à développer", "Compte Smart actif vérifié le 18 septembre. Aucun accès API exposé dans Compte/Gestion. Session navigateur authentifiée disponible; pont automatique non établi.", "P1"],
