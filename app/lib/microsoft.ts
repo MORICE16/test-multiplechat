@@ -95,10 +95,10 @@ export async function readMicrosoftTodo(uid: string, listId: string) {
   if (!stored) throw new Error("Connectez Microsoft dans Connexions.");
   if (listId.length>2048) throw new Error("Liste invalide.");
   if (!listId) {
-    const data=await graph(uid,"/me/todo/lists?$top=100&$select=id,displayName") as {value?:unknown[];"@odata.nextLink"?:string};
+    const data=await graph(uid,"/me/todo/lists") as {value?:unknown[];"@odata.nextLink"?:string};
     return {account:stored.account_email,lists:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
   }
-  const data=await graph(uid,`/me/todo/lists/${encodeURIComponent(listId)}/tasks?$top=100&$select=id,title,status,importance,dueDateTime,isReminderOn,reminderDateTime,createdDateTime`) as {value?:unknown[];"@odata.nextLink"?:string};
+  const data=await graph(uid,`/me/todo/lists/${encodeURIComponent(listId)}/tasks?$top=100`) as {value?:unknown[];"@odata.nextLink"?:string};
   return {account:stored.account_email,tasks:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
 }
 

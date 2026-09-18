@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { WeatherCity, WeatherResult } from '@/app/lib/weather';
+import { deviceWeather } from '@/app/lib/weather-browser';
 
 const storageKey = 'morice-weather-city-v1';
 export function HorizonWeather() {
@@ -52,9 +53,7 @@ export function HorizonWeather() {
       controller?.abort(); controller = new AbortController();
       setBusy(true); setError('');
       try {
-        const response = await fetch(follow ? '/api/weather' : `/api/weather?id=${selected}`, follow ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(position),signal:controller.signal} : {signal:controller.signal});
-        const data = await response.json() as WeatherResult & {error?: string};
-        if (!response.ok) throw new Error(data.error || 'Météo indisponible.');
+        const data = await deviceWeather(selected,follow ? position : null,AbortSignal.any([controller.signal,AbortSignal.timeout(15000)]));
         if (!active || currentRun !== run) return;
         setWeather(data); document.documentElement.dataset.weather = data.theme;
         document.documentElement.dataset.temperature = data.temperature>=25 ? 'warm' : data.temperature<=8 ? 'cold' : 'mild';
