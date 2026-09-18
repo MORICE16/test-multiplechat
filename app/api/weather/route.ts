@@ -4,7 +4,7 @@ import { cityId, cityQuery, weatherReading, weatherCoordinates } from '@/app/lib
 const headers = { 'Cache-Control': 'no-store' };
 async function getJson(url: URL) {
   const response = await fetch(url, { signal: AbortSignal.timeout(10000), redirect: 'manual' });
-  if (!response.ok) throw new Error('Météo indisponible');
+  if (!response.ok) throw new Error(`Service météo indisponible (${url.hostname}, HTTP ${response.status}).`);
   const data = await response.json();
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Réponse invalide');
   return data as Record<string, unknown>;
@@ -52,5 +52,9 @@ export async function GET(request: Request) {
     url.search = new URLSearchParams({latitude:String(location.latitude), longitude:String(location.longitude), current:'temperature_2m,weather_code,is_day', timeformat:'unixtime', forecast_days:'1'}).toString();
     const data = await getJson(url);
     return Response.json({city:selected, ...weatherReading(data.current && typeof data.current === 'object' ? data.current : {}), fetchedAt:new Date().toISOString()}, {headers});
-  } catch {return Response.json({error:'Météo indisponible pour le moment. Réessayez plus tard.'}, {status:502, headers});}
+  } catch (error) {
+    const reason=error instanceof Error ? error.message : '';
+    const safeReason=reason.startsWith('Service météo indisponible') || ['Météo non confirmée','Ville non confirmée','Coordonnées invalides','Réponse invalide'].includes(reason) ? reason : 'Météo indisponible pour le moment. Réessayez plus tard.';
+    return Response.json({error:safeReason}, {status:502, headers});
+  }
 }
