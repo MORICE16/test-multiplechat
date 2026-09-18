@@ -1,4 +1,4 @@
-import { runtimeValue } from "@/app/lib/runtime";
+import { runtimeValue, userId } from "@/app/lib/runtime";
 
 const scopes = [
   "openid",
@@ -19,6 +19,7 @@ function base64Url(bytes: Uint8Array) {
 }
 
 export async function GET(request: Request) {
+  userId(request);
   const clientId = runtimeValue("MICROSOFT_CLIENT_ID");
   const tenant = runtimeValue("MICROSOFT_TENANT_ID") || "common";
   if (!clientId) return Response.json({ error: "L’identifiant Microsoft de Morice n’est pas encore configuré." }, { status: 503 });
@@ -40,6 +41,8 @@ export async function GET(request: Request) {
     prompt: "select_account",
   }).toString();
 
+  const hint = new URL(request.url).searchParams.get("email") || "";
+  if (hint.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(hint)) authorize.searchParams.set("login_hint", hint);
   const response = new Response(null, { status: 302, headers: { Location: authorize.toString() } });
   const cookieOptions = "Path=/api/microsoft; HttpOnly; Secure; SameSite=Lax; Max-Age=600";
   response.headers.append("Set-Cookie", `morice_ms_state=${state}; ${cookieOptions}`);

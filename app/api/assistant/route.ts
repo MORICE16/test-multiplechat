@@ -14,7 +14,7 @@ type Plan = {
   requiresApproval: boolean;
   provider: "local" | "microsoft" | "make";
   operation: string;
-  payload: Required<{ [Key in Exclude<keyof ActionPayload, "categoryPlan">]: string | null }>;
+  payload: Required<{ [Key in Exclude<keyof ActionPayload, "categoryPlan" | "accountId">]: string | null }>;
 };
 
 const writeIntents = new Set<Intent>(["mail_draft", "mail_send", "calendar_create", "todo_create", "make_trigger"]);

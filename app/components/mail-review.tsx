@@ -1,9 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MailReview } from "../lib/mail-triage";
 import { MAIL_CATEGORIES } from "../lib/mail-categories";
 
 export function MailReviewPanel() {
+  const [accounts, setAccounts] = useState<Array<{ id: string; email: string }>>([]);
+  const [accountId, setAccountId] = useState("");
+  useEffect(() => { fetch("/api/connections", { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(); return r.json() as Promise<{ microsoft: { accounts?: Array<{ id: string; email: string }> } }>; }).then(d => setAccounts(d.microsoft.accounts || [])).catch(() => setError("Liste des comptes indisponible.")); }, []);
   const [review, setReview] = useState<MailReview | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +19,7 @@ export function MailReviewPanel() {
   async function load() {
     setLoading(true); setError("");
     try {
-      const response = await fetch("/api/microsoft/triage", { cache: "no-store" });
+      const response = await fetch(`/api/microsoft/triage?accountId=${encodeURIComponent(accountId)}`, { cache: "no-store" });
       const data = await response.json() as MailReview & { error?: string; permissions: typeof permissions };
       if (!response.ok) throw new Error(data.error || "Lecture indisponible.");
       setReview(data); setPermissions(data.permissions); setFilter("Tous"); setPage(0); setSelection({}); setApproval(null);
@@ -27,7 +30,7 @@ export function MailReviewPanel() {
     if (!review) return;
     setLoading(true); setError(""); setResult("");
     try {
-      const response = await fetch("/api/microsoft/triage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ account: review.account, entries: Object.entries(selection).map(([id, category]) => ({ id, category })) }) });
+      const response = await fetch("/api/microsoft/triage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountId, account: review.account, entries: Object.entries(selection).map(([id, category]) => ({ id, category })) }) });
       const data = await response.json() as { id: string; summary: string; error?: string };
       if (!response.ok) throw new Error(data.error || "Préparation impossible.");
       setApproval(data);
@@ -51,7 +54,8 @@ export function MailReviewPanel() {
   const shown = review?.messages.filter(message => filter === "Tous" || (message.suggestions.length ? message.suggestions : ["À examiner"]).includes(filter)) || [];
   return <section className="panel" aria-label="Préparer le classement des mails">
     <p className="eyebrow">CLASSEMENT À PRÉPARER</p><h2>Organiser ma boîte mail</h2>
-    <p>Examiner jusqu’à 100 messages récents de la boîte de réception, depuis janvier 2025. Les autres comptes et dossiers ne sont pas inclus.</p>
+    <label>Boîte Microsoft <select value={accountId} disabled={loading} onChange={event => { setAccountId(event.target.value); setReview(null); setSelection({}); setApproval(null); setResult(""); setError(""); }}><option value="">Compte principal</option>{accounts.filter(a => a.id).map(a => <option value={a.id} key={a.id}>{a.email}</option>)}</select></label>
+    <p>Examiner jusqu’à 100 messages récents de la boîte choisie, depuis janvier 2025. Les autres dossiers ne sont pas encore inclus.</p>
     <p>Propositions par mots-clés dans l’objet et l’expéditeur. Choisissez les catégories, puis validez leur ajout dans Outlook. Aucun déplacement, envoi ou suppression.</p>
     <button disabled={loading} onClick={load}>{loading ? "Lecture Microsoft en cours…" : review ? "Actualiser les propositions" : "Préparer le classement"}</button>
     {error && <p role="alert">{error}{review ? " Le résultat ci-dessous provient de la lecture précédente." : ""}</p>}

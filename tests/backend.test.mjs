@@ -12,7 +12,7 @@ import { CategoryExecutionError, categoryPermissions, validateCategoryPlan, appl
 // external providers are substituted. No real email/webhook is sent.
 async function fixture() {
   const sql = new DatabaseSync(':memory:');
-  for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
+  for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history', '0004_ancient_micromax']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
   const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan };
   f.env = { DB: {
@@ -40,12 +40,14 @@ async function fixture() {
     source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
+      const connection=(...a)=>f.microsoftConnection(...a);
       const fetch=(...a)=>f.fetch(...a);
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
     const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
     return import('data:text/javascript;base64,' + Buffer.from(code).toString('base64'));
   };
+  f.microsoftConnection = (await f.route('app/lib/microsoft-accounts.ts')).microsoftConnection;
   f.pending = (uid='alice') => {
     sql.prepare("INSERT INTO morice_items VALUES('action',?,'approval','Test','Details','pending','normal',0,'now','now')").run(uid);
     sql.prepare("INSERT INTO morice_action_payloads VALUES('action',?,'microsoft','mail_send','{}','','now',NULL)").run(uid);
@@ -54,6 +56,56 @@ async function fixture() {
   f.close = () => { sql.close(); delete globalThis[key]; };
   return f;
 }
+
+test('additional mailbox is isolated by owner and never falls back to the primary account', async () => {
+  const f = await fixture();
+  try {
+    const expiry = new Date(Date.now()+3600000).toISOString();
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh',?,'primary@example.invalid','Mail.ReadWrite','connected','now')").run(expiry);
+    f.sql.prepare("INSERT INTO morice_microsoft_accounts VALUES('alice','second','secondary','refresh',?,'second@example.invalid','Mail.ReadWrite','connected','now')").run(expiry);
+    assert.equal((await f.microsoftConnection('alice')).access_token, 'primary');
+    assert.equal((await f.microsoftConnection('alice','second')).access_token, 'secondary');
+    assert.equal(await f.microsoftConnection('bob','second'), null);
+    const ms = await f.route('app/lib/microsoft.ts');
+    f.fetch = async (_url, init) => { assert.equal(init.headers.Authorization, 'Bearer secondary'); return Response.json({value:[]}); };
+    assert.match(await ms.runMicrosoftAction('alice','mail_read',{accountId:'second'}), /Aucun mail/);
+    await assert.rejects(ms.runMicrosoftAction('bob','mail_read',{accountId:'second'}), /reconnecté/);
+    await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{accountId:'second'}), /compte principal/);
+  } finally { f.close(); }
+});
+
+test('OAuth for another mailbox preserves the primary connection and reconnects idempotently', async () => {
+  const f = await fixture();
+  try {
+    f.vars.MICROSOFT_CLIENT_ID='test'; f.vars.MICROSOFT_CLIENT_SECRET='test';
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh','2099','primary@example.invalid','Mail.ReadWrite','connected','now')").run();
+    f.fetch = async (url, init) => url.includes('/token') ? Response.json({access_token:'secondary',refresh_token:'r',expires_in:3600,scope:'Mail.ReadWrite'}) : Response.json(init.headers.Authorization === 'Bearer primary' ? {id:'primary-id'} : {id:'secondary-id',mail:'second@example.invalid'});
+    const callback=await f.route('app/api/microsoft/callback/route.ts');
+    const request=()=>new Request('https://morice.example/api/microsoft/callback?state=state&code=code',{headers:{cookie:'morice_ms_state=state; morice_ms_verifier=verifier'}});
+    for(let i=0;i<2;i++) assert.match((await callback.GET(request())).headers.get('location'),/microsoft=connected/);
+    assert.equal((await f.microsoftConnection('alice')).access_token,'primary');
+    assert.equal((await f.microsoftConnection('alice','secondary-id')).access_token,'secondary');
+    assert.equal(f.sql.prepare('SELECT count(*) AS n FROM morice_microsoft_accounts').get().n,1);
+    f.fetch=async url=>url.includes('/token') ? Response.json({access_token:'bad',refresh_token:'bad'}) : Response.json({error:'failed'},{status:403});
+    assert.match((await callback.GET(request())).headers.get('location'),/microsoft=error/);
+    assert.equal((await f.microsoftConnection('alice','secondary-id')).access_token,'secondary');
+  } finally { f.close(); }
+});
+
+test('refreshing an additional account cannot overwrite primary or another owner tokens', async () => {
+  const f = await fixture();
+  try {
+    f.vars.MICROSOFT_CLIENT_ID='test'; f.vars.MICROSOFT_CLIENT_SECRET='test';
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh','2099','primary@example.invalid','','connected','now')").run();
+    for(const owner of ['alice','bob']) f.sql.prepare("INSERT INTO morice_microsoft_accounts VALUES(?,'second','expired','refresh','2000','second@example.invalid','','connected','now')").run(owner);
+    f.fetch=async (url,init)=>{ if(url.includes('/token')) return Response.json({access_token:'renewed',refresh_token:'new-refresh',expires_in:3600}); assert.equal(init.headers.Authorization,'Bearer renewed'); return Response.json({value:[]}); };
+    const ms=await f.route('app/lib/microsoft.ts');
+    await ms.runMicrosoftAction('alice','mail_read',{accountId:'second'});
+    assert.equal((await f.microsoftConnection('alice','second')).access_token,'renewed');
+    assert.equal((await f.microsoftConnection('bob','second')).access_token,'expired');
+    assert.equal((await f.microsoftConnection('alice')).access_token,'primary');
+  } finally { f.close(); }
+});
 const request = (body, uid='alice') => new Request('https://morice.test/api', { method: 'POST', headers: { 'Content-Type': 'application/json', 'test-user': uid }, body: JSON.stringify(body) });
 
 test('concurrent confirmations dispatch the external action exactly once', async () => {

@@ -1,3 +1,4 @@
+import { microsoftConnection } from "@/app/lib/microsoft-accounts";
 import { reviewMicrosoftMailbox } from "@/app/lib/microsoft";
 import { userId } from "@/app/lib/runtime";
 import { env } from "cloudflare:workers";
@@ -6,8 +7,9 @@ import { categoryPermissions, validateCategoryPlan, type CategoryEntry } from "@
 export async function GET(request: Request) {
   const uid = userId(request);
   try {
-    const connection = await env.DB.prepare("SELECT scopes FROM morice_connections WHERE user_id=? AND provider='microsoft' AND status='connected'").bind(uid).first<{ scopes: string }>();
-    return Response.json({ ...await reviewMicrosoftMailbox(uid), permissions: categoryPermissions(connection?.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
+    const accountId = new URL(request.url).searchParams.get("accountId") || "";
+    const connection = await microsoftConnection(uid, accountId);
+    return Response.json({ ...await reviewMicrosoftMailbox(uid, accountId), accountId, permissions: categoryPermissions(connection?.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ error: "La lecture des mails n’a pas abouti. Vérifiez Microsoft dans Connexions puis réessayez." }, { status: 502, headers: { "Cache-Control": "no-store" } });
   }
@@ -17,9 +19,10 @@ export async function POST(request: Request) {
   const uid = userId(request);
   if (request.headers.get("Origin") !== new URL(request.url).origin) return Response.json({ error: "Origine non autorisée." }, { status: 403 });
   try {
-    const body = await request.json() as { entries?: CategoryEntry[]; account?: string };
+    const body = await request.json() as { entries?: CategoryEntry[]; account?: string; accountId?: string };
     const createdAt = new Date().toISOString();
-    const review = await reviewMicrosoftMailbox(uid);
+    const accountId = typeof body.accountId === "string" ? body.accountId : "";
+    const review = await reviewMicrosoftMailbox(uid, accountId);
     const plan = { account: body.account || "", createdAt, entries: body.entries || [] };
     validateCategoryPlan(plan, review.account);
     // Only current Inbox messages from the reviewed perimeter may be selected.
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
     const summary = `${review.account}\n${plan.entries.map(entry => `${entry.subject} → ${entry.category}`).join("\n")}\nAjout de catégories seulement. Validité : 30 minutes.`;
     await env.DB.batch([
       env.DB.prepare("INSERT INTO morice_items(id,user_id,kind,title,content,status,priority,position,created_at,updated_at) VALUES(?,?,'approval',?,?,'pending','normal',0,?,?)").bind(id, uid, title, summary, createdAt, createdAt),
-      env.DB.prepare("INSERT INTO morice_action_payloads(item_id,user_id,provider,operation,payload,result,created_at) VALUES(?,?,'microsoft','mail_categorize',?,'',?)").bind(id, uid, JSON.stringify({ categoryPlan: plan }), createdAt),
+      env.DB.prepare("INSERT INTO morice_action_payloads(item_id,user_id,provider,operation,payload,result,created_at) VALUES(?,?,'microsoft','mail_categorize',?,'',?)").bind(id, uid, JSON.stringify({ categoryPlan: plan, accountId }), createdAt),
     ]);
     return Response.json({ id, summary }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

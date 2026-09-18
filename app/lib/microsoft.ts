@@ -18,22 +18,13 @@ export type ActionPayload = {
   notes?: string | null;
   webhookEvent?: string | null;
   categoryPlan?: CategoryPlan;
+  accountId?: string;
 };
 
-type ConnectionRow = {
-  access_token: string;
-  refresh_token: string;
-  expires_at: string;
-  account_email: string;
-  scopes: string;
-};
+import { microsoftConnection as connection } from "./microsoft-accounts";
 
-async function connection(uid: string) {
-  return env.DB.prepare("SELECT access_token, refresh_token, expires_at, account_email, scopes FROM morice_connections WHERE user_id = ? AND provider = 'microsoft' AND status = 'connected'").bind(uid).first<ConnectionRow>();
-}
-
-async function accessToken(uid: string) {
-  const stored = await connection(uid);
+async function accessToken(uid: string, accountId = "") {
+  const stored = await connection(uid, accountId);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
 
   if (new Date(stored.expires_at).getTime() > Date.now() + 60_000) {
@@ -61,14 +52,17 @@ async function accessToken(uid: string) {
 
   const refreshToken = token.refresh_token || await decryptSecret(stored.refresh_token);
   const expiresAt = new Date(Date.now() + Math.max(60, token.expires_in || 3600) * 1000).toISOString();
-  await env.DB.prepare("UPDATE morice_connections SET access_token = ?, refresh_token = ?, expires_at = ?, updated_at = ? WHERE user_id = ? AND provider = 'microsoft'")
+  if (accountId) {
+    await env.DB.prepare("UPDATE morice_microsoft_accounts SET access_token=?,refresh_token=?,expires_at=?,updated_at=? WHERE user_id=? AND account_id=?")
+      .bind(await encryptSecret(token.access_token), await encryptSecret(refreshToken), expiresAt, now(), uid, accountId).run();
+  } else await env.DB.prepare("UPDATE morice_connections SET access_token = ?, refresh_token = ?, expires_at = ?, updated_at = ? WHERE user_id = ? AND provider = 'microsoft'")
     .bind(await encryptSecret(token.access_token), await encryptSecret(refreshToken), expiresAt, now(), uid).run();
   return token.access_token;
 }
 
-async function graph(uid: string, path: string, init?: RequestInit) {
+async function graph(uid: string, path: string, init?: RequestInit, accountId = "") {
   let token: string;
-  try { token = await accessToken(uid); }
+  try { token = await accessToken(uid, accountId); }
   catch { throw new ActionError("Microsoft 365 doit être reconnecté dans Connexions. Aucune action n’a été envoyée.", true); }
   const response = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     ...init,
@@ -84,10 +78,10 @@ async function graph(uid: string, path: string, init?: RequestInit) {
   return payload as Record<string, unknown> | null;
 }
 
-export async function reviewMicrosoftMailbox(uid: string) {
-  const stored = await connection(uid);
+export async function reviewMicrosoftMailbox(uid: string, accountId = "") {
+  const stored = await connection(uid, accountId);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
-  return inspectMailbox(stored.account_email, path => graph(uid, path));
+  return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId));
 }
 
 export async function readMicrosoftTodo(uid: string, listId: string) {
@@ -110,16 +104,18 @@ export async function readMicrosoftDay(uid: string, start: string, end: string) 
 }
 
 export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload, progress: (text: string) => Promise<void> = async () => {}) {
+  const accountId = payload.accountId || "";
+  if (accountId && !["mail_categorize", "mail_triage", "mail_read"].includes(operation)) throw new ActionError("Cette action utilise encore le compte principal.", true);
   if (operation === "mail_categorize") {
-    const stored = await connection(uid);
+    const stored = await connection(uid, accountId);
     const permissions = categoryPermissions(stored?.scopes || "");
     if (!stored || !permissions.writeMail || !permissions.manageCategories) throw new ActionError("Autorisez le classement Microsoft depuis Emails avant de valider.", true);
     validateCategoryPlan(payload.categoryPlan!, stored.account_email);
-    return applyCategoryPlan(payload.categoryPlan!, (path, init) => graph(uid, path, init), progress);
+    return applyCategoryPlan(payload.categoryPlan!, (path, init) => graph(uid, path, init, accountId), progress);
   }
-  if (operation === "mail_triage") return mailReviewText(await reviewMicrosoftMailbox(uid));
+  if (operation === "mail_triage") return mailReviewText(await reviewMicrosoftMailbox(uid, accountId));
   if (operation === "mail_read") {
-    const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead") as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };
+    const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead", undefined, accountId) as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };
     const rows = data?.value || [];
     return rows.length ? rows.map(message => `${message.isRead ? "Lu" : "Non lu"} — ${message.from?.emailAddress?.name || "Expéditeur inconnu"} : ${message.subject || "Sans objet"}`).join("\n") : "Aucun mail récent.";
   }
@@ -166,7 +162,7 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     return "Le rendez-vous a été créé dans Outlook.";
   }
   if (operation === "todo_create") {
-    const lists = await graph(uid, "/me/todo/lists?$top=20&$select=id,displayName") as { value?: Array<{ id?: string; displayName?: string }> };
+    const lists = await graph(uid, "/me/todo/lists") as { value?: Array<{ id?: string; displayName?: string }> };
     const wanted = (payload.list || "Tasks").toLocaleLowerCase("fr");
     const list = (lists?.value || []).find(item => item.displayName?.toLocaleLowerCase("fr") === wanted) || lists?.value?.[0];
     if (!list?.id) throw new ActionError("Aucune liste Microsoft To Do n’est disponible.", true);

@@ -56,7 +56,7 @@ type BrandIconName = "hubspot" | "outlook" | "todo" | "notes" | "onedrive" | "bi
 
 type ConnectionState = {
   openai: { configured: boolean; model: string };
-  microsoft: { configured: boolean; connected: boolean; account: string };
+  microsoft: { configured: boolean; connected: boolean; account: string; accounts?: Array<{ id: string; email: string }> };
   make: { configured: boolean };
   hubspot: { configured: false; disabled: true; reason: string };
 };
@@ -623,6 +623,8 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
   return <section className="panel"><p className="eyebrow">SERVICES AUTORISÉS</p><h2>Connexions</h2><p>Les secrets restent côté serveur. Les actions externes sensibles attendent toujours ta validation.</p><div className="connection-grid">
     <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Configurée · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
     <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Connecté · ${state.microsoft.account}` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
+    <article><div><b>Autres boîtes Microsoft</b>{state?.microsoft.accounts?.filter(account => account.id).map(account => <span className="connected" key={account.id}>{account.email} · Connectée</span>)}<span>Les comptes ajoutés sont conservés séparément. Choisissez votre boîte dans Emails. Agenda, To Do et conversation utilisent encore le compte principal.</span></div><a className="secondary" href="/api/microsoft/start?categories=1">Ajouter une boîte Microsoft</a></article>
+    <article><div><b>Google / Gmail</b><span>Raccordement à Morice à configurer. Une connexion Gmail dans Codex ne connecte pas automatiquement cette application.</span></div></article>
     <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook configuré · vérifié lors de l’exécution" : "Webhook à ajouter"}</span></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>
     <OpenClawPanel />

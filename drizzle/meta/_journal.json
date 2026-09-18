@@ -23,6 +23,19 @@
       "tag": "0002_conversation_history",
       "breakpoints": true
     },
-    { "idx": 3, "version": "6", "when": 1789695000000, "tag": "0003_jobs", "breakpoints": true }
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1789695000000,
+      "tag": "0003_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1789733111814,
+      "tag": "0004_ancient_micromax",
+      "breakpoints": true
+    }
   ]
 }

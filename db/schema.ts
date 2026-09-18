@@ -17,6 +17,13 @@ export const connections = sqliteTable("morice_connections", {
   status: text("status").notNull().default("connected"),
   updatedAt: text("updated_at").notNull(),
 }, table => [primaryKey({ columns: [table.userId, table.provider] })]);
+export const microsoftAccounts = sqliteTable("morice_microsoft_accounts", {
+  userId: text("user_id").notNull(), accountId: text("account_id").notNull(),
+  accessToken: text("access_token").notNull(), refreshToken: text("refresh_token").notNull(),
+  expiresAt: text("expires_at").notNull(), accountEmail: text("account_email").notNull(),
+  scopes: text("scopes").notNull(), status: text("status").notNull().default("connected"), updatedAt: text("updated_at").notNull(),
+}, table => [primaryKey({ columns: [table.userId, table.accountId] })]);
+
 export const actionPayloads = sqliteTable("morice_action_payloads", {
   itemId: text("item_id").primaryKey(),
   userId: text("user_id").notNull(),
