@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { ActionError, actionFailure } from '../app/lib/action-error.ts';
 import { boundedHistory, planningError } from '../app/lib/assistant-context.ts';
+import { inspectMailbox, mailReviewText } from '../app/lib/mail-triage.ts';
 
 // Run the real route SQL against SQLite; only the Cloudflare transport and
 // external providers are substituted. No real email/webhook is sent.
@@ -12,7 +13,7 @@ async function fixture() {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
-  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError };
+  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText };
   f.env = { DB: {
     prepare(query) {
       return { query, bind(...values) {
@@ -35,7 +36,7 @@ async function fixture() {
   f.route = async path => {
     let source = await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
     source = source.replace(/^import .*;\r?\n/gm, '');
-    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError} = f;
+    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const fetch=(...a)=>f.fetch(...a);
@@ -137,4 +138,15 @@ test('direct Microsoft reading forbids write operations and passes only authenti
     assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
     assert.equal((await response.json()).result,'Calendar verified');
   } finally { f.close(); }
+});
+
+test('mail triage uses the authenticated mailbox and performs only a Graph GET', async () => {
+  const f=await fixture();try {
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');let reads=0;
+    f.fetch=async(url,init)=>{reads++;assert.equal(init.method,undefined);assert.match(url,/graph.microsoft.com\/v1.0\/me\/mailFolders\/inbox\/messages/);return Response.json({value:[{subject:'Facture notaire'}]});};
+    await assert.rejects(()=>ms.reviewMicrosoftMailbox('bob'),/Connecte/);assert.equal(reads,0);
+    const result=await ms.reviewMicrosoftMailbox('alice');assert.equal(result.account,'alice@example.invalid');assert.equal(reads,1);
+    assert.equal(result.messages[0].suggestions.length,2);
+  }finally{f.close();}
 });

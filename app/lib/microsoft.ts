@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import { decryptSecret, encryptSecret } from "./secret-crypto";
 import { now, runtimeValue } from "./runtime";
 import { ActionError } from "./action-error";
+import { inspectMailbox, mailReviewText } from "./mail-triage";
 
 export type ActionPayload = {
   to?: string | null;
@@ -80,7 +81,14 @@ async function graph(uid: string, path: string, init?: RequestInit) {
   return payload as Record<string, unknown> | null;
 }
 
+export async function reviewMicrosoftMailbox(uid: string) {
+  const stored = await connection(uid);
+  if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
+  return inspectMailbox(stored.account_email, path => graph(uid, path));
+}
+
 export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload) {
+  if (operation === "mail_triage") return mailReviewText(await reviewMicrosoftMailbox(uid));
   if (operation === "mail_read") {
     const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead") as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };
     const rows = data?.value || [];
