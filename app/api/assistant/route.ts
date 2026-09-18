@@ -3,6 +3,7 @@ import { runMicrosoftAction, type ActionPayload } from "@/app/lib/microsoft";
 import { now, runtimeValue, userId } from "@/app/lib/runtime";
 import { boundedHistory, planningError, type HistoryMessage } from "@/app/lib/assistant-context";
 import { createJob, startResearch, transitionJob } from "@/app/lib/jobs";
+import { isExplicitMailPreview } from "@/app/lib/mail-triage";
 
 type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "onedrive_search" | "make_trigger" | "web_search" | "answer";
 type Plan = {
@@ -47,6 +48,7 @@ function localPlan(message: string, mode: string): Plan {
 
 async function intelligentPlan(message: string, mode: string, history: HistoryMessage[], memory: string): Promise<Plan> {
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
+  if (mode === "auto" && isExplicitMailPreview(message)) return { intent: "mail_triage", title: "Préparer le classement de la boîte connectée", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_triage", payload: emptyPayload() };
   const key = runtimeValue("OPENAI_API_KEY");
   if (!key) {
     if (mode === "approval") return localPlan(message, mode);

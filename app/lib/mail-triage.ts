@@ -2,6 +2,15 @@ export type MailSummary = { id?: string; subject?: string; receivedDateTime?: st
 export type MailSuggestion = { subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
 export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[] };
 
+export function isExplicitMailPreview(message: string) {
+  const text = message.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  // Only a direct request at the beginning; quoted examples and negated commands are not actions.
+  return /^(?:(?:morice|maurice)[, :]+)?(?:prepare|preparer|montre[- ]moi|affiche)\b/.test(text.trim())
+    && /\b(apercu|propositions?|plan)\b/.test(text)
+    && /\b(classement|tri|categories?)\b/.test(text)
+    && /\b(mails?|emails?|courriels?|boites?)\b/.test(text);
+}
+
 const rules: [string, RegExp][] = [
   ["Juridique / Notaire", /\b(notaire|notaires|notarial|notariale|notariaux)\b/],
   ["Juridique / Huissier", /\b(huissier|huissiers|commissaire de justice|commissaires de justice)\b/],

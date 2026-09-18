@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { suggestMail, inspectMailbox, mailReviewText } from '../app/lib/mail-triage.ts';
+import { suggestMail, inspectMailbox, mailReviewText, isExplicitMailPreview } from '../app/lib/mail-triage.ts';
+
+test('only explicit mail preview commands qualify for direct read-only routing',()=>{
+  assert.equal(isExplicitMailPreview('Prépare un aperçu du classement des mails de mes cinq boîtes.'),true);
+  for(const text of ['Ne prépare pas un aperçu du classement des mails','Explique la phrase « prépare un aperçu du classement des mails »','Prépare un mail pour le notaire','Classe tous mes mails','Mémorise : prépare un aperçu du classement des mails']) assert.equal(isExplicitMailPreview(text),false,text);
+});
 
 test('proposals explain evidence, preserve categories and leave unknown mail undecided', () => {
   const input={subject:'Facture du notaire',from:{emailAddress:{name:'Étude notariale'}},categories:['Personnel'],importance:'normal',isRead:false};

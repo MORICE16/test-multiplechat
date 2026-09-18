@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { ActionError, actionFailure } from '../app/lib/action-error.ts';
 import { boundedHistory, planningError } from '../app/lib/assistant-context.ts';
-import { inspectMailbox, mailReviewText } from '../app/lib/mail-triage.ts';
+import { inspectMailbox, mailReviewText, isExplicitMailPreview } from '../app/lib/mail-triage.ts';
 
 // Run the real route SQL against SQLite; only the Cloudflare transport and
 // external providers are substituted. No real email/webhook is sent.
@@ -13,7 +13,7 @@ async function fixture() {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
-  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText };
+  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview };
   f.env = { DB: {
     prepare(query) {
       return { query, bind(...values) {
@@ -36,7 +36,7 @@ async function fixture() {
   f.route = async path => {
     let source = await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
     source = source.replace(/^import .*;\r?\n/gm, '');
-    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText} = f;
+    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const fetch=(...a)=>f.fetch(...a);
