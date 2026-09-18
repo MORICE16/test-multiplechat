@@ -13,11 +13,13 @@ export async function createJob(uid: string, title: string, request: string, ope
   ]);
   return id;
 }
-export async function transitionJob(uid: string, id: string, status: string, detail: string, result = "", evidence: object = {}) {
+export async function transitionJob(uid: string, id: string, status: "running" | "done" | "blocked", detail: string, result = "", evidence: object = {}) {
   const date = now();
   await env.DB.batch([
-    env.DB.prepare("UPDATE morice_jobs SET status=?,result=?,evidence=?,error=?,updated_at=? WHERE id=? AND user_id=?").bind(status, result, JSON.stringify(evidence), status === "blocked" ? detail : "", date, id, uid),
-    env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) VALUES(?,?,?,?,?)").bind(id, uid, status, detail, date),
+    // A delayed provider acknowledgement or stale timeout must never reopen a
+    // terminal job, erase its result or create an event for a different owner.
+    env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) SELECT id,user_id,?,?,? FROM morice_jobs WHERE id=? AND user_id=? AND status IN ('queued','submitting','running') AND status<>?").bind(status, detail, date, id, uid, status),
+    env.DB.prepare("UPDATE morice_jobs SET status=?,result=?,evidence=?,error=?,updated_at=? WHERE id=? AND user_id=? AND status IN ('queued','submitting','running') AND status<>?").bind(status, result, JSON.stringify(evidence), status === "blocked" ? detail : "", date, id, uid, status),
   ]);
 }
 async function completeResearch(uid: string, id: string, result: ReturnType<typeof webResult>) {
@@ -77,7 +79,7 @@ export async function refreshResearch(uid: string) {
       else if (!["queued", "in_progress"].includes(response.status || "")) await transitionJob(uid, job.id, "blocked", "La recherche s’est arrêtée sans résultat complet. Demande conservée.");
     } catch (error) {
       // Keep the response ID for a later read-only reconciliation, including after reconnecting.
-      await env.DB.prepare("UPDATE morice_jobs SET error=? WHERE id=? AND user_id=?").bind(error instanceof Error ? error.message : "Résultat momentanément inaccessible.", job.id, uid).run();
+      await env.DB.prepare("UPDATE morice_jobs SET error=? WHERE id=? AND user_id=? AND status IN ('running','submitting')").bind("Résultat momentanément inaccessible. Une prochaine lecture reprendra la récupération sans relancer la recherche.", job.id, uid).run();
     }
   }
 }

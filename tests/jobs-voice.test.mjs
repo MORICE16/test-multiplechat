@@ -101,3 +101,30 @@ test('failed conversation save rolls back completion and later recovers without 
     assert.equal(f.created,1);
   } finally {f.close();}
 });
+
+test('late acknowledgements and stale timeouts cannot erase a completed result',async()=>{
+  const f=await fixture();try {
+    const id=await f.module.createJob('alice','Test','Query','web_search');
+    await f.module.startResearch('alice',id,'Query');await f.module.refreshResearch('alice');
+    const before=f.job(id);
+    const events=f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events WHERE job_id=?').get(id).n;
+    await f.module.transitionJob('alice',id,'running','Delayed provider acknowledgement');
+    await f.module.transitionJob('alice',id,'blocked','Stale timeout');
+    assert.deepEqual(f.job(id),before);
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events WHERE job_id=?').get(id).n,events);
+  } finally {f.close();}
+});
+test('unknown owners and duplicate transitions create no misleading job history',async()=>{
+  const f=await fixture();try {
+    const id=await f.module.createJob('alice','Test','Query','web_search');
+    await f.module.transitionJob('bob',id,'done','Wrong owner');
+    await f.module.transitionJob('alice','missing','done','Missing job');
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events').get().n,1);
+    await f.module.transitionJob('alice',id,'running','Started');
+    await f.module.transitionJob('alice',id,'running','Duplicate');
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events').get().n,2);
+    await f.module.transitionJob('alice',id,'blocked','Unknown external outcome');
+    await f.module.transitionJob('alice',id,'running','Late retry');
+    assert.equal(f.job(id).status,'blocked');
+  } finally {f.close();}
+});
