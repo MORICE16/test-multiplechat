@@ -31,7 +31,7 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(page, /function toggleDictation/);
   assert.match(page, /Transcription…/);
   assert.match(page, /Morice réfléchit…/);
-  assert.match(page, /Passerelle à relier au site/);
+  assert.match(page, /Diagnostic dans Connexions/);
   assert.match(page, /\/morice-3d\.png\?v=morice-logo-44fce869-20260823/);
   assert.equal(createHash("sha256").update(portrait).digest("hex"), "44fce86945cff412c4e7206eeef44c81647d49cc8668e3aa389e753b88099c4a");
   assert.deepEqual(logo, portrait);

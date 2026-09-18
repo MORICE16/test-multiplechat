@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import "./horizon.css";
 
 export const viewport = {
-  themeColor: "#f3f7fc",
+  themeColor: "#08172e",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover" as const,

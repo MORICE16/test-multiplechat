@@ -1,0 +1,271 @@
+/* Horizon: approved navy identity, shared by every Morice workspace. */
+:root {
+  color-scheme:dark;
+  --bg:#071426; --surface:#0e2038; --surface2:#172c49;
+  --line:#2c4465; --text:#f2f6ff; --muted:#acbfdc;
+  --blue:#367eea; --blue-ink:#83d8ff; --green:#6ad9b0;
+  --primary:#91dfff; --horizon-lavender:#c5b5ff;
+  --sky-glow:rgba(41,101,168,.3);
+}
+html { background:var(--bg); }
+body {
+  background:radial-gradient(ellipse at 86% 0%,var(--sky-glow),transparent 48%),
+    radial-gradient(ellipse at 8% 92%,#122945 0,transparent 50%),var(--bg);
+  background-attachment:fixed; color:var(--text);
+  font-family:"Segoe UI",system-ui,sans-serif;
+}
+/* The landscape is decorative; solid surfaces retain contrast above it. */
+body::before {
+  content:""; position:fixed; inset:0; height: min(850px,100vh); z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg,#07142675 0%,#071426c9 52%,var(--bg) 100%),url("/horizon-sky.png") center top/cover no-repeat;
+}
+body { isolation:isolate; }
+html[data-weather="clear"] { --sky-glow:rgba(105,161,201,.42); }
+html[data-weather="cloud"] { --sky-glow:rgba(89,107,142,.38); }
+html[data-weather="rain"] { --sky-glow:rgba(56,76,129,.42); }
+html[data-weather="snow"] { --sky-glow:rgba(142,177,204,.32); }
+html[data-weather="night"] { --sky-glow:rgba(76,60,139,.35); }
+::selection { background:#4666a1; color:#fff; }
+button,a,input,textarea,select { touch-action:manipulation; }
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible {
+  outline:3px solid #91dfff; outline-offset:4px;
+}
+button:disabled { opacity:.55; cursor:not-allowed; }
+input,select,textarea { color:var(--text); background:#0b1a30; border-color:#476082; font:inherit; }
+select { border:1px solid #476082; border-radius:10px; padding:10px; max-width:100%; }
+input::placeholder,textarea::placeholder,.composer textarea::placeholder { color:#a3b6d0; opacity:1; }
+a { color:var(--blue-ink); text-underline-offset:3px; }
+small { line-height:1.5; }
+.eyebrow { color:#8fceef; letter-spacing:.15em; }
+.morice-shell { grid-template-columns:238px minmax(0,1fr); }
+.morice-sidebar {
+  background:linear-gradient(180deg,#0a192cec,#081526f5); border-color:var(--line);
+  padding:32px 18px 24px; scrollbar-width:thin; scrollbar-color:#385474 transparent;
+}
+.brand { gap:10px; padding-bottom:30px; }
+.brand b { font-size:19px; letter-spacing:.18em; }
+.brand small { color:#a8bcde; }
+.brand img,.portrait-wrap,.portrait-wrap img,.topbar-actions>img { background:none; border:0; border-radius:0; box-shadow:none; }
+.brand img { width:46px; height:56px; }
+.side-navigation button { position:relative; color:#bbccec; border-radius:10px; min-height:48px; }
+.side-navigation button:hover { background:#182e4c; color:#fff; }
+.side-navigation button.active {
+  color:#b8e9ff; background:linear-gradient(100deg,#173758,#15253f); border-color:#335179;
+  box-shadow:inset 3px 0 #55d6ff;
+}
+.side-navigation button.active i { color:#83d8ff; }
+.side-navigation em { background:#253f67; color:#d5e8ff; }
+.other-spaces { border-top:1px solid var(--line); padding-top:12px; }
+.other-spaces summary { color:var(--muted); }
+.outline-action { border-color:#3a5272; color:#c9dafa; background:#0d2038; }
+.outline-action:hover { background:#1b3352; }
+.morice-content { max-width:1640px; padding-inline:36px; }
+.topbar { min-height:100px; height:auto; padding-block:24px; border-bottom:1px solid #29415d; margin-bottom:26px; }
+.topbar h1 { font-weight:600; font-size:28px; }
+.topbar .eyebrow { color:#95b5db; font-size:10px; letter-spacing:.2em; }
+.topbar-actions button { background:#122743; color:#b8d8ff; border-color:#405a7e; }
+.topbar-actions b,.mobile-navigation b { background:#7d66d4; }
+.notice { background:#153252; border-color:#41668d; color:#dfedff; }
+.command-panel,.quick-panel,.activity-panel,.context-rail>section,.panel {
+  background:linear-gradient(135deg,#10243cee,#0c1c32f5); border-color:#304b70;
+  border-radius:18px; box-shadow:0 16px 38px #02081730; max-width:100%;
+}
+.panel { margin-bottom:22px; }
+.panel>p,.row p { color:#b3c5e0; }
+.welcome-card { background:linear-gradient(115deg,#173657aa,#13264077); border-color:#375375; }
+.welcome-identity p:last-of-type { color:#b9cce7; }
+.welcome-meta { border-color:#3a5573; }
+.welcome-meta article { background:#112842; border-color:var(--line); }
+.welcome-talk,.send-command,.download-app {
+  background:linear-gradient(115deg,#285ac2,#366da9); color:#fff; border:1px solid #72a8ef;
+  box-shadow:0 3px 20px #367eea26;
+}
+.welcome-talk:hover:not(:disabled),.send-command:hover:not(:disabled) { background:#386fd0; }
+.command-heading { padding-top:24px; }
+.command-mark { background:#183650; color:#8dddff; }
+.composer { background:#0a1b30; border-color:#38557a; }
+.composer:focus-within { border-color:#7acfff; box-shadow:0 0 0 3px #66c8ff16; }
+.voice-indicator { color:#78d5fa; }
+.mode-row button.selected { background:#25395d; border-color:#647dae; color:#e0dbff; }
+.main-mic { background:#12354a; border-color:#4788a2; color:#b7edff; }
+.main-mic span { color:#9fddff; }
+.main-mic.listening,.welcome-talk.listening,.mobile-navigation .mobile-mic.listening {
+  background:#44243b; border-color:#d28ba7; color:#ffcedf; outline-color:#d28ba7;
+}
+.main-mic.listening span { color:#ffcedf; }
+.over-limit { color:#ffabbf; }
+.chat-message { background:#162b46; border-color:#314d70; }
+.chat-message.user { background:#203857; border-color:#4d6a94; }
+.chat-message.error { background:#39283d; border-color:#966279; }
+.conversation-log { scrollbar-color:#415e7e transparent; }
+.message-author { color:#91dbff; }
+.message-actions button,.result-text a,.audio-recovery a { color:#9bdbff; }
+.examples button { color:#bdd0ea; border-color:#3b5273; background:#11253e; }
+.examples button:hover { background:#1e385b; }
+.quick-grid button { background:#10243c; border-color:#345071; }
+.quick-grid button:hover { background:#1b3553; border-color:#6898be; }
+.quick-grid i,.quick-grid .quick-notes i,.quick-grid .quick-todo i { background:none; }
+.device-card>button,.panel button,.audio-recovery button {
+  background:#203659; border:1px solid #587ab0; color:#dfedff; border-radius:11px; padding:10px 14px;
+  min-height:44px; line-height:1.4;
+}
+.panel button:hover:not(:disabled),.device-card>button:hover,.audio-recovery button:hover { background:#2c4971; }
+.panel .secondary,.primary-controls .secondary { background:#132b42; color:#c9dff4; border:1px solid #47637f; }
+.primary-controls .secondary { border-radius:11px; padding:10px 14px; min-height:46px; }
+.empty,.horizon-empty { background:#0a1b2c; border:1px dashed #425d7b; color:#b9cbe3; border-radius:12px; padding:22px; }
+.connection-grid article { background:#0b1c32; border-color:#355070; }
+.connection-grid .connected,.device-list em.ok { color:#85e3c0; }
+.install-status,.install-help { background:#152d47; }
+.response-player select { background:#0c213b; border-color:#486080; }
+.response-player input[type=range] { accent-color:#8ccbff; }
+.job-group,.job-card { border-color:#334d6b; }
+.mobile-sections { color:#b3c8e6; }
+.mobile-sections select { background:#0d233d; border-color:#385778; color:#e8f2ff; }
+
+/* Open, editorial home: the day and the journal are the primary destinations. */
+.horizon-home { min-width:0; }
+.horizon-heading { display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; margin:8px 0 28px; }
+.horizon-heading h2 { font-size:clamp(28px,3.5vw,42px); margin:0 0 10px; font-weight:600; }
+.horizon-heading p { color:#b2c8e4; margin-bottom:8px; }
+.horizon-heading>div { min-width:0; }
+.horizon-layout { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(260px,.85fr); gap:28px; align-items:start; }
+.horizon-main { min-width:0; display:grid; gap:26px; }
+.horizon-layout>aside { min-width:0; display:grid; gap:24px; }
+.horizon-journal-preview { padding:24px; border:1px solid #465b8c; background:linear-gradient(140deg,#1c2f52cf,#12233ce8); border-radius:18px; }
+.horizon-journal-preview h2,.horizon-timeline h2 { font-size:25px; font-weight:600; }
+.horizon-journal-preview p { color:#becbe6; }
+.horizon-home button,.horizon-journal button { min-height:44px; }
+.horizon-home>button,.horizon-journal-preview>button,.horizon-timeline>button,.horizon-heading button {
+  padding:11px 16px; border:1px solid #586f9b; color:#e4eaff; border-radius:11px; background:#203454;
+}
+.horizon-app-dock { display:flex; align-items:center; gap:20px; flex-wrap:wrap; padding:22px 0 4px; border-top:1px solid #355677; }
+.horizon-app-dock>div { display:flex; align-items:center; flex-wrap:wrap; gap:18px; }
+.horizon-app-dock button,.horizon-app-dock a { display:flex; flex-direction:column; align-items:center; gap:8px; background:none; border:0; padding:8px 4px; color:#bdcce6; font-size:12px; text-decoration:none; }
+.horizon-app-dock button:hover,.horizon-app-dock a:hover { color:#fff; background:none; }
+.horizon-app-dock .brand-icon,.horizon-app-dock button img,.horizon-app-dock a img { width:34px; height:34px; object-fit:contain; }
+.horizon-app-dock>img { width:105px; height:120px; object-fit:contain; margin-left:auto; background:none; border:0; filter:drop-shadow(0 8px 12px #01081366); }
+.horizon-app-dock .horizon-mascot { margin-left:auto; padding:0; align-self:flex-end; background:none; border:0; box-shadow:none; }
+.horizon-app-dock .horizon-mascot img { width:108px; height:124px; object-fit:contain; border:0; border-radius:0; background:none; filter:drop-shadow(0 8px 12px #01081366); }
+.horizon-caption { color:#acbfdc; font-size:12px; line-height:1.65; margin:0; }
+.horizon-followup { display:grid; gap:0; }
+.horizon-followup button { display:flex; align-items:center; gap:12px; min-height:58px; text-align:left; border:0; border-bottom:1px solid #324b6a; border-radius:0; background:transparent; color:#cedef4; padding:15px 0; }
+.horizon-followup button:hover { color:#94dfff; }
+.horizon-followup strong { color:#f4f6ff; font-size:26px; font-weight:500; min-width:30px; }
+.horizon-day { min-width:0; }
+.horizon-section-heading { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:8px; }
+.horizon-section-heading h2 { margin-bottom:8px; font-size:27px; }
+.horizon-day .button { padding:10px 14px; min-height:44px; background:#1d3553; border:1px solid #4c6990; border-radius:10px; color:#d8e7fc; font-size:13px; }
+.horizon-day>p { color:#b5c8e3; }
+.horizon-day-source,.horizon-day-updated { font-size:12px; color:#9fb7d8!important; }
+.horizon-day [role="alert"] { color:#ffc4d4; }
+.horizon-journal>form { flex-wrap:wrap; }
+.horizon-journal>form input { flex:1 1 220px; }
+.horizon-journal>form button { padding:10px 16px; border:1px solid #7c79b8; border-radius:11px; background:#29395b; color:#e4eaff; }
+.horizon-journal-entry button { padding:9px 13px; border:1px solid #5c78a4; border-radius:10px; font-size:13px; text-align:left; }
+.horizon-journal-audio { border:1px solid #586faf; border-radius:18px; padding:18px 22px; margin-top:24px; background:linear-gradient(120deg,#142d49,#1c284b); }
+.horizon-journal-audio>p { margin:0; font-size:13px; color:#c9d8f2; }
+.horizon-journal-audio .response-player button { border:1px solid #6683b8; background:#254467; color:#edf4ff; border-radius:10px; padding:10px 15px; }
+.horizon-timeline { padding:8px 0; min-width:0; }
+.horizon-timeline article { position:relative; padding:0 0 24px 29px; margin-left:7px; border-left:1px solid #5e7598; min-width:0; }
+.horizon-timeline article::before { content:""; position:absolute; left:-7px; top:4px; width:13px; height:13px; border:2px solid #8ad7ff; border-radius:50%; background:#10223c; }
+.horizon-timeline article:nth-of-type(3n+1)::before { border-color:#ffb9cf; }
+.horizon-timeline article:nth-of-type(3n+2)::before { border-color:#c6bbff; }
+.horizon-timeline article:last-of-type { border-left-color:transparent; }
+.horizon-timeline article time,.horizon-timeline article small { color:#a0c4ee; font-size:13px; }
+.horizon-timeline article time { display:block; font-weight:600; letter-spacing:.025em; margin-bottom:4px; }
+.horizon-timeline article h3,.horizon-timeline article b { font-size:17px; font-weight:600; margin:0 0 5px; }
+.horizon-timeline article p { color:#acbfdc; font-size:14px; margin:4px 0; overflow-wrap:anywhere; }
+.horizon-journal { max-width:1140px; }
+.horizon-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:24px 0; padding-bottom:1px; border-bottom:1px solid #456085; }
+.horizon-tabs button { border:0; border-radius:10px 10px 0 0; background:none; color:#b8c7e6; padding:12px 18px; position:relative; }
+.horizon-tabs button[aria-selected="true"],.horizon-tabs button[aria-pressed="true"],.horizon-tabs button.active { color:#fff; background:linear-gradient(#293859,#1a2945); box-shadow:inset 0 -3px #bba9ff; }
+.horizon-journal-entry { padding:22px 24px; margin:16px 0; border:1px solid #4a6090; background:linear-gradient(115deg,#1d3153,#13243e); border-radius:15px; overflow-wrap:anywhere; }
+.horizon-journal-entry h3 { font-size:20px; margin:8px 0 12px; }
+.horizon-journal-entry p { color:#c5d3eb; line-height:1.7; }
+.horizon-journal-entry small,.horizon-journal-entry time { color:#aebfe0; font-size:12px; }
+.horizon-journal-entry a { color:#91dcff; }
+.horizon-journal-entry details { margin-top:14px; }
+.horizon-journal-entry summary { color:#b8b9ff; padding:10px 0; cursor:pointer; }
+.horizon-journal-entry button { border-color:#657bb0; background:#243c61; color:#edf1ff; }
+.horizon-journal-entry ul { padding-left:22px; }
+.horizon-journal-entry li { margin:8px 0; }
+.horizon-weather { max-width:360px; min-width:0; color:#d5e6fd; font-size:14px; }
+.horizon-weather p { margin:8px 0; }
+.horizon-weather .weather-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.horizon-weather button { background:#112b45; color:#d3eaff; border:1px solid #4b6889; border-radius:10px; padding:9px 13px; min-height:44px; }
+.horizon-weather-form,.weather-form { display:flex; gap:8px; flex-wrap:wrap; margin-block:12px; }
+.horizon-weather-form input,.weather-form input { flex:1; width:140px; min-width:0; }
+.weather-form label,.weather-form>small { flex-basis:100%; }
+.weather-form>small { color:#a6bddb; font-size:11px; }
+.weather-summary>small { flex-basis:100%; font-size:11px; color:#acbfda; }
+.weather-actions { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+.weather-choices { display:grid; gap:7px; padding:0; list-style:none; }
+.weather-choices button { width:100%; text-align:left; }
+.weather-error { color:#ffc4d4!important; }
+.weather-source { font-size:11px; color:#a6bddb!important; }
+
+@media(min-width:901px) and (max-width:1180px) {
+  .morice-shell { grid-template-columns:204px minmax(0,1fr); }
+  .morice-sidebar { padding-inline:12px; }
+  .morice-content { padding-inline:24px; }
+  .horizon-layout { grid-template-columns:minmax(0,1fr); }
+  .horizon-layout>aside { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:900px) {
+  .morice-shell { display:block; }
+  .morice-content { padding-inline:22px; padding-bottom:calc(112px + env(safe-area-inset-bottom)); }
+  .topbar { margin-bottom:22px; min-height:88px; padding-block:18px; }
+  .horizon-layout { grid-template-columns:minmax(0,1.2fr) minmax(220px,.8fr); gap:22px; }
+  .horizon-heading { gap:20px; }
+  .horizon-heading h2 { font-size:32px; }
+  .mobile-navigation {
+    background:#091b30f5; border-color:#426386; box-shadow:0 -8px 26px #020b1b88;
+    padding:8px 9px calc(8px + env(safe-area-inset-bottom));
+  }
+  .mobile-navigation button { color:#bed0eb; min-height:60px; }
+  .mobile-navigation .active { background:#1c3558; color:#aaddff; }
+  .mobile-navigation .mobile-mic { background:linear-gradient(140deg,#2c609d,#263a73); color:#fff; border:1px solid #81cfff; box-shadow:0 0 18px #5cc4ff24; }
+  .mobile-navigation b { background:#7051c5; }
+}
+@media(max-width:650px) {
+  .morice-content { padding-inline:17px; }
+  .topbar h1 { font-size:25px; }
+  .topbar-actions { gap:8px; }
+  .horizon-heading { display:block; margin-bottom:24px; }
+  .horizon-heading h2 { font-size:30px; }
+  .horizon-weather { max-width:none; margin-top:18px; }
+  .horizon-layout { display:flex; flex-direction:column; gap:24px; }
+  .horizon-main,.horizon-layout>aside { width:100%; }
+  .horizon-layout>aside { display:grid; grid-template-columns:1fr; }
+  .horizon-journal-preview { padding:20px; }
+  .horizon-journal-entry { padding:18px; }
+  .horizon-journal-entry h3 { font-size:18px; }
+  .horizon-tabs { gap:0; }
+  .horizon-tabs button { flex:1; padding-inline:8px; font-size:14px; }
+  .horizon-timeline article { padding-bottom:24px; }
+  .horizon-app-dock { gap:16px; }
+  .horizon-app-dock>div { gap:14px; }
+  .horizon-app-dock>img { width:90px; height:105px; }
+  .horizon-app-dock .horizon-mascot img { width:90px; height:105px; }
+  .panel { padding:20px; border-radius:16px; }
+  .composer { margin-inline:10px; padding:14px; }
+  .command-heading { padding-inline:18px; }
+  .command-heading h2 { font-size:22px; }
+  .connection-grid { grid-template-columns:1fr; }
+  .mobile-navigation span { font-size:11px; }
+  .mobile-sections { font-size:12px; gap:8px; }
+}
+@media(max-width:360px) {
+  .morice-content { padding-inline:12px; }
+  .horizon-app-dock { gap:10px; }
+  .horizon-app-dock>img { width:72px; height:90px; }
+  .horizon-app-dock .horizon-mascot img { width:70px; height:88px; }
+  .horizon-app-dock button,.horizon-app-dock a { font-size:11px; gap:6px; }
+  .horizon-journal-preview { padding:15px; }
+  .horizon-tabs button { font-size:12px; padding-inline:5px; }
+  .horizon-app-dock .brand-icon { width:30px; height:30px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  .welcome-talk:hover:not(:disabled) { transform:none; }
+}

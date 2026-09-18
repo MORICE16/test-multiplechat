@@ -4,8 +4,9 @@ import { now, runtimeValue, userId } from "@/app/lib/runtime";
 import { boundedHistory, planningError, type HistoryMessage } from "@/app/lib/assistant-context";
 import { createJob, startResearch, transitionJob } from "@/app/lib/jobs";
 import { isExplicitMailPreview } from "@/app/lib/mail-triage";
+import { fetchOpenClawDiagnostic } from "@/app/lib/openclaw-diagnostic";
 
-type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "onedrive_search" | "make_trigger" | "web_search" | "answer";
+type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "answer";
 type Plan = {
   intent: Intent;
   title: string;
@@ -48,6 +49,8 @@ function localPlan(message: string, mode: string): Plan {
 
 async function intelligentPlan(message: string, mode: string, history: HistoryMessage[], memory: string): Promise<Plan> {
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
+  if (mode === "auto" && /^recherche sur le web\b/.test(normalized(message))) return { intent: "web_search", title: conciseTitle(message), reply: "", requiresApproval: false, provider: "local", operation: "web_search", payload: { ...emptyPayload(), query: message } };
+  if (mode === "auto" && /^(?:(?:morice|maurice)[, :]+)?(?:verifie|teste|diagnostic|etat)\b.*\bopenclaw\b/.test(normalized(message))) return { intent: "openclaw_diagnostic", title: "Diagnostic privé OpenClaw", reply: "", requiresApproval: false, provider: "local", operation: "openclaw_diagnostic", payload: emptyPayload() };
   if (mode === "auto" && isExplicitMailPreview(message)) return { intent: "mail_triage", title: "Préparer le classement de la boîte connectée", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_triage", payload: emptyPayload() };
   const key = runtimeValue("OPENAI_API_KEY");
   if (!key) {
@@ -173,6 +176,21 @@ export async function POST(request: Request) {
     const response = await respond({ ok: true, reply: "La recherche est enregistrée dans Travaux. Morice la lance sur le Web et conservera ses sources. Le résultat sera récupéré automatiquement tant que Morice est ouvert, ou à ta prochaine ouverture.", action: { id: jobId, jobId, kind: "result", title: plan.title, content: query, status: "queued", label: "Recherche en cours", view: "jobs" } });
     await startResearch(uid, jobId, query);
     return response;
+  }
+
+  if (plan.intent === "openclaw_diagnostic") {
+    const jobId = await createJob(uid, plan.title, message, plan.intent);
+    await transitionJob(uid, jobId, "running", "Diagnostic privé demandé");
+    try {
+      const data = await fetchOpenClawDiagnostic(runtimeValue("OPENAI_API_KEY"), runtimeValue("MORICE_OPENCLAW_TUNNEL_ID"));
+      const evidence = { tool: "OpenClaw via tunnel MCP privé", operation: plan.intent, checkedAt: data.checkedAt, responseId: data.responseId, verification: "Deux résultats reçus; lecture seule" };
+      await transitionJob(uid, jobId, "done", "Diagnostic reçu", data.result, evidence);
+      return respond({ ok: true, reply: data.result, action: { id: jobId, jobId, kind: "result", title: plan.title, content: data.result, status: "done", label: "Diagnostic OpenClaw", view: "jobs", ...evidence } });
+    } catch {
+      const error = "Diagnostic OpenClaw non confirmé. Vérifie que le PC et le client du tunnel sont actifs. Aucun ordre envoyé au téléphone.";
+      await transitionJob(uid, jobId, "blocked", error);
+      return Response.json({ error }, { status: 502 });
+    }
   }
 
   if (writeIntents.has(plan.intent)) {

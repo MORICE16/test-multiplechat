@@ -3,6 +3,7 @@ import { decryptSecret, encryptSecret } from "./secret-crypto";
 import { now, runtimeValue } from "./runtime";
 import { ActionError } from "./action-error";
 import { inspectMailbox, mailReviewText } from "./mail-triage";
+import { dayEvents, validateDayRange } from "./calendar-day";
 
 export type ActionPayload = {
   to?: string | null;
@@ -85,6 +86,13 @@ export async function reviewMicrosoftMailbox(uid: string) {
   const stored = await connection(uid);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
   return inspectMailbox(stored.account_email, path => graph(uid, path));
+}
+
+export async function readMicrosoftDay(uid: string, start: string, end: string) {
+  validateDayRange(start, end);
+  const query = new URLSearchParams({ startDateTime: start, endDateTime: end, "$top": "100", "$orderby": "start/dateTime", "$select": "id,subject,start,end,isAllDay,isCancelled,location" });
+  const data = await graph(uid, `/me/calendarView?${query}`, { headers: { Prefer: 'outlook.timezone="UTC"' } });
+  return dayEvents(data, start, end);
 }
 
 export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload) {
