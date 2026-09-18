@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import { runMakeAction, runMicrosoftAction, type ActionPayload } from "@/app/lib/microsoft";
 import { now, userId } from "@/app/lib/runtime";
 import { actionFailure } from "@/app/lib/action-error";
+import { CategoryExecutionError } from "@/app/lib/mail-categories";
 
 type PendingAction = { item_id: string; provider: string; operation: string; payload: string };
 
@@ -21,12 +22,14 @@ export async function POST(request: Request) {
   try {
     const payload = JSON.parse(action.payload) as ActionPayload;
     result = action.provider === "microsoft"
-      ? await runMicrosoftAction(uid, action.operation, payload)
+      ? await runMicrosoftAction(uid, action.operation, payload, async text => {
+        await env.DB.prepare("UPDATE morice_action_payloads SET result=? WHERE item_id=? AND user_id=?").bind(text, id, uid).run();
+      })
       : action.provider === "make"
         ? await runMakeAction(payload, action.item_id)
         : (() => { throw new Error("Fournisseur d’action inconnu."); })();
   } catch (error) {
-    const failure = actionFailure(error);
+    const failure = error instanceof CategoryExecutionError ? { status: "needs_review", message: error.message } : actionFailure(error);
     await env.DB.batch([
       env.DB.prepare("UPDATE morice_items SET status=?, updated_at=? WHERE id=? AND user_id=? AND status='executing'").bind(failure.status, now(), id, uid),
       env.DB.prepare("UPDATE morice_action_payloads SET result=? WHERE item_id=? AND user_id=?").bind(failure.message, id, uid),

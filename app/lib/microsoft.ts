@@ -4,6 +4,7 @@ import { now, runtimeValue } from "./runtime";
 import { ActionError } from "./action-error";
 import { inspectMailbox, mailReviewText } from "./mail-triage";
 import { dayEvents, validateDayRange } from "./calendar-day";
+import { applyCategoryPlan, categoryPermissions, validateCategoryPlan, type CategoryPlan } from "./mail-categories";
 
 export type ActionPayload = {
   to?: string | null;
@@ -16,6 +17,7 @@ export type ActionPayload = {
   query?: string | null;
   notes?: string | null;
   webhookEvent?: string | null;
+  categoryPlan?: CategoryPlan;
 };
 
 type ConnectionRow = {
@@ -95,7 +97,14 @@ export async function readMicrosoftDay(uid: string, start: string, end: string) 
   return dayEvents(data, start, end);
 }
 
-export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload) {
+export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload, progress: (text: string) => Promise<void> = async () => {}) {
+  if (operation === "mail_categorize") {
+    const stored = await connection(uid);
+    const permissions = categoryPermissions(stored?.scopes || "");
+    if (!stored || !permissions.writeMail || !permissions.manageCategories) throw new ActionError("Autorisez le classement Microsoft depuis Emails avant de valider.", true);
+    validateCategoryPlan(payload.categoryPlan!, stored.account_email);
+    return applyCategoryPlan(payload.categoryPlan!, (path, init) => graph(uid, path, init), progress);
+  }
   if (operation === "mail_triage") return mailReviewText(await reviewMicrosoftMailbox(uid));
   if (operation === "mail_read") {
     const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead") as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };

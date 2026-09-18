@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     response_type: "code",
     redirect_uri: redirectUri,
     response_mode: "query",
-    scope: scopes,
+    scope: scopes + (new URL(request.url).searchParams.get("categories") === "1" ? " MailboxSettings.ReadWrite" : ""),
     state,
     code_challenge: challenge,
     code_challenge_method: "S256",

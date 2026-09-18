@@ -1,5 +1,5 @@
 export type MailSummary = { id?: string; subject?: string; receivedDateTime?: string; importance?: string; isRead?: boolean; categories?: string[]; from?: { emailAddress?: { name?: string; address?: string } } };
-export type MailSuggestion = { subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
+export type MailSuggestion = { id: string; subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
 export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[] };
 
 export function isExplicitMailPreview(message: string) {
@@ -29,14 +29,14 @@ export function suggestMail(message: MailSummary): MailSuggestion {
     const match = text.match(pattern);
     return match ? [{ category, reason: `Mot repéré dans l’objet ou l’expéditeur : « ${match[0]} ».` }] : [];
   });
-  return { subject, sender, receivedAt: message.receivedDateTime || "", categories: message.categories || [],
+  return { id: message.id || "", subject, sender, receivedAt: message.receivedDateTime || "", categories: message.categories || [],
     suggestions: matches.map(m => m.category), reasons: matches.map(m => m.reason),
     priority: message.importance === "high" ? "Importance haute signalée par Outlook — à vérifier" : "Priorité à examiner",
     unread: message.isRead === false };
 }
 
 export async function inspectMailbox(account: string, read: (path: string) => Promise<unknown>): Promise<MailReview> {
-  const query = new URLSearchParams({ "$top": "100", "$orderby": "receivedDateTime desc", "$filter": "receivedDateTime ge 2025-01-01T00:00:00Z", "$select": "subject,from,receivedDateTime,importance,isRead,categories" });
+  const query = new URLSearchParams({ "$top": "100", "$orderby": "receivedDateTime desc", "$filter": "receivedDateTime ge 2025-01-01T00:00:00Z", "$select": "id,subject,from,receivedDateTime,importance,isRead,categories" });
   const data = await read(`/me/mailFolders/inbox/messages?${query}`) as { value?: MailSummary[]; "@odata.nextLink"?: string };
   if (!data || !Array.isArray(data.value)) throw new Error("La lecture de la boîte est incomplète.");
   return { account, checkedAt: new Date().toISOString(), hasMore: Boolean(data["@odata.nextLink"]), messages: data.value.slice(0, 100).map(suggestMail) };
@@ -45,5 +45,5 @@ export async function inspectMailbox(account: string, read: (path: string) => Pr
 export function mailReviewText(review: MailReview) {
   const counts = new Map<string, number>();
   for (const message of review.messages) for (const category of message.suggestions.length ? message.suggestions : ["À examiner"]) counts.set(category, (counts.get(category) || 0) + 1);
-  return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.${review.hasMore ? " Il reste d’autres messages : cet aperçu n’est pas exhaustif." : " Les autres dossiers ne sont pas inclus."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes et le classement Outlook restent à raccorder.`;
+  return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.${review.hasMore ? " Il reste d’autres messages : cet aperçu n’est pas exhaustif." : " Les autres dossiers ne sont pas inclus."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes restent à raccorder. Pour appliquer les catégories, ouvrez Emails, sélectionnez jusqu’à 10 messages et confirmez le lot.`;
 }
