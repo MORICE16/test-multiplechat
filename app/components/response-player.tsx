@@ -1,53 +1,55 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { AudioReader, emptyReader, type ReadingPosition } from "../lib/audio-reader";
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+export function ResponsePlayer(props: { text: string; disabled?: boolean }) { return <Player key={props.text} {...props} />; }
 
-export function ResponsePlayer({ text, disabled = false }: { text: string; disabled?: boolean }) {
+function Player({ text, disabled = false }: { text: string; disabled?: boolean }) {
   const audio = useRef<HTMLAudioElement>(null);
-  const abort = useRef<AbortController | null>(null);
-  const objectUrl = useRef("");
-  const [src, setSrc] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [playing, setPlaying] = useState(false);
-  const [position, setPosition] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [rate, setRate] = useState(1);
-  useEffect(() => () => { abort.current?.abort(); if (objectUrl.current) URL.revokeObjectURL(objectUrl.current); }, []);
+  const reader = useRef<AudioReader | null>(null);
+  const disabledRef = useRef(disabled);
+  const [state, setState] = useState(emptyReader);
+  const [initialized, setInitialized] = useState(false);
   useEffect(() => {
-    const pauseOthers = (event: Event) => { if ((event as CustomEvent).detail !== audio.current) audio.current?.pause(); };
-    window.addEventListener("morice-audio-play", pauseOthers);
-    return () => window.removeEventListener("morice-audio-play", pauseOthers);
-  }, []);
-  useEffect(() => { if (disabled) audio.current?.pause(); }, [disabled]);
-
-  async function toggle() {
-    if (disabled || busy) return;
-    if (src && audio.current) {
-      if (!audio.current.paused) audio.current.pause();
-      else try { await audio.current.play(); } catch { setError("Touchez à nouveau Lecture pour autoriser le son."); }
-      return;
+    let disposed = false;
+    const element = audio.current!;
+    async function initialize() {
+      let storageKey = "";
+      let saved: Partial<ReadingPosition> | null = null;
+      try {
+        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+        storageKey = "morice-reading-v1:" + Array.from(new Uint8Array(digest), n => n.toString(16).padStart(2, "0")).join("");
+        saved = JSON.parse(sessionStorage.getItem(storageKey) || "null");
+      } catch { /* Playback remains available when session storage is blocked. */ }
+      if (disposed) return;
+      reader.current = new AudioReader(text, element, {
+        async generate(part, signal) {
+          const response = await fetch("/api/speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: part }), signal });
+          if (!response.ok) { const data = await response.json() as { error?: string }; throw new Error(data.error || "Audio indisponible."); }
+          return URL.createObjectURL(await response.blob());
+        },
+        release: url => URL.revokeObjectURL(url), changed: setState,
+        save: position => { if (storageKey) sessionStorage.setItem(storageKey, JSON.stringify(position)); },
+        activate: () => window.dispatchEvent(new CustomEvent("morice-audio-play", { detail: element })),
+      }, saved);
+      reader.current.setDisabled(disabledRef.current); setInitialized(true);
     }
-    setBusy(true); setError("");
-    const controller = new AbortController(); abort.current = controller;
-    try {
-      const response = await fetch("/api/speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }), signal: controller.signal });
-      if (!response.ok) { const data = await response.json() as { error?: string }; throw new Error(data.error || "Audio indisponible."); }
-      const blob = await response.blob();
-      if (controller.signal.aborted) return;
-      objectUrl.current = URL.createObjectURL(blob); setSrc(objectUrl.current);
-    } catch (e) { if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Audio indisponible."); }
-    finally { if (!controller.signal.aborted) setBusy(false); }
-  }
-  function seek(value: number) { if (audio.current) { audio.current.currentTime = Math.max(0, Math.min(duration, value)); setPosition(audio.current.currentTime); } }
+    void initialize();
+    const pauseOthers = (event: Event) => { if ((event as CustomEvent).detail !== element) reader.current?.pause(); };
+    window.addEventListener("morice-audio-play", pauseOthers);
+    return () => { disposed = true; reader.current?.dispose(); reader.current = null; window.removeEventListener("morice-audio-play", pauseOthers); };
+  }, [text]);
+  useEffect(() => { disabledRef.current = disabled; reader.current?.setDisabled(disabled); }, [disabled]);
   return <div className="response-player" role="group" aria-label="Lecteur de réponse Morice">
-    {/* The full spoken transcript is the adjacent message, available before audio generation. */}
+    {/* The adjacent message is the full transcript, available before generation. */}
     {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-    <audio ref={audio} src={src || undefined} preload="metadata" onPlay={() => { setPlaying(true); window.dispatchEvent(new CustomEvent("morice-audio-play", { detail: audio.current })); }} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} onTimeUpdate={() => setPosition(audio.current?.currentTime || 0)} onLoadedMetadata={() => { const value = audio.current?.duration || 0; setDuration(Number.isFinite(value) ? value : 0); }} onError={() => setError("Cet audio ne peut pas être lu par ce navigateur.")} />
-    <button disabled={disabled || busy} onClick={toggle}>{busy ? "Préparation de la voix…" : playing ? "Pause" : src ? "Lecture" : "Écouter la réponse"}</button>
-    {src && <><button disabled={disabled || !duration} onClick={() => seek(position - 10)} aria-label="Reculer de 10 secondes">−10 s</button><input aria-label="Position de lecture" type="range" min="0" max={duration || 1} step="0.1" value={position} disabled={disabled || !duration} onChange={e => seek(Number(e.target.value))} /><span>{clock(position)} / {clock(duration)}</span><button disabled={disabled || !duration} onClick={() => seek(position + 10)} aria-label="Avancer de 10 secondes">+10 s</button><select aria-label="Vitesse de lecture" value={rate} onChange={e => { const value = Number(e.target.value); setRate(value); if (audio.current) audio.current.playbackRate = value; }}><option value="1">×1</option><option value="1.5">×1,5</option><option value="2">×2</option></select></>}
-    <small>Voix générée par IA{src ? " · Audio prêt : appuyez sur Lecture." : ""}</small>
-    {error && <p role="alert">{error}</p>}
+    <audio ref={audio} preload="metadata" />
+    <button disabled={disabled || !initialized} onClick={() => void reader.current?.toggle()}>{state.busy ? "Annuler la préparation" : state.playing ? "Pause" : state.ready ? "Lecture" : state.position > 0 || state.part > 0 ? "Reprendre la réponse" : "Écouter la réponse"}</button>
+    {state.count > 1 && <select aria-label="Passage de la réponse" disabled={disabled || state.busy} value={state.part} onChange={e => void reader.current?.select(Number(e.target.value))}>{Array.from({ length: state.count }, (_, n) => <option key={n} value={n}>Passage {n + 1} / {state.count}</option>)}</select>}
+    {state.ready && <><button disabled={disabled || !state.duration} onClick={() => reader.current?.seek(state.position - 10)} aria-label="Reculer de 10 secondes">−10 s</button><input aria-label="Position de lecture dans le passage" type="range" min="0" max={state.duration || 1} step="0.1" value={Math.min(state.position, state.duration || 0)} disabled={disabled || !state.duration} onChange={e => reader.current?.seek(Number(e.target.value))} /><span>{clock(state.position)} / {clock(state.duration)}</span><button disabled={disabled || !state.duration} onClick={() => reader.current?.seek(state.position + 10)} aria-label="Avancer de 10 secondes">+10 s</button></>}
+    <select aria-label="Vitesse de lecture" value={state.rate} disabled={disabled || !initialized} onChange={e => reader.current?.speed(Number(e.target.value))}><option value="1">×1</option><option value="1.5">×1,5</option><option value="2">×2</option></select>
+    <small>Voix générée par IA · Position conservée dans cet onglet.{state.count > 1 ? " Les passages s’enchaînent pendant la lecture." : ""}{!state.ready && state.position > 0 ? ` Reprise vers ${clock(state.position)} après préparation.` : ""}</small>
+    {state.error && <p role="alert">{state.error}</p>}
   </div>;
 }
