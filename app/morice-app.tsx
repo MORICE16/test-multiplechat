@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { readWidgetDraft } from "./lib/widget-draft";
 import { createRecording, type RecordingState as DictationState } from "./lib/recording";
+import { ResponsePlayer } from "./components/response-player";
+import { ResultText } from "./components/result-text";
+import { JobsPanel, useJobs } from "./components/jobs-panel";
+import { ImprovementsPanel } from "./components/improvements-panel";
+import { type Citation } from "./lib/web-result";
 
 type Item = {
   id: string;
@@ -26,6 +31,10 @@ type InstallState = "checking" | "available" | "manual" | "installed";
 type ChatMessage = { id: string; role: "user" | "assistant" | "error"; text: string; action?: AssistantAction };
 
 type AssistantAction = {
+  jobId?: string;
+  citations?: Citation[];
+  checkedAt?: string;
+  tool?: string;
   id: string;
   kind: "task" | "memory" | "approval" | "result";
   title: string;
@@ -52,6 +61,8 @@ const navigation = [
   ["home", "Accueil", "⌂"],
   ["chat", "Conversation", "✦"],
   ["tasks", "Tâches", "✓"],
+  ["jobs", "Travaux", "↻"],
+  ["improvements", "Améliorations", "✧"],
   ["calendar", "Agenda", "□"],
   ["approvals", "Validations", "◆"],
   ["connections", "Connexions", "⌁"],
@@ -118,6 +129,7 @@ async function api<T = Record<string, unknown>>(path: string, init?: RequestInit
 }
 
 export default function MoriceApp() {
+  const queue = useJobs(() => { void loadConversation(); });
   const [state, setState] = useState<State>(defaultState);
   const [view, setView] = useState("home");
   const [storageStatus, setStorageStatus] = useState<"checking" | "online" | "error">("checking");
@@ -195,8 +207,8 @@ export default function MoriceApp() {
         setDictationState(widgetDraft ? "ready" : "idle");
         history.replaceState({}, "", window.location.pathname + window.location.search);
         if (widgetDraft) setNotice("Votre dictée est prête. Relisez-la, puis touchez Envoyer.");
-      } else if (params.get("view") === "chat") {
-        setView("chat");
+      } else if (["chat", "jobs", "improvements"].includes(params.get("view") || "")) {
+        setView(params.get("view")!);
       }
       setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
       const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
@@ -373,12 +385,6 @@ export default function MoriceApp() {
     }
   }
 
-  function speak(text: string) {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
-  }
-
   function toggleDictation() {
     if (voiceActive) { dictationRef.current?.stop(); return; }
     if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
@@ -386,6 +392,7 @@ export default function MoriceApp() {
       setNotice("Le microphone nécessite un navigateur compatible en HTTPS. Essayez Chrome ou Edge."); return;
     }
     window.speechSynthesis?.cancel(); setNotice(""); setDictationError("");
+    window.dispatchEvent(new CustomEvent("morice-audio-play", { detail: null }));
     dictationRef.current?.dispose();
     dictationRef.current = createRecording({
       acquire: () => navigator.mediaDevices.getUserMedia({ audio: true }),
@@ -451,7 +458,7 @@ export default function MoriceApp() {
                 <div className="welcome-meta"><button onClick={() => setView("tasks")}><strong>{storageStatus === "online" ? tasks.filter(item => item.status !== "done").length : "—"}</strong><span>Tâches à suivre</span></button><button onClick={() => setView("approvals")}><strong>{storageStatus === "online" ? approvals.length : "—"}</strong><span>À valider</span></button><div><strong>{timeText}</strong><span>Heure locale</span></div></div>
               </section>
 
-              <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} />
+              <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} />
 
               <section className="quick-panel"><div className="panel-heading"><div><p className="eyebrow">RACCOURCIS</p><h2>Accès rapide</h2></div></div><div className="quick-grid">{quickActions.map(([id, label, source, brand]) => <button key={id} className={`quick-${brand}`} onClick={() => setView(id)}><i><BrandIcon name={brand} /></i><span><b>{label}</b><small>{source}</small></span><em>→</em></button>)}</div></section>
 
@@ -467,9 +474,11 @@ export default function MoriceApp() {
           </div>
         </>}
 
-        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} onSpeak={speak} /></div>}
+        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
+        {view === "jobs" && <JobsPanel queue={queue} waiting={approvals.length} tasks={tasks} onTasks={() => setView("tasks")} onApprovals={() => setView("approvals")} />}
+        {view === "improvements" && <ImprovementsPanel />}
         {view === "memory" && <ListPanel title="Mémoire longue durée" items={memories} value={newValue} setValue={setNewValue} add={() => addItem("memory", "Souvenir", newValue)} update={updateItem} />}
         {view === "approvals" && <section className="panel"><p className="eyebrow">CONTRÔLE HUMAIN</p><h2>Validations</h2><p>Morice n’envoie, ne crée et ne modifie rien à l’extérieur sans ton accord ici.</p>
           {approvals.length ? approvals.map(item => <article className="row" key={item.id}><div><b>{item.title}</b><p>{item.content}</p><ActionDetails item={item} /></div><button disabled={Boolean(executingId) || !item.execution} onClick={() => executeApproval(item.id)}>{executingId === item.id ? "Exécution…" : "Valider et exécuter"}</button><button className="secondary" disabled={Boolean(executingId)} onClick={() => updateItem(item.id, "rejected")}>Refuser</button></article>) : <div className="empty">Aucune validation en attente.</div>}
@@ -482,7 +491,7 @@ export default function MoriceApp() {
         {view === "documents" && <InfoPanel title="Documents & OneDrive" text="Morice peut rechercher des documents OneDrive après la connexion Microsoft 365, sans exposer les jetons d’accès." />}
         {view === "connections" && <ConnectionsPanel state={connections} refresh={refreshConnections} disconnectMicrosoft={disconnectMicrosoft} />}
         {view === "projects" && <InfoPanel title="Projets" text="L’espace projets est prêt. Il n’affichera que des projets réellement enregistrés ou connectés." />}
-        {view === "search" && <InfoPanel title="Recherche" text="La recherche unifiée sera branchée sur les sources autorisées. Aucune source n’est simulée." />}
+        {view === "search" && <section className="panel"><h2>Recherche Web</h2><p>Demandez une recherche à Morice. Son résultat, ses sources et son suivi apparaîtront dans Travaux.</p><button onClick={() => { setView("chat"); setMessage("Recherche sur le Web : "); }}>Nouvelle recherche</button><button className="secondary" onClick={() => setView("jobs")}>Voir mes travaux</button></section>}
         {view === "clients" && <InfoPanel title="Clients" text="Aucun accès HubSpot direct n’est disponible. Ce module attendra une passerelle professionnelle autorisée." />}
         {view === "crypto" && <InfoPanel title="Crypto" text="Le module reste en lecture et surveillance uniquement tant qu’aucune source de marché n’est connectée. Aucune action sur Ledger n’est autorisée." />}
         {view === "estate" && <InfoPanel title="Immobilier" text="Espace prévu pour les dossiers, échéances, documents et suivis immobiliers réellement enregistrés." />}
@@ -516,7 +525,7 @@ function NavigationIcon({ id, fallback }: { id: string; fallback: string }) {
   return brand ? <BrandIcon name={brand} /> : <>{fallback}</>;
 }
 
-function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction, onSpeak }: {
+function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction }: {
   onPause: () => void;
   audioUrl: string;
   audioExtension: string;
@@ -533,7 +542,6 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   onMic: () => void;
   onSend: () => void;
   onOpenAction: (view: string) => void;
-  onSpeak: (text: string) => void;
 }) {
   const listening = ["starting", "listening", "reconnecting", "paused"].includes(voicePhase);
   const locked = listening || Boolean(audioUrl) || voicePhase === "stopping" || assistantBusy;
@@ -563,7 +571,7 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
     {audioUrl && voicePhase !== "stopping" && <div className="audio-recovery" role="group" aria-label="Audio conservé"><p>Votre audio reste disponible dans cette page jusqu’à sa fermeture.</p><button onClick={onRetry}>Réessayer la transcription</button><a href={audioUrl} download={`morice-dictee.${audioExtension}`}>Télécharger l’audio</a><button className="secondary" onClick={onDiscard}>Effacer l’audio</button></div>}
     <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
       {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
-      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><p>{entry.text}</p>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<button disabled={listening || voicePhase === "stopping"} onClick={() => onSpeak(entry.text)}>Écouter la réponse</button></div>}</article>)}
+      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><ResultText text={entry.text} citations={entry.action?.citations} />{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<ResponsePlayer disabled={listening || voicePhase === "stopping"} text={entry.text.replace(/[^]*/g, "")} /></div>}</article>)}
       {assistantBusy && <article className="chat-message assistant pending"><span className="message-author">Morice</span><p>Je m’occupe de votre demande<span className="thinking-dots" aria-hidden="true">…</span></p></article>}
     </div>
     {messages.length === 0 && <div className="examples"><button disabled={locked} onClick={() => setMessage("Quelles sont mes tâches prioritaires ?")}>Organiser ma journée</button><button disabled={locked} onClick={() => setMessage("Prépare un mail de suivi à mon client")}>Préparer un email</button><button disabled={locked} onClick={() => setMessage("Mémorise une information importante : ")}>Garder une idée</button></div>}

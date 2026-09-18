@@ -1,4 +1,21 @@
-# Morice — version du 16 septembre 2026
+# Morice — reprise fonctionnelle du 18 septembre 2026
+
+## Travaux, recherche et lecture vocale
+
+- `web_search` lance une vraie recherche OpenAI en arrière-plan avec l’accès serveur existant. La requête et l’identifiant fournisseur sont conservés dans D1. Aucun nouvel envoi automatique après une soumission ambiguë.
+- `POST /api/jobs` récupère les réponses existantes, sans répéter la génération. Le navigateur vérifie toutes les 15 secondes lorsqu’il est visible, à sa réouverture et au retour du réseau. Une tâche jamais soumise peut être reprise; une soumission interrompue sans identifiant est bloquée après deux minutes.
+- Un résultat n’est marqué terminé qu’après réponse complète, appel Web effectué et citations valides. Les sources sont cliquables. Cela prouve l’exécution de l’outil, pas l’exactitude absolue des pages externes.
+- Les lectures Microsoft déclenchées dans la conversation ont aussi un journal d’exécution et un résultat durable.
+- Les travaux longs nécessitent `background: true` et `store: true` chez OpenAI. Le résultat récupéré est ensuite conservé dans D1. Un résultat fournisseur expiré reste signalé, sans nouvelle dépense automatique.
+- Le lecteur de réponse appelle `/api/speech` à la demande : MP3, lecture/pause, déplacement, sauts de 10 secondes et vitesses ×1/×1,5/×2. Voix synthétique explicitement indiquée. Maximum actuel : 4 000 caractères par lecture; aucun texte tronqué silencieusement.
+- Veille et améliorations rassemble les exigences et pistes du fil historique, avec état et justification. Ce catalogue versionné ne constitue pas une synchronisation automatique des futurs messages.
+- Migration additive `0003_jobs.sql`; tables existantes inchangées.
+
+### Limites à ne pas masquer
+
+La récupération des recherches est déclenchée par l’application ouverte; il n’existe pas encore de planificateur cloud ni de notification de fin indépendante de la consultation. OpenClaw est sain sur le PC, mais le site n’y est pas relié et le Z Fold était déconnecté lors de l’audit du 18 septembre. MultipleChat Smart a été vérifié connecté; aucun écran API n’a été trouvé dans les paramètres. Aucun pont automatique vers ses modes ou vers les plugins ChatGPT n’est déclaré actif. Le classement de cinq ou six comptes mail, les rappels/alertes planifiés, la galerie et le formulaire Avisun restent à développer ou à raccorder.
+
+Sources techniques : [recherche Web](https://developers.openai.com/api/docs/guides/tools-web-search), [exécution en arrière-plan](https://developers.openai.com/api/docs/guides/background), [voix](https://developers.openai.com/api/docs/guides/text-to-speech), [limites des Workers](https://developers.cloudflare.com/workers/platform/limits/).
 
 ## Fiabilité et continuité de conversation
 
