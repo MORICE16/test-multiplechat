@@ -386,6 +386,7 @@ export default function MoriceApp() {
   }
 
   function toggleDictation() {
+    setView("chat");
     if (voiceActive) { dictationRef.current?.stop(); return; }
     if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
@@ -469,7 +470,7 @@ export default function MoriceApp() {
             <section><div className="panel-heading"><div><p className="eyebrow">LE FIL DE VOS ACTIONS</p><h2>À suivre</h2></div></div><div className="horizon-followup"><button onClick={() => setView("tasks")}><strong>{storageStatus === "online" ? tasks.filter(t => t.status !== "done").length : "—"}</strong> tâches à suivre →</button><button onClick={() => setView("approvals")}><strong>{storageStatus === "online" ? approvals.length : "—"}</strong> validations →</button><button onClick={() => setView("jobs")}>Voir mes travaux et résultats →</button></div></section>
             <section className="connection-card"><div className="panel-heading"><div><p className="eyebrow">APPLICATIONS & AUTOMATISATIONS</p><h2>Mes connexions</h2></div></div><div className="service-list"><ServiceStatus name="Microsoft 365" ok={Boolean(connections?.microsoft.connected)} detail={connections?.microsoft.connected ? connections.microsoft.account : "Non connecté"} /><ServiceStatus name="OpenClaw" ok={false} detail="Diagnostic dans Connexions" /></div><button className="outline-action" onClick={() => setView("connections")}>Ouvrir les connexions →</button></section>
           </aside></div>
-          <CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={setView} />
+          <button className="horizon-open-chat" onClick={() => setView("chat")}>Ouvrir ma conversation avec Morice →</button>
         </div>}
         {view === "journal" && <div className="horizon-layout"><HorizonJournal messages={messages} memories={memories} jobs={queue.data.jobs} onExplore={exploreIdea} onAdd={saveIdea} voiceActive={voiceActive} error={queue.error} /><aside className="context-rail"><HorizonDay connected={Boolean(connections?.microsoft.connected)} onCalendar={() => setView(connections?.microsoft.connected ? "calendar" : "connections")} /></aside></div>}
 

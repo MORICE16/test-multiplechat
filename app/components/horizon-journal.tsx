@@ -15,7 +15,7 @@ export function HorizonJournal({ messages, memories, jobs, onExplore, onAdd, com
   const [failure, setFailure] = useState('');
   const questions = messages.filter(m => m.role === 'user').slice().reverse();
   const articles = jobs.filter(j => j.status === 'done' && j.evidence.citations?.some(c => safeWebUrl(c.url)));
-  const limit = compact ? 2 : 40;
+  const limit = compact ? 1 : 40;
   const audio = tab === 'questions' ? questions.slice(0, 10).map(m => m.text).join('\n\n') : tab === 'ideas' ? memories.slice(0, 10).map(m => m.title + '. ' + m.content).join('\n\n') : articles.slice(0, 3).map(j => j.title + '. ' + j.result.replace(/[^]*/g, '')).join('\n\n');
   async function save() {
     if (!draft.trim() || saving) return;

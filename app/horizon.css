@@ -269,3 +269,87 @@ small { line-height:1.5; }
   *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
   .welcome-talk:hover:not(:disabled) { transform:none; }
 }
+
+/* Compact home: applications first, full conversations in their own workspace. */
+.morice-content,.morice-content>* { min-width:0; }
+.morice-content { overflow-wrap:anywhere; }
+.topbar>div,.panel-heading>div,.horizon-section-heading>div { min-width:0; }
+.horizon-home .horizon-app-dock { order:-2; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; padding:8px 0; border-top:0; }
+.horizon-home .horizon-app-dock>* { min-width:0; margin:0; }
+.horizon-home .horizon-app-dock .horizon-mascot img { width:64px; height:70px; }
+.horizon-home .horizon-main { gap:14px; }
+.horizon-home .horizon-layout { gap:18px; }
+.horizon-home .horizon-layout>aside { gap:14px; }
+.horizon-home .context-rail>section { padding:16px; }
+.horizon-home .horizon-journal-preview { padding:16px; }
+.horizon-home .horizon-tabs { margin:10px 0; }
+.horizon-home .horizon-journal-entry { padding:10px 0; }
+.horizon-home .horizon-journal-entry>p { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.horizon-home .horizon-caption { font-size:11px; margin:0; }
+.horizon-home .horizon-journal-preview .horizon-caption { display:none; }
+.horizon-home .horizon-journal-entry ul { max-height:120px; overflow:auto; }
+.horizon-home .horizon-timeline { max-height:180px; overflow:auto; }
+.horizon-home .horizon-day-source,.horizon-home .horizon-day-updated { margin:4px 0; }
+.horizon-home .horizon-heading { margin:0 0 12px; gap:10px; }
+.horizon-home .horizon-heading h2 { font-size:28px; margin-bottom:4px; }
+.horizon-home .horizon-heading p { margin-bottom:4px; }
+.horizon-open-chat { width:100%; margin-top:12px; }
+.horizon-home .service-list { margin-block:8px; }
+.horizon-home .service-list>div { min-width:0; }
+@media(max-width:1100px) {
+  .morice-shell { display:block; }
+  .morice-sidebar { display:none; }
+  .morice-content { padding:0 16px calc(86px + env(safe-area-inset-bottom)); }
+  .topbar { min-height:64px; padding-block:10px; margin-bottom:8px; }
+  .topbar h1 { font-size:22px; }
+  .topbar .eyebrow { font-size:9px; margin-bottom:3px; }
+  .mobile-sections { display:flex; margin:0 0 10px; align-items:center; justify-content:space-between; gap:8px; font-size:12px; }
+  .mobile-sections select { min-width:0; max-width:65%; padding:7px 10px; }
+  .mobile-navigation { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); position:fixed; z-index:20; bottom:0; left:0; right:0; padding:5px 8px calc(5px + env(safe-area-inset-bottom)); background:#091b30f5; border-top:1px solid #426386; }
+  .mobile-navigation button { min-width:0; min-height:52px; border:0; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:12px; background:none; color:#bed0eb; }
+  .mobile-navigation .mobile-mic { background:#285292; color:white; }
+  .mobile-navigation i { font-style:normal; font-size:20px; }
+  .mobile-navigation span { font-size:11px; }
+  .horizon-home .horizon-layout { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); }
+  .horizon-home .horizon-layout>aside { display:grid; grid-template-columns:minmax(0,1fr); }
+  .horizon-home h2 { font-size:20px; }
+  .horizon-heading>div>p:not(.eyebrow) { display:none; }
+}
+@media(max-width:650px) {
+  .morice-content { padding-inline:12px; }
+  .horizon-home .horizon-layout { grid-template-columns:minmax(0,1fr); gap:12px; }
+  .horizon-home .horizon-layout>aside { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .horizon-home .context-rail>section { padding:12px; }
+  .horizon-home .context-rail .eyebrow { display:none; }
+  .horizon-home .context-rail h2 { font-size:17px; }
+  .horizon-home .horizon-followup { gap:6px; }
+  .horizon-home .horizon-followup button { padding:6px 8px; font-size:13px; }
+  .horizon-home .horizon-heading { display:flex; align-items:center; }
+  .horizon-home .horizon-heading h2 { font-size:23px; }
+  .horizon-home .horizon-weather { margin:0; font-size:12px; }
+  .horizon-home .horizon-weather button { padding:7px 10px; font-size:12px; }
+  .horizon-home .horizon-app-dock button,.horizon-home .horizon-app-dock a { font-size:10px; gap:5px; padding:4px 0; }
+  .horizon-home .horizon-app-dock .brand-icon { width:29px; height:29px; }
+  .horizon-home .horizon-app-dock .horizon-mascot img { width:53px; height:58px; }
+  .horizon-home .horizon-journal-preview h2 { font-size:20px; }
+  .horizon-home .panel-heading { gap:8px; }
+  .horizon-home .horizon-journal-preview .eyebrow { font-size:9px; }
+  .panel-heading,.horizon-section-heading { flex-wrap:wrap; }
+  .composer textarea { min-width:0; width:100%; }
+}
+.horizon-home .horizon-followup button { padding:10px 0; min-height:44px; }
+.horizon-home .horizon-followup strong { font-size:22px; }
+.horizon-home .horizon-empty { padding:12px; font-size:14px; margin-bottom:0; }
+.horizon-home .horizon-day .eyebrow { display:none; }
+.horizon-home .horizon-day>p { margin-bottom:8px; }
+@media(max-width:650px) {
+  .horizon-home .horizon-layout>aside { grid-template-columns:minmax(0,1fr); }
+  .horizon-home .connection-card { display:none; }
+  .horizon-home .horizon-followup { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .horizon-home .horizon-followup button { padding:4px; font-size:12px; }
+  .horizon-home .horizon-followup button:last-child { grid-column:1 / -1; }
+  .horizon-home .horizon-journal-preview { padding:12px; }
+  .horizon-home .horizon-tabs { margin:6px 0; }
+  .horizon-home .horizon-journal-preview .eyebrow { display:none; }
+  .horizon-home .horizon-weather button { min-height:44px; }
+}
