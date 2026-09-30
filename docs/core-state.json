@@ -53,5 +53,15 @@
     "Tester caméra et dictée sur le Fold avec le parcours livré.",
     "Connecter les autres boîtes et vérifier leurs droits avant un classement limité et réversible.",
     "Compléter le CORE privé et les notifications, puis évaluer l’upgrade OpenClaw sans remplacer la chaîne validée."
+  ],
+  "Synchronisation — consolidation 2026-09-30": [
+    "Décision Alan : 04 MORICE SYNC réunit sync et RADAR ; 02 MORICE DEV reste séparé ; code applicatif inchangé.",
+    "Protocole commun manuel/quotidien MORICE-SYNC/1 : docs/MORICE-SYNC.md ; instruction de reprise dans AGENTS.md.",
+    "Tâche quotidienne existante réutilisée et activée sous le titre 04 MORICE SYNC ; calendrier conservé. Veille Morice et 03 RADAR désactivées ; consignes/historiques préservés.",
+    "Lecture GitHub/local attestée avant consolidation au commit applicatif b45da39 ; les commits suivants de cette mission ne concernent que la documentation de synchronisation.",
+    "Morice 4/5 : recherche ciblée sans contenu exploitable ; décisions spécifiques non consolidées, lacune conservée.",
+    "MC-SYNC-001 préparé dans docs/MORICE-SYNC.md : EN ATTENTE MULTIPLECHAT ; aucun avis reçu ni nouveau transport validé.",
+    "Exécution de la nouvelle tâche et persistance quotidienne NON ENCORE PROUVÉES ; aucun accès complet aux conversations ni aux autres sessions Work garanti.",
+    "Reprise 02 : lire main et le journal de synchronisation ; contrôler divergence locale ; tester collecte/persistance ; aucune refonte applicative autorisée."
   ]
 }
