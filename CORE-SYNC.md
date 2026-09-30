@@ -1,9 +1,10 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T14:22:58.888Z
-Commit source au moment de la génération : `40119d1d61b5a2ac20e0e9322905953567db008c`
+Généré : 2026-09-30T15:47:12.635Z
+Commit source au moment de la génération : `b9ab5333b2bf4ac8ce6d5f3c49242b22a1d1c911`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
+Les résultats applicatifs ci-dessous sont les preuves consignées antérieurement ; ils n'ont pas été retestés pendant la consolidation documentaire.
 
 ## Décisions nouvelles
 
@@ -67,12 +68,24 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Connecter les autres boîtes et vérifier leurs droits avant un classement limité et réversible.
 - Compléter le CORE privé et les notifications, puis évaluer l’upgrade OpenClaw sans remplacer la chaîne validée.
 
-## Fichiers modifiés lors de la génération
+## Synchronisation — consolidation 2026-09-30
 
-- app/horizon.css
-- app/morice-app.tsx
+- Décision Alan : 04 MORICE SYNC réunit sync et RADAR ; 02 MORICE DEV reste séparé ; code applicatif inchangé.
+- Protocole commun manuel/quotidien MORICE-SYNC/1 : docs/MORICE-SYNC.md ; instruction de reprise dans AGENTS.md.
+- Tâche quotidienne existante réutilisée et activée sous le titre 04 MORICE SYNC ; calendrier conservé. Veille Morice et 03 RADAR désactivées ; consignes/historiques préservés.
+- Lecture GitHub/local attestée avant consolidation au commit applicatif b45da39 ; les commits suivants de cette mission ne concernent que la documentation de synchronisation.
+- Morice 4/5 : recherche ciblée sans contenu exploitable ; décisions spécifiques non consolidées, lacune conservée.
+- MC-SYNC-001 préparé dans docs/MORICE-SYNC.md : EN ATTENTE MULTIPLECHAT ; aucun avis reçu ni nouveau transport validé.
+- Exécution de la nouvelle tâche et persistance quotidienne NON ENCORE PROUVÉES ; aucun accès complet aux conversations ni aux autres sessions Work garanti.
+- Reprise 02 : lire main et le journal de synchronisation ; contrôler divergence locale ; tester collecte/persistance ; aucune refonte applicative autorisée.
+
+## Fichiers modifiés lors de la consolidation
+
+- AGENTS.md
+- docs/MORICE-SYNC.md
 - docs/core-state.json
+- CORE-SYNC.md
 
 ## Reprise MultipleChat
 
-Importer le dépôt GitHub existant, branche main, puis CORE-SYNC.md. Utiliser Re-sync dans le Project. Aucune API publique de synchronisation automatique n’a été confirmée. Ne pas importer le CORE privé complet dans un dépôt public.
+Importer les fichiers techniques actuels du dépôt existant, branche main, puis utiliser Re-sync dans le Project. Le dossier MC-SYNC-001 est dans docs/MORICE-SYNC.md. API de synchronisation et interrogation automatique non confirmées ; EN ATTENTE MULTIPLECHAT jusqu'à récupération d'avis réels. Aucun CORE privé dans le dépôt public.
