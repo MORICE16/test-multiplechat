@@ -89,3 +89,10 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 ## Reprise MultipleChat
 
 Importer les fichiers techniques actuels du dépôt existant, branche main, puis utiliser Re-sync dans le Project. Le dossier MC-SYNC-001 est dans docs/MORICE-SYNC.md. API de synchronisation et interrogation automatique non confirmées ; EN ATTENTE MULTIPLECHAT jusqu'à récupération d'avis réels. Aucun CORE privé dans le dépôt public.
+
+## Synchronisation — essai Work 2026-09-30
+
+- Lancement immédiat 04 MORICE SYNC demandé et accepté ; résultat original et persistance planifiée non encore confirmés.
+- Références main relues ; bilan d'essai enregistré par Work dans docs/MORICE-SYNC.md, distinct d'un résultat du planificateur.
+- Lecture locale/commande Git indisponible dans la session d'essai ; PC Desktop Commander hors ligne. Aucun checkout local mis à jour.
+- MC-SYNC-001 : EN ATTENTE MULTIPLECHAT ; aucun navigateur contrôlable ni avis récupéré ; aucune implémentation nouvelle validée.
