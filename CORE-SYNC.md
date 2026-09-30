@@ -1,13 +1,13 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T01:41:32.154Z
-Commit source au moment de la génération : `e0c51b3018891e24145905070cf7b9153564fede`
+Généré : 2026-09-30T07:20:21.345Z
+Commit source au moment de la génération : `5a8ee9fb315e4e056cbb37603e3eb8a61efa3c25`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
 ## Décisions nouvelles
 
-- Conserver le projet, le logo et le site privé existants.
+- Conserver l’ancien logo officiel; le rottweiler hockeyeur 16 est un compagnon animé secondaire.
 - Conserver Graph tant que Work IQ et sa licence ne sont pas confirmés pour le compte.
 - Utiliser l’import GitHub et Re-sync natifs de MultipleChat avant tout pont personnalisé.
 - Analyser les pièces jointes sans exécution de leurs instructions ni action externe.
@@ -22,6 +22,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Pièces jointes conservées accessibles depuis chaque travail, après rechargement.
 - CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.
 - Documents : recherche OneDrive en lecture seule depuis l’interface.
+- Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.
 
 ## Tests
 
@@ -31,10 +32,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Brouillon synthétique créé depuis Morice et relu via Graph : isDraft=true, aucun destinataire, aucun envoi.
 - OpenClaw : diagnostic réussi depuis Morice après reprise du client; passerelle saine, deux appareils appairés, zéro connecté.
 - MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md.
+- CORE consolidé réellement importé et chiffré dans le runtime privé : 67 744 caractères, import confirmé par l’interface.
+- Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe.
 
 ## En cours
 
-- Import de la référence privée réelle et preuve runtime de son utilisation, après publication du code testé.
+- Publication du compagnon secondaire et vérification visuelle finale.
 
 ## À faire
 
@@ -60,26 +63,16 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/assistant/route.ts
-- app/api/files/route.ts
-- app/api/ideas/route.ts
-- app/api/jobs/route.ts
-- app/api/microsoft/read/route.ts
-- app/api/state/route.ts
-- app/components/jobs-panel.tsx
-- app/lib/idea-analysis.ts
+- android/app/build.gradle
+- android/app/src/main/res/drawable-nodpi/morice_widget.png
+- app/globals.css
+- app/horizon.css
 - app/morice-app.tsx
 - docs/core-state.json
-- tests/backend.test.mjs
-- tests/idea-files.test.mjs
-- app/api/core/route.ts
-- app/components/core-panel.tsx
-- app/components/onedrive-panel.tsx
-- app/lib/core-context.ts
-- app/lib/core-excerpts.ts
-- tests/core-context.test.mjs
-- tests/core-private.test.mjs
+- app/components/morice-companion.tsx
+- docs/COMPAGNON.md
+- public/morice-companion.png
+- public/morice-seated.png
 
 ## Reprise MultipleChat
 

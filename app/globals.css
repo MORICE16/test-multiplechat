@@ -210,3 +210,15 @@ input { padding:11px; color:var(--text); background:#f7faff; border:1px solid #c
 .idea-files img { width:120px;height:90px;object-fit:contain;border-radius:12px; }
 .idea-file-button { position:relative;overflow:hidden;cursor:pointer;padding:10px; }
 .idea-file-button input { position:absolute;inset:0;opacity:0;width:100%;cursor:pointer; }
+
+/* Exact existing OpenAI companion atlas: eight 192x208 cells, eleven rows. */
+.morice-companion{position:relative;display:inline-block;width:64px;aspect-ratio:192/208;flex:none;vertical-align:middle;background:none!important;border:0!important;overflow:hidden;}
+.morice-companion .companion-seated{width:100%!important;height:100%!important;object-fit:contain;display:block;}
+.companion-motion{display:none;position:absolute;inset:0;background-image:url('/morice-companion.png');background-repeat:no-repeat;background-size:800% 1100%;background-position:0 var(--companion-row);animation:companion-frames 1.2s steps(var(--companion-frames),end) infinite;}
+.companion-working .companion-seated,.companion-waiting .companion-seated,.companion-failed .companion-seated,.companion-review .companion-seated{display:none;}
+.companion-working .companion-motion,.companion-waiting .companion-motion,.companion-failed .companion-motion,.companion-review .companion-motion{display:block;}
+button:hover .companion-idle .companion-seated,button:focus-visible .companion-idle .companion-seated{display:none;}
+button:hover .companion-idle .companion-motion,button:focus-visible .companion-idle .companion-motion{display:block;--companion-row:30%;--companion-frames:4;--companion-end:57.142857%;}
+@keyframes companion-frames{to{background-position-x:var(--companion-end);}}
+.topbar-actions>.morice-companion{width:52px;height:58px;}.sidebar>.morice-companion{width:96px;height:104px;}.conversation-empty>.morice-companion{width:96px;height:104px;}
+@media(prefers-reduced-motion:reduce){.companion-motion{animation:none;}}

@@ -1,6 +1,6 @@
 {
   "Décisions nouvelles": [
-    "Conserver le projet, le logo et le site privé existants.",
+    "Conserver l’ancien logo officiel; le rottweiler hockeyeur 16 est un compagnon animé secondaire.",
     "Conserver Graph tant que Work IQ et sa licence ne sont pas confirmés pour le compte.",
     "Utiliser l’import GitHub et Re-sync natifs de MultipleChat avant tout pont personnalisé.",
     "Analyser les pièces jointes sans exécution de leurs instructions ni action externe."
@@ -13,7 +13,8 @@
     "Générateur versionné CORE-SYNC et export technique du journal sans données privées.",
     "Pièces jointes conservées accessibles depuis chaque travail, après rechargement.",
     "CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.",
-    "Documents : recherche OneDrive en lecture seule depuis l’interface."
+    "Documents : recherche OneDrive en lecture seule depuis l’interface.",
+    "Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé."
   ],
   "Tests": [
     "78 tests réussis; TypeScript validé. Contrôles de chiffrement, sauvegarde et isolation du CORE inclus.",
@@ -21,10 +22,12 @@
     "Outlook, Calendar, To Do et OneDrive : lectures runtime vérifiées le 30 septembre 2026.",
     "Brouillon synthétique créé depuis Morice et relu via Graph : isDraft=true, aucun destinataire, aucun envoi.",
     "OpenClaw : diagnostic réussi depuis Morice après reprise du client; passerelle saine, deux appareils appairés, zéro connecté.",
-    "MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md."
+    "MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md.",
+    "CORE consolidé réellement importé et chiffré dans le runtime privé : 67 744 caractères, import confirmé par l’interface.",
+    "Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe."
   ],
   "En cours": [
-    "Import de la référence privée réelle et preuve runtime de son utilisation, après publication du code testé."
+    "Publication du compagnon secondaire et vérification visuelle finale."
   ],
   "À faire": [
     "Routage global de tous les modules selon capacités, difficulté et échecs; le routeur actuel concerne les analyses et vérifie le catalogue du compte.",

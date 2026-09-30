@@ -145,7 +145,7 @@ small { line-height:1.5; }
 .horizon-app-dock .brand-icon,.horizon-app-dock button img,.horizon-app-dock a img { width:34px; height:34px; object-fit:contain; }
 .horizon-app-dock>img { width:105px; height:120px; object-fit:contain; margin-left:auto; background:none; border:0; filter:drop-shadow(0 8px 12px #01081366); }
 .horizon-app-dock .horizon-mascot { margin-left:auto; padding:0; align-self:flex-end; background:none; border:0; box-shadow:none; }
-.horizon-app-dock .horizon-mascot img { width:108px; height:124px; object-fit:contain; border:0; border-radius:0; background:none; filter:drop-shadow(0 8px 12px #01081366); }
+.horizon-app-dock .horizon-mascot .morice-companion { width:108px; height:124px; object-fit:contain; border:0; border-radius:0; background:none; filter:drop-shadow(0 8px 12px #01081366); }
 .horizon-caption { color:#acbfdc; font-size:12px; line-height:1.65; margin:0; }
 .horizon-followup { display:grid; gap:0; }
 .horizon-followup button { display:flex; align-items:center; gap:12px; min-height:58px; text-align:left; border:0; border-bottom:1px solid #324b6a; border-radius:0; background:transparent; color:#cedef4; padding:15px 0; }
@@ -246,7 +246,7 @@ small { line-height:1.5; }
   .horizon-app-dock { gap:16px; }
   .horizon-app-dock>div { gap:14px; }
   .horizon-app-dock>img { width:90px; height:105px; }
-  .horizon-app-dock .horizon-mascot img { width:90px; height:105px; }
+  .horizon-app-dock .horizon-mascot .morice-companion { width:90px; height:105px; }
   .panel { padding:20px; border-radius:16px; }
   .composer { margin-inline:10px; padding:14px; }
   .command-heading { padding-inline:18px; }
@@ -259,7 +259,7 @@ small { line-height:1.5; }
   .morice-content { padding-inline:12px; }
   .horizon-app-dock { gap:10px; }
   .horizon-app-dock>img { width:72px; height:90px; }
-  .horizon-app-dock .horizon-mascot img { width:70px; height:88px; }
+  .horizon-app-dock .horizon-mascot .morice-companion { width:70px; height:88px; }
   .horizon-app-dock button,.horizon-app-dock a { font-size:11px; gap:6px; }
   .horizon-journal-preview { padding:15px; }
   .horizon-tabs button { font-size:12px; padding-inline:5px; }
@@ -276,7 +276,7 @@ small { line-height:1.5; }
 .topbar>div,.panel-heading>div,.horizon-section-heading>div { min-width:0; }
 .horizon-home .horizon-app-dock { order:-2; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; padding:8px 0; border-top:0; }
 .horizon-home .horizon-app-dock>* { min-width:0; margin:0; }
-.horizon-home .horizon-app-dock .horizon-mascot img { width:64px; height:70px; }
+.horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:64px; height:70px; }
 .horizon-home .horizon-main { gap:14px; }
 .horizon-home .horizon-layout { gap:18px; }
 .horizon-home .horizon-layout>aside { gap:14px; }
@@ -330,7 +330,7 @@ small { line-height:1.5; }
   .horizon-home .horizon-weather button { padding:7px 10px; font-size:12px; }
   .horizon-home .horizon-app-dock button,.horizon-home .horizon-app-dock a { font-size:10px; gap:5px; padding:4px 0; }
   .horizon-home .horizon-app-dock .brand-icon { width:29px; height:29px; }
-  .horizon-home .horizon-app-dock .horizon-mascot img { width:53px; height:58px; }
+  .horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:53px; height:58px; }
   .horizon-home .horizon-journal-preview h2 { font-size:20px; }
   .horizon-home .panel-heading { gap:8px; }
   .horizon-home .horizon-journal-preview .eyebrow { font-size:9px; }
