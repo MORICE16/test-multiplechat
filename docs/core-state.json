@@ -63,5 +63,11 @@
     "MC-SYNC-001 préparé dans docs/MORICE-SYNC.md : EN ATTENTE MULTIPLECHAT ; aucun avis reçu ni nouveau transport validé.",
     "Exécution de la nouvelle tâche et persistance quotidienne NON ENCORE PROUVÉES ; aucun accès complet aux conversations ni aux autres sessions Work garanti.",
     "Reprise 02 : lire main et le journal de synchronisation ; contrôler divergence locale ; tester collecte/persistance ; aucune refonte applicative autorisée."
+  ],
+  "Synchronisation — essai Work 2026-09-30": [
+    "Lancement immédiat 04 MORICE SYNC demandé et accepté ; résultat original et persistance planifiée non encore confirmés.",
+    "Références main relues ; bilan d'essai enregistré par Work dans docs/MORICE-SYNC.md, distinct d'un résultat du planificateur.",
+    "Lecture locale/commande Git indisponible dans la session d'essai ; PC Desktop Commander hors ligne. Aucun checkout local mis à jour.",
+    "MC-SYNC-001 : EN ATTENTE MULTIPLECHAT ; aucun navigateur contrôlable ni avis récupéré ; aucune implémentation nouvelle validée."
   ]
 }
