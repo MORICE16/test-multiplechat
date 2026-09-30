@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { readWidgetDraft } from "./lib/widget-draft";
 import { createRecording, type RecordingState as DictationState } from "./lib/recording";
 import { ResponsePlayer } from "./components/response-player";
+import { CopyMessage } from "./components/copy-message";
+import { IdeaComposer } from "./components/idea-composer";
 import { ResultText } from "./components/result-text";
 import { JobsPanel, useJobs } from "./components/jobs-panel";
 import { ImprovementsPanel } from "./components/improvements-panel";
@@ -563,6 +565,10 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   const listening = ["starting", "listening", "reconnecting", "paused"].includes(voicePhase);
   const locked = listening || Boolean(audioUrl) || voicePhase === "stopping" || assistantBusy;
   const logRef = useRef<HTMLDivElement>(null);
+  const [compact,setCompact]=useState(false);
+  const [attachmentsOpen,setAttachmentsOpen]=useState(false);
+  const [attachmentsCreated,setAttachmentsCreated]=useState(false);
+  useEffect(()=>{if(assistantBusy)setCompact(true);},[assistantBusy]);
   useEffect(() => { const log = logRef.current; if (log) log.scrollTop = log.scrollHeight; }, [messages, assistantBusy]);
   const labels: Record<string, [string, string]> = {
     idle: ["Microphone éteint", "Un clic démarre l’écoute. Aucun maintien appuyé."],
@@ -578,17 +584,22 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   const [phaseLabel, phaseDetail] = labels[voicePhase];
   return <section className="command-panel" aria-label="Conversation avec Morice">
     <div className="command-heading"><div><span className="command-mark">✦</span><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>À vous la parole.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
-    <div className="composer">
+    <div className={"composer"+(compact?" composer-compact":"")}>
+      <div className="composer-toolbar"><button type="button" aria-expanded={!compact} onClick={()=>setCompact(!compact)}>{compact?'Écrire / agrandir':'Réduire la saisie'}</button><button type="button" disabled={locked} aria-expanded={attachmentsOpen} onClick={()=>{setAttachmentsCreated(true);setAttachmentsOpen(!attachmentsOpen);}}>Joindre une photo / un PDF</button></div>
       <div className={"voice-progress " + voicePhase} role="status"><div className="voice-indicator" aria-hidden="true"><span /><span /><span /><span /></div><div><b>{phaseLabel}</b><small>{voicePhase === "error" && dictationError ? dictationError : phaseDetail}</small></div></div>
+      {compact&&message&&<p className="draft-summary">Brouillon conservé · {message.length} caractères</p>}
+      <div hidden={compact}>
       <label className="sr-only" htmlFor="morice-message">Votre message à Morice</label>
       <textarea id="morice-message" aria-describedby="composer-help" readOnly={locked} value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); onSend(); } }} placeholder="Écrivez ici, ou démarrez le microphone…" rows={3} />
       <div className="composer-help" id="composer-help"><span>{listening ? "Gardez cette page ouverte pendant la dictée." : "Ctrl / ⌘ + Entrée pour envoyer"}</span><span className={message.length > 1200 ? "over-limit" : ""}>{message.length} / 1 200</span></div>
+      </div>
       <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls">{(voicePhase === "listening" || voicePhase === "paused") && <button className="secondary" onClick={onPause}>{voicePhase === "paused" ? "Reprendre" : "Pause"}</button>}<button disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={onSend} disabled={assistantBusy || voicePhase === "stopping" || voicePhase === "starting" || Boolean(audioUrl) || (!listening && (!message.trim() || message.length > 1200))}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
     </div>
+    <div hidden={!attachmentsOpen} className="chat-attachments"><p>Analyse privée de fichiers · le résultat et sa trace apparaissent dans Travaux.</p>{attachmentsCreated&&<IdeaComposer initialText={message} onSaved={()=>onOpenAction('jobs')}/>}</div>
     {audioUrl && voicePhase !== "stopping" && <div className="audio-recovery" role="group" aria-label="Audio conservé"><p>Votre audio reste disponible dans cette page jusqu’à sa fermeture.</p><button onClick={onRetry}>Réessayer la transcription</button><a href={audioUrl} download={`morice-dictee.${audioExtension}`}>Télécharger l’audio</a><button className="secondary" onClick={onDiscard}>Effacer l’audio</button></div>}
     <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
       {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
-      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><ResultText text={entry.text} citations={entry.action?.citations} />{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<ResponsePlayer disabled={listening || voicePhase === "stopping"} text={entry.text.replace(/[^]*/g, "")} /></div>}</article>)}
+      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><ResultText text={entry.text} citations={entry.action?.citations} /><CopyMessage text={entry.text}/>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<ResponsePlayer disabled={listening || voicePhase === "stopping"} text={entry.text.replace(/[^]*/g, "")} /></div>}</article>)}
       {assistantBusy && <article className="chat-message assistant pending"><span className="message-author">Morice</span><MoriceCompanion state="working" label="Morice travaille" /><p>Je m’occupe de votre demande<span className="thinking-dots" aria-hidden="true">…</span></p></article>}
     </div>
     {messages.length === 0 && <div className="examples"><button disabled={locked} onClick={() => setMessage("Quelles sont mes tâches prioritaires ?")}>Organiser ma journée</button><button disabled={locked} onClick={() => setMessage("Prépare un mail de suivi à mon client")}>Préparer un email</button><button disabled={locked} onClick={() => setMessage("Mémorise une information importante : ")}>Garder une idée</button></div>}

@@ -12,8 +12,26 @@ body {
   background:radial-gradient(ellipse at 86% 0%,var(--sky-glow),transparent 48%),
     radial-gradient(ellipse at 8% 92%,#122945 0,transparent 50%),var(--bg);
   background-attachment:fixed; color:var(--text);
-  font-family:"Segoe UI",system-ui,sans-serif;
+  font-family:Arial,"Segoe UI",system-ui,sans-serif;
 }
+
+/* Readable conversations and a collapsible composer on Fold and desktop. */
+.command-panel [hidden] { display:none!important; }
+.composer-toolbar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+.composer-toolbar button,.copy-message button { min-height:44px; font-size:15px; font-weight:600; }
+.command-panel .result-text,.command-panel textarea { font-family:Arial,"Segoe UI",sans-serif; font-size:18px; font-weight:500; line-height:1.65; color:#f7faff; }
+.command-panel .conversation-log { max-height:none!important; min-height:160px; overflow:visible; }
+.command-panel .chat-message { max-width:100%; overflow-wrap:anywhere; }
+.copy-message { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:12px; }
+.copy-message span { font-size:14px; }
+.copy-message textarea { width:100%; }
+.chat-attachments { margin:0 16px 16px; }
+.command-panel .composer-compact { padding:10px 14px; margin-bottom:12px; }
+.composer-compact .mode-row,.composer-compact .voice-progress.idle,.composer-compact .voice-progress.thinking { display:none; }
+.composer-compact .voice-progress small { display:none; }
+.draft-summary { margin:4px 0; font-size:14px; color:var(--muted); }
+.composer-compact .command-actions { border-top:0; padding-top:4px; justify-content:flex-end; }
+@media(max-width:600px){.command-panel .result-text { font-size:18px; }.composer-toolbar button { flex:1; }.command-panel .command-heading { padding-block:12px; }.command-heading .session-label { display:none; }}
 /* The landscape is decorative; solid surfaces retain contrast above it. */
 body::before {
   content:""; position:fixed; inset:0; height: min(850px,100vh); z-index:-1; pointer-events:none;

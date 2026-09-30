@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { MAX_ATTACHMENTS, MAX_FILE_BYTES } from '../lib/attachment-validation';
 type Attachment={file:File;url:string;id?:string};
-export function IdeaComposer({onSaved}:{onSaved:()=>void}) {
-  const [text,setText]=useState(''); const [files,setFiles]=useState<Attachment[]>([]);
+export function IdeaComposer({onSaved,initialText=''}:{onSaved:()=>void;initialText?:string}) {
+  const [text,setText]=useState(initialText); const [files,setFiles]=useState<Attachment[]>([]);
   const [busy,setBusy]=useState(false); const [notice,setNotice]=useState('');
   const requestId=useRef(crypto.randomUUID()); const fileState=useRef(files);
   useEffect(()=>{fileState.current=files;},[files]);
@@ -37,7 +37,7 @@ export function IdeaComposer({onSaved}:{onSaved:()=>void}) {
     }catch(e){setNotice(e instanceof Error?e.message:'Connexion interrompue. Texte et fichiers conservés. Vérifiez Travaux avant de renvoyer.');}
     finally{setBusy(false);}
   }
-  return <section className="idea-composer" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();add(e.dataTransfer.files);}}>
+  return <section className="idea-composer" onPaste={e=>{if(e.clipboardData.files.length){e.preventDefault();add(e.clipboardData.files);}}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();add(e.dataTransfer.files);}}>
     <label htmlFor="idea-text">Nouvelle idée · analyser une photo ou un document</label>
     <textarea id="idea-text" rows={3} maxLength={4000} value={text} disabled={busy} onChange={e=>setText(e.target.value)} placeholder="Que voulez-vous comprendre ou préparer ?" />
     <div className="idea-files">{files.map((item,index)=><figure key={item.url}>{item.file.type.startsWith('image/') ? <img src={item.url} alt={`Aperçu ${item.file.name}`} /> : <span aria-label="Document PDF">PDF</span>}<figcaption>{item.file.name}</figcaption><button type="button" disabled={busy} onClick={()=>void remove(index)}>Retirer</button></figure>)}</div>
