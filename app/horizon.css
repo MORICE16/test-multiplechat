@@ -383,3 +383,13 @@ html[data-weather="night"] body::before { filter:brightness(.65) saturate(.8); }
 .command-panel .attachment-trigger { background:#255479; border:1px solid #78c3e0; color:#fff; font-weight:700; }
 .command-panel .chat-attachments { padding:14px; margin-block:12px; border:1px solid #78c3e0; border-radius:16px; }
 @media(max-width:650px) { .command-heading .conversation-companion .morice-companion { width:86px; height:94px; } }
+/* Large secondary companion: its own row avoids overlapping app controls. */
+.horizon-home .horizon-app-dock .horizon-mascot { grid-column:1 / -1; justify-self:center; width:100%; max-width:340px; }
+.horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:280px; height:304px; max-width:100%; }
+.command-heading .conversation-companion .morice-companion { width:224px; height:244px; }
+.command-panel .command-heading>div { flex-wrap:wrap; }
+@media(max-width:650px) {
+ .horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:240px; height:260px; }
+ .command-heading .conversation-companion .morice-companion { width:172px; height:188px; }
+ .command-panel .command-heading>div { gap:10px; }
+}

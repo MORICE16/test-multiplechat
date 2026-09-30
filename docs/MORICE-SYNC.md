@@ -126,3 +126,15 @@ Aucun changement matériel. Aucune contradiction nouvelle, aucune nouveauté RAD
 3. Le premier bilan de la tâche fusionnée et son écriture dans ce journal sont confirmés ; vérifier les changements depuis cette preuve et les sources encore inaccessibles. Les droits/outils du planificateur peuvent différer de Work.
 4. L’agent traite MC-SYNC-001 lorsque son accès MultipleChat est opérationnel et conserve les avis réels. Sans accès, laisser ce dossier en attente et poursuivre les diagnostics/raccordements indépendants déjà autorisés ; ne pas demander à l’utilisateur de copier-coller le dossier.
 5. Aucune refonte ni installation applicative n'est validée. Demander une décision uniquement après dossier concret et confrontation pour les changements importants.
+
+### 2026-09-30 — reprise DEV, compagnon agrandi et accès réels
+- Main distant 582650060e8de238d2b10def2716929feb5bb0c9 lu; copie de travail auparavant b45da39 mise à jour en fast-forward, sans changements locaux perdus.
+- docs/MORICE-SYNC.md et CORE-SYNC.md lus avant modification. MC-SYNC-001 reste en attente uniquement pour les changements architecturaux concernés.
+- Modification explicitement demandée : compagnon secondaire nettement agrandi, ligne dédiée à l’accueil et doublement en conversation; logo principal conservé. Aucune migration ni nouvelle permission.
+- Accès code/GitHub/Sites owner privé confirmé. Contrôle du navigateur échoue après relance; vérification visuelle PC/Fold non renouvelée dans cette reprise.
+- Logs runtime récents : assistant, calendrier Microsoft, connexions et travaux HTTP 200. Ces statuts ne prouvent pas la lecture complète de toutes les boîtes.
+- Lectures directes authentifiées par le mécanisme Sites disponible : API applicative HTTP 401; aucun contenu privé ni secret affiché, aucun droit élargi. Tests des boîtes non renouvelés.
+- Briefing quotidien : conserver la tâche fusionnée 04 existante; aucune seconde veille créée, aucun déclenchement répété.
+- Ledger différée par Alan. Aucun achat, envoi, tri massif ou commande téléphone effectué.
+- Diagnostic local OpenClaw 2026.8.1 renouvelé : nœud Android connecté, device.status ok=true. Lecture seule; aucun ordre application, micro ou message.
+- Validation de la correction : TypeScript, 83 tests et build réussis. Vérification visuelle actuelle non disponible, navigateur de contrôle en erreur.

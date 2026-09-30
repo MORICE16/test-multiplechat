@@ -104,3 +104,9 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - 02 MORICE DEV lit le protocole et le dernier bilan depuis main ; reprise des diagnostics et raccordements existants autorisés sans transfert manuel par l’utilisateur.
 - MC-SYNC-001 demeure EN ATTENTE MULTIPLECHAT ; ne bloque que les changements architecturaux qui exigent cette confrontation.
 - Commande locale de lecture échouée : sandbox provisioning failed. Git local, navigateur et runtime non contrôlés dans cette session ; aucun branchement applicatif revendiqué.
+
+## Reprise DEV — compagnon et accès, 30 septembre 2026
+- Compagnon secondaire agrandi sur une ligne dédiée à l’accueil; dimensions doublées dans la conversation. Ancien logo officiel conservé.
+- Code, main GitHub et Sites accessibles. Navigateur de contrôle indisponible après relance; tests visuels et voix Fold non renouvelés.
+- Runtime : journaux récents assistant, calendrier et travaux HTTP 200. Relecture des boîtes via accès direct refusée HTTP 401; ne pas annoncer ces lectures comme prouvées.
+- Conserver le briefing quotidien 04 existant. MultipleChat reste une dépendance uniquement pour les décisions architecturales correspondantes.
