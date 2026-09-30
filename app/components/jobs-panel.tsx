@@ -4,7 +4,7 @@ import { ResultText } from "./result-text";
 import { ResponsePlayer } from "./response-player";
 import { type Citation } from "../lib/web-result";
 
-type JobView = { id: string; title: string; request: string; operation: string; status: string; result: string; error: string; updated_at: string; evidence: { citations?: Citation[]; checkedAt?: string; tool?: string; responseId?: string; trace?:string; core?:string } };
+type JobView = { id: string; title: string; request: string; operation: string; status: string; result: string; error: string; updated_at: string; evidence: { citations?: Citation[]; checkedAt?: string; tool?: string; responseId?: string; trace?:string; core?:string; files?:{id:string;name:string;size:number}[] } };
 type QueueData = { jobs: JobView[]; events: { job_id: string; status: string; detail: string; created_at: string }[] };
 const groups = [["queued", "À faire"], ["running", "En cours"], ["approval", "En attente de validation"], ["blocked", "Bloqué"], ["done", "Terminé"]];
 
@@ -54,6 +54,7 @@ export function JobsPanel({ queue, waiting, tasks, onTasks, onApprovals }: { que
           <small>{job.evidence.tool || job.operation} · {new Date(job.updated_at).toLocaleString("fr-FR")}</small>
           {job.evidence.trace && <p className="horizon-caption">{job.evidence.trace} → {job.status === 'done' ? 'résultat enregistré' : job.status === 'blocked' ? 'bloqué' : 'en cours'}</p>}
           {job.evidence.core && <small>{job.evidence.core}</small>}
+          {!!job.evidence.files?.length && <ul aria-label="Pièces jointes conservées">{job.evidence.files.map(file=><li key={file.id}><a href={`/api/files/${file.id}`} target="_blank" rel="noopener noreferrer">{file.name} ↗</a> · {Math.ceil(file.size/1024)} Ko</li>)}</ul>}
           {job.error && <p role="status">{job.error}</p>}
           {job.result && <><ResultText text={job.result} citations={job.evidence.citations} /><ResponsePlayer text={job.result.replace(/[^]*/g, "")} /></>}
           <details><summary>Historique et preuve</summary><p>Référence Morice : {job.id}</p>{job.evidence.responseId && <p>Référence du moteur : {job.evidence.responseId}</p>}{job.evidence.checkedAt && <p>Résultat reçu le {new Date(job.evidence.checkedAt).toLocaleString("fr-FR")}</p>}<ul>{queue.data.events.filter(e => e.job_id === job.id).map((event, n) => <li key={n}>{new Date(event.created_at).toLocaleString("fr-FR")} — {event.detail}</li>)}</ul></details>

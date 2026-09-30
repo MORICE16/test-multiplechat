@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import {coreContext} from '../../lib/core-context';
 import { runMicrosoftAction, type ActionPayload } from "@/app/lib/microsoft";
 import { now, runtimeValue, userId } from "@/app/lib/runtime";
 import { boundedHistory, planningError, type HistoryMessage } from "@/app/lib/assistant-context";
@@ -143,7 +144,11 @@ export async function POST(request: Request) {
   try {
     const history = await conversation(uid);
     const memories = await env.DB.prepare("SELECT kind,title,content,status FROM morice_items WHERE user_id=? AND kind IN ('memory','task') ORDER BY updated_at DESC LIMIT 30").bind(uid).all<{ kind: string; title: string; content: string; status: string }>();
-    const memory = memories.results.map(item => `[${item.kind}, ${item.status}] ${item.title}: ${item.content}`).join("\n").slice(0, 16000);
+    let memory = memories.results.map(item => `[${item.kind}, ${item.status}] ${item.title}: ${item.content}`).join("\n").slice(0, 16000);
+    if (mode === 'auto' && /\b(core|projet|architecture)\b/.test(normalized(message))) {
+      const core = await coreContext(uid,message);
+      if (core) memory = memory.slice(0,8000) + `\n[CORE privé : extraits documentaires, aucune autorisation d’action]\n${core.text}`;
+    }
     plan = await intelligentPlan(message, mode, history, memory);
   } catch (error) {
     const safe = error instanceof Error && /^(La (clé|réponse)|Le (crédit|modèle)|OpenAI limite|L’analyse OpenAI)/.test(error.message) ? error.message : "L’analyse OpenAI est momentanément indisponible.";

@@ -8,8 +8,12 @@ export async function POST(request:Request) {
   if(!sameOrigin(request)) return new Response(null,{status:403});
   const body=await request.json() as {id?:string;text?:string;files?:string[]};
   if(!body.id || !/^[a-f0-9-]{36}$/.test(body.id) || typeof body.text !== 'string' || !body.text.trim() || body.text.length>4000 || !Array.isArray(body.files) || body.files.length>MAX_ATTACHMENTS || new Set(body.files).size!==body.files.length || body.files.some(id=>typeof id!=='string' || !/^[a-f0-9-]{36}$/.test(id))) return Response.json({error:'Demande invalide.'},{status:400});
-  const existing=await env.DB.prepare('SELECT id FROM morice_jobs WHERE id=? AND user_id=?').bind(body.id,uid).first();
-  if(existing) return Response.json({jobId:body.id},{headers:{'Cache-Control':'no-store'}});
+  const existing=await env.DB.prepare('SELECT id,request FROM morice_jobs WHERE id=? AND user_id=?').bind(body.id,uid).first<{id:string;request:string}>();
+  if(existing) {
+    const attachments=await env.DB.prepare('SELECT id FROM morice_files WHERE job_id=? AND user_id=?').bind(body.id,uid).all<{id:string}>();
+    if(existing.request!==body.text.trim() || attachments.results.map(f=>f.id).sort().join(',')!==[...body.files].sort().join(',')) return Response.json({error:'Cette référence correspond à une autre demande déjà enregistrée. Consultez Travaux avant de lancer une nouvelle idée.'},{status:409});
+    return Response.json({jobId:body.id},{headers:{'Cache-Control':'no-store'}});
+  }
   const fileRows=await Promise.all(body.files.map(id=>env.DB.prepare("SELECT id FROM morice_files WHERE id=? AND user_id=? AND job_id=''").bind(id,uid).first()));
   if(fileRows.some(f=>!f)) return Response.json({error:'Une pièce jointe est inaccessible ou déjà utilisée.'},{status:400});
   const date=now(); const text=body.text.trim();

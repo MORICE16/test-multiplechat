@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     ]);
     itemRows = await env.DB.prepare("SELECT id, kind, title, content, status, priority, position FROM morice_items WHERE user_id = ? ORDER BY position, created_at DESC").bind(uid).all();
   }
-  const settingRows = await env.DB.prepare("SELECT key, value FROM morice_settings WHERE user_id = ?").bind(uid).all();
+  const settingRows = await env.DB.prepare("SELECT key, value FROM morice_settings WHERE user_id = ? AND key NOT LIKE 'core_%'").bind(uid).all();
   const settings: Record<string, unknown> = {};
   for (const row of settingRows.results as Array<{key:string,value:string}>) { try { settings[row.key] = JSON.parse(row.value); } catch { settings[row.key] = row.value; } }
   const actions = await env.DB.prepare("SELECT item_id,provider,operation,payload,result FROM morice_action_payloads WHERE user_id=?").bind(uid).all();
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     return Response.json({ ok: true });
   }
   if (body.action === "setting") {
+    if (body.key?.startsWith('core_')) return Response.json({error:'Utilisez le parcours CORE privé.'},{status:403});
     await env.DB.prepare("INSERT INTO morice_settings(user_id,key,value) VALUES(?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET value=excluded.value").bind(uid,body.key,body.value).run();
     return Response.json({ ok: true });
   }

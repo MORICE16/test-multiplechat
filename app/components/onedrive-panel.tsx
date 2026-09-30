@@ -1,0 +1,7 @@
+'use client';
+import {useState} from 'react';
+export function OneDrivePanel(){
+ const [query,setQuery]=useState('');const [result,setResult]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
+ async function search(){if(!query.trim()||busy)return;setBusy(true);setError('');try{const r=await fetch(`/api/microsoft/read?operation=onedrive_search&query=${encodeURIComponent(query.trim())}`);const d=await r.json() as {result?:string;error?:string;checkedAt?:string};if(!r.ok)throw Error(d.error||'Recherche non confirmée.');setResult(`${d.result}\n\nLecture confirmée le ${new Date(d.checkedAt!).toLocaleString('fr-FR')}`);}catch(e){setError(e instanceof Error?e.message:'Recherche indisponible.');}finally{setBusy(false);}}
+ return <section className="panel"><p className="eyebrow">DOCUMENTS PRIVÉS</p><h2>Documents & OneDrive</h2><p>Rechercher dans votre OneDrive principal, en lecture seule. Les pièces jointes de vos idées restent disponibles dans Travaux.</p><form className="inline" onSubmit={e=>{e.preventDefault();void search();}}><label className="sr-only" htmlFor="drive-query">Rechercher dans OneDrive</label><input id="drive-query" value={query} maxLength={200} onChange={e=>setQuery(e.target.value)} placeholder="Nom ou mot-clé d’un document…"/><button disabled={busy||!query.trim()}>{busy?'Recherche…':'Chercher dans OneDrive'}</button></form>{error&&<p role="status">{error}</p>}{result&&<p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{result}</p>}</section>;
+}

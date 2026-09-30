@@ -38,8 +38,17 @@ test('private upload, owner isolation, removal and idea idempotency use real rou
     x.f.uid='alice';assert.equal((await x.file.GET(get,ctx(ids[1]))).headers.get('Content-Type'),'application/pdf');
     const id=crypto.randomUUID();const body=JSON.stringify({id,text:'Analyser les deux pièces de test.',files:ids});const req=()=>new Request('https://morice.test/api/ideas',{method:'POST',body});
     assert.equal((await x.idea.POST(req())).status,202);assert.equal((await x.idea.POST(req())).status,200);assert.equal(x.f.starts,1);
+    assert.equal((await x.idea.POST(new Request('https://morice.test/api/ideas',{method:'POST',body:JSON.stringify({id,text:'Different request',files:ids})}))).status,409);assert.equal(x.f.starts,1);
     assert.equal(x.sql.prepare('SELECT COUNT(*) n FROM morice_items WHERE kind=\'memory\'').get().n,1);
     assert.equal((await x.file.DELETE(new Request('https://morice.test/api/files',{method:'DELETE'}),ctx(ids[0]))).status,409);
     assert.throws(()=>x.sql.prepare('UPDATE morice_files SET job_id=? WHERE id=?').run(crypto.randomUUID(),ids[0]),/claimed/);
   }finally{x.close();}
+});
+
+test('chunked multipart body is capped before decoding',async()=>{
+ const x=await fixture();try{
+ const stream=new ReadableStream({start(controller){controller.enqueue(new Uint8Array(MAX_FILE_BYTES+65537));controller.close();}});
+ const response=await x.upload.POST(new Request('https://morice.test/api/files',{method:'POST',body:stream,duplex:'half',headers:{'Content-Type':'multipart/form-data; boundary=test'}}));
+ assert.equal(response.status,413);assert.equal(x.objects.size,0);
+ }finally{x.close();}
 });

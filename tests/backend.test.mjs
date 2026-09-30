@@ -42,6 +42,7 @@ async function fixture() {
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const connection=(...a)=>f.microsoftConnection(...a);
       const fetch=(...a)=>f.fetch(...a);
+      const coreContext=(...a)=>f.coreContext?.(...a) || Promise.resolve(null);
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
     const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;

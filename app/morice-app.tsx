@@ -13,6 +13,8 @@ import { HorizonWeather } from "./components/horizon-weather";
 import { HorizonDay } from "./components/horizon-day";
 import { OpenClawPanel } from "./components/openclaw-panel";
 import { TodoPanel } from "./components/todo-panel";
+import {CorePanel} from './components/core-panel';
+import {OneDrivePanel} from './components/onedrive-panel';
 import { type Citation } from "./lib/web-result";
 
 type Item = {
@@ -66,6 +68,7 @@ const MORICE_LOGO_SRC = "/morice-3d.png?v=morice-logo-44fce869-20260823";
 const navigation = [
   ["home", "Aujourd’hui", "⌂"],
   ["journal", "Journal d’idées", "✧"],
+  ["core", "CORE Morice", "◉"],
   ["documents", "Documents", "▤"],
   ["chat", "Conversation", "✦"],
   ["tasks", "Tâches", "✓"],
@@ -491,7 +494,8 @@ export default function MoriceApp() {
         {view === "mail" && <><MailReviewPanel /><MicrosoftReadPanel title="Emails récents" operation="mail_read" /></>}
         {view === "hubspot" && <InfoPanel title="HubSpot indisponible" text="Aucun accès HubSpot supplémentaire n’est disponible. Morice ne simulera jamais une connexion et utilisera Microsoft 365 ou Make pour les actions autorisées." />}
         {view === "calendar" && <MicrosoftReadPanel title="Agenda" operation="calendar_read" />}
-        {view === "documents" && <InfoPanel title="Documents & OneDrive" text="Morice peut rechercher des documents OneDrive après la connexion Microsoft 365, sans exposer les jetons d’accès." />}
+        {view === "documents" && <OneDrivePanel />}
+        {view === "core" && <CorePanel />}
         {view === "connections" && <ConnectionsPanel state={connections} refresh={refreshConnections} disconnectMicrosoft={disconnectMicrosoft} />}
         {view === "projects" && <InfoPanel title="Projets" text="L’espace projets est prêt. Il n’affichera que des projets réellement enregistrés ou connectés." />}
         {view === "search" && <section className="panel"><h2>Recherche Web</h2><p>Demandez une recherche à Morice. Son résultat, ses sources et son suivi apparaîtront dans Travaux.</p><button onClick={() => { setView("chat"); setMessage("Recherche sur le Web : "); }}>Nouvelle recherche</button><button className="secondary" onClick={() => setView("jobs")}>Voir mes travaux</button></section>}

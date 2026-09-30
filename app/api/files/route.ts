@@ -8,7 +8,12 @@ export async function POST(request: Request) {
   if (Number(request.headers.get('content-length')) > MAX_FILE_BYTES + 65536) return Response.json({error:'Fichier supérieur à 4 Mo.'},{status:413});
   if (!env.FILES) return Response.json({error:'Stockage privé non disponible.'},{status:503});
   try {
-    const form = await request.formData(); const file = form.get('file');
+    // Bound the body even when Content-Length is omitted (chunked requests).
+    if (!request.body) return Response.json({error:'Fichier requis.'},{status:400});
+    const reader=request.body.getReader(); const chunks:Uint8Array[]=[];let total=0;
+    try { for (;;) { const part=await reader.read();if(part.done)break;total+=part.value.byteLength;if(total>MAX_FILE_BYTES+65536){await reader.cancel();return Response.json({error:'Fichier supérieur à 4 Mo.'},{status:413});}chunks.push(part.value); } } finally {reader.releaseLock();}
+    const bytesBody=new Uint8Array(total);let offset=0;for(const chunk of chunks){bytesBody.set(chunk,offset);offset+=chunk.length;}
+    const form = await new Response(bytesBody,{headers:{'Content-Type':request.headers.get('Content-Type') || ''}}).formData(); const file = form.get('file');
     if (!(file instanceof File) || file.size > MAX_FILE_BYTES) return Response.json({error:'Fichier requis, 4 Mo maximum.'},{status:400});
     const bytes = new Uint8Array(await file.arrayBuffer()); const mime = detectFile(bytes);
     const id = crypto.randomUUID(); const name = safeFilename(file.name);
