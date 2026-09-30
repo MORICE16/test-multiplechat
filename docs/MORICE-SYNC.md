@@ -84,6 +84,22 @@ Résultat initial persistant : ce dossier de synchronisation ; état technique a
 - Bilan de ce test enregistré par Work dans ce journal ; cette écriture ne prouve pas la persistance de la tâche planifiée.
 - Reprise : récupérer le résultat de 04 lorsqu'il devient disponible ; utiliser une session PC accessible pour lire Git local et ouvrir le Project MultipleChat existant. Aucune refonte applicative autorisée.
 
+### 2026-09-30 17:58 Europe/Paris — première exécution quotidienne fusionnée
+Couverture : GitHub main `c1932aaa`, CORE-SYNC et core-state LU ; cinq fichiers applicatifs ciblés LU ; contexte récent Work/Claude PARTIEL ; Git local, runtime servi, diagnostics authentifiés et historique complet des chats INACCESSIBLES dans cette exécution. Dates de preuve applicative non renouvelées : les attestations de CORE-SYNC restent celles du 30/09.
+
+Changements matériels :
+- Persistance de la tâche fusionnée désormais PROUVÉE par cet ajout au journal ; cela ne prouve ni exécution du runtime Morice ni synchronisation automatique vers MultipleChat.
+- MultipleChat : un fichier joint directement à un chat Claude a été lu correctement et les trois contrôles attendus ont été restitués. À l’inverse, le même fichier placé dans les fichiers du projet n’a pas été trouvé par ce chat. Cette preuve valide seulement le parcours manuel « pièce jointe directe → un modèle » ; elle ne valide ni Project Files, ni Re-sync automatique, ni API/MCP/CLI/webhook, ni collecte de plusieurs avis. `MC-SYNC-001` reste donc EN ATTENTE MULTIPLECHAT.
+- Audit code au commit courant : les transitions atomiques `pending → executing` des actions et `queued → submitting` des recherches sont présentes ; les deux alertes de double exécution ont été retirées. Risque résiduel confirmé : si l’action externe réussit mais que la confirmation DB échoue, l’item peut rester `executing` et requiert une réconciliation sans renvoi automatique.
+- Multi-comptes Microsoft : les requêtes de compte sont isolées par `user_id + account_id`, mais un compte secondaire n’est accepté que pour `mail_categorize`, `mail_triage` et `mail_read`. Calendrier, OneDrive, brouillons, envoi et To Do continuent d’utiliser le compte principal.
+- Secrets : AES-GCM, clé 32 octets et IV aléatoire 12 octets confirmés dans `app/lib/secret-crypto.ts`. Le format stocké ne porte ni version ni identifiant de clé ; rotation/migration reste À TESTER, sans modification validée.
+
+Contradictions : le premier audit Claude signalait deux risques de double exécution ; le code courant les contredit et Claude a retiré ces deux points après correction. Aucun autre conflit résolu.
+
+RADAR filtré : aucun changement matériel plus récent que `docs/TECHNOLOGIES-20260930.md` retenu dans cette exécution ; ARTEMIS reste DISPONIBLE/À TESTER, sans installation, et ne remplace pas Tasker avant benchmark. Aucune licence, dépense, migration ou refonte validée.
+
+Décisions : CONSERVER l’architecture et les garde-fous actuels ; AMÉLIORER ultérieurement la réconciliation `executing`, l’extension multi-comptes et la rotation de clé seulement après validation Alan. Aucun travail nouveau transmis à 02 ; `MC-SYNC-001` reste un TEST À VALIDER pour tout transport automatique.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
