@@ -1,0 +1,10 @@
+'use client';
+import {useEffect,useState} from 'react';
+type Account={id:string;email:string;status:string;updatedAt:string};
+export function GoogleConnections(){
+ const [data,setData]=useState<{configured:boolean;accounts:Account[]}>();const [status,setStatus]=useState('');const [busy,setBusy]=useState('');
+ async function refresh(){const r=await fetch('/api/google/accounts',{cache:'no-store'});if(!r.ok)throw Error('Lecture des connexions Google indisponible.');setData(await r.json());}
+ useEffect(()=>{const c=new AbortController();void fetch('/api/google/accounts',{signal:c.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(d=>{if(!c.signal.aborted)setData(d as {configured:boolean;accounts:Account[]});}).catch(()=>{if(!c.signal.aborted)setStatus('Connexions Google non confirmées.');});return()=>c.abort();},[]);
+ async function verify(id:string){if(busy)return;setBusy(id);try{const r=await fetch(`/api/google/read?accountId=${encodeURIComponent(id)}`,{cache:'no-store'});const d=await r.json() as {error?:string;messagesTotal?:number;account?:string};if(!r.ok)throw Error(d.error||'Lecture non confirmée.');setStatus(`${d.account} : lecture Gmail réussie, ${d.messagesTotal??'—'} messages dans la boîte. Aucun message modifié.`);await refresh();}catch(e){setStatus(e instanceof Error?e.message:'Lecture non confirmée.');}finally{setBusy('');}}
+ return <div><h3>Google / Gmail</h3><p>Connexion propre à Morice, distincte du connecteur Codex. Première étape : lecture seule, sans classement ni envoi.</p>{data?.accounts.map(a=><div key={a.id}><p>{a.email} · {a.status==='verified'?'Lecture vérifiée':'Autorisé, à tester'}</p><button disabled={!!busy} onClick={()=>void verify(a.id)}>{busy===a.id?'Vérification…':'Vérifier la lecture Gmail'}</button></div>)}{data?.configured?<a href="/api/google/start">Ajouter une boîte Google en lecture seule</a>:<p>Client OAuth Google à configurer côté serveur. Aucun compte Gmail n’est encore raccordé par ce parcours.</p>}{status&&<p role="status">{status}</p>}</div>;
+}

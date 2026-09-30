@@ -14,6 +14,7 @@ import { HorizonDay } from "./components/horizon-day";
 import { OpenClawPanel } from "./components/openclaw-panel";
 import { TodoPanel } from "./components/todo-panel";
 import {MoriceCompanion} from "./components/morice-companion";
+import {GoogleConnections} from "./components/google-connections";
 import {CorePanel} from './components/core-panel';
 import {OneDrivePanel} from './components/onedrive-panel';
 import { type Citation } from "./lib/web-result";
@@ -206,6 +207,11 @@ export default function MoriceApp() {
       } else if (params.get("microsoft") === "error") {
         setView("connections");
         setNotice(params.get("reason") || "La connexion Microsoft n’a pas abouti.");
+        history.replaceState({}, "", window.location.pathname);
+      }
+      if (params.get("google")) {
+        setView("connections");
+        setNotice(params.get("google") === "authorized" ? "Google est autorisé. Vérifiez maintenant la lecture Gmail dans Connexions." : params.get("reason") || "La connexion Google n’a pas abouti.");
         history.replaceState({}, "", window.location.pathname);
       }
       const widgetDraft = readWidgetDraft(window.location.hash);
@@ -631,7 +637,7 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
     <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Configurée · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
     <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Autorisé · ${state.microsoft.account} · vérifier les services` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
     <article><div><b>Autres boîtes Microsoft</b>{state?.microsoft.accounts?.filter(account => account.id).map(account => <span className="connected" key={account.id}>{account.email} · Autorisée, à tester</span>)}<span>Les comptes ajoutés sont conservés séparément. Choisissez votre boîte dans Emails. Agenda, To Do et conversation utilisent encore le compte principal.</span></div><a className="secondary" href="/api/microsoft/start?categories=1">Ajouter une boîte Microsoft</a></article>
-    <article><div><b>Google / Gmail</b><span>Raccordement à Morice à configurer. Une connexion Gmail dans Codex ne connecte pas automatiquement cette application.</span></div></article>
+    <article><GoogleConnections /></article>
     <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook configuré · vérifié lors de l’exécution" : "Webhook à ajouter"}</span></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>
     <OpenClawPanel />

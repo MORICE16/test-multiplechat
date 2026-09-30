@@ -14,7 +14,8 @@
     "Pièces jointes conservées accessibles depuis chaque travail, après rechargement.",
     "CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.",
     "Documents : recherche OneDrive en lecture seule depuis l’interface.",
-    "Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé."
+    "Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.",
+    "Parcours Google OAuth en lecture Gmail seule, isolation par compte/utilisateur, tokens chiffrés; client Google encore à configurer."
   ],
   "Tests": [
     "78 tests réussis; TypeScript validé. Contrôles de chiffrement, sauvegarde et isolation du CORE inclus.",
@@ -24,10 +25,13 @@
     "OpenClaw : diagnostic réussi depuis Morice après reprise du client; passerelle saine, deux appareils appairés, zéro connecté.",
     "MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md.",
     "CORE consolidé réellement importé et chiffré dans le runtime privé : 67 744 caractères, import confirmé par l’interface.",
-    "Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe."
+    "Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe.",
+    "Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.",
+    "Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.",
+    "80 tests réussis; TypeScript et lint Google validés. Tests OAuth, chiffrement SQL et isolation du compte Gmail inclus."
   ],
   "En cours": [
-    "Publication du compagnon secondaire et vérification visuelle finale."
+    "Configuration du client OAuth Google et reconnexion du téléphone OpenClaw."
   ],
   "À faire": [
     "Routage global de tous les modules selon capacités, difficulté et échecs; le routeur actuel concerne les analyses et vérifie le catalogue du compte.",

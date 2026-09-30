@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T07:20:21.345Z
-Commit source au moment de la génération : `5a8ee9fb315e4e056cbb37603e3eb8a61efa3c25`
+Généré : 2026-09-30T08:13:28.470Z
+Commit source au moment de la génération : `674ae2f448b183809818de30647bcb8cd0795adb`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -23,6 +23,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.
 - Documents : recherche OneDrive en lecture seule depuis l’interface.
 - Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.
+- Parcours Google OAuth en lecture Gmail seule, isolation par compte/utilisateur, tokens chiffrés; client Google encore à configurer.
 
 ## Tests
 
@@ -34,10 +35,13 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md.
 - CORE consolidé réellement importé et chiffré dans le runtime privé : 67 744 caractères, import confirmé par l’interface.
 - Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe.
+- Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.
+- Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.
+- 80 tests réussis; TypeScript et lint Google validés. Tests OAuth, chiffrement SQL et isolation du compte Gmail inclus.
 
 ## En cours
 
-- Publication du compagnon secondaire et vérification visuelle finale.
+- Configuration du client OAuth Google et reconnexion du téléphone OpenClaw.
 
 ## À faire
 
@@ -63,16 +67,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- android/app/build.gradle
-- android/app/src/main/res/drawable-nodpi/morice_widget.png
-- app/globals.css
-- app/horizon.css
-- app/morice-app.tsx
-- docs/core-state.json
-- app/components/morice-companion.tsx
-- docs/COMPAGNON.md
-- public/morice-companion.png
-- public/morice-seated.png
+- scripts/core-sync.mjs
 
 ## Reprise MultipleChat
 

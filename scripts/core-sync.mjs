@@ -1,6 +1,6 @@
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync} from 'node:fs';
-const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const git=(...args)=>execFileSync('git',['-c',`safe.directory=${process.cwd().replaceAll('\\','/')}`,...args],{encoding:'utf8'}).trim();
 const decisions=JSON.parse(readFileSync('docs/core-state.json','utf8'));
 const commit=git('rev-parse','HEAD');
 const files=[...new Set([...git('diff','--name-only','HEAD').split('\n'),...git('ls-files','--others','--exclude-standard').split('\n')])].filter(Boolean).filter(p=>!/(^|\/)(\.env|tokens|credentials)|\.(key|db|sqlite|pem)$/.test(p));

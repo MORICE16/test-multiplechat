@@ -1,0 +1,3 @@
+import {env} from 'cloudflare:workers';
+import {runtimeValue,userId} from '../../../lib/runtime';
+export async function GET(request:Request){const uid=userId(request);const r=await env.DB.prepare("SELECT substr(provider,8) AS id,account_email AS email,status,updated_at AS updatedAt FROM morice_connections WHERE user_id=? AND provider LIKE 'google:%' ORDER BY account_email").bind(uid).all();return Response.json({configured:!!(runtimeValue('GOOGLE_CLIENT_ID')&&runtimeValue('GOOGLE_CLIENT_SECRET')&&runtimeValue('MORICE_ENCRYPTION_KEY')),accounts:r.results},{headers:{'Cache-Control':'no-store'}});}
