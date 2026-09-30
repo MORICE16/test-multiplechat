@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T08:20:16.015Z
-Commit source au moment de la génération : `8f9e78c4c28cd325057def0ba9ba90c48652d028`
+Généré : 2026-09-30T09:19:05.995Z
+Commit source au moment de la génération : `229a79978c6c829b95c1e3dc5b5fa7a31fb96d7b`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -23,25 +23,25 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.
 - Documents : recherche OneDrive en lecture seule depuis l’interface.
 - Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.
-- Parcours Google OAuth en lecture Gmail seule, isolation par compte/utilisateur, tokens chiffrés; client Google encore à configurer.
+- Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.
 
 ## Tests
 
-- 78 tests réussis; TypeScript validé. Contrôles de chiffrement, sauvegarde et isolation du CORE inclus.
+- 83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.
 - Site privé : image 42 et PDF 73 analysés réellement; résultat, référence et journal conservés après rechargement.
 - Outlook, Calendar, To Do et OneDrive : lectures runtime vérifiées le 30 septembre 2026.
 - Brouillon synthétique créé depuis Morice et relu via Graph : isDraft=true, aucun destinataire, aucun envoi.
-- OpenClaw : diagnostic réussi depuis Morice après reprise du client; passerelle saine, deux appareils appairés, zéro connecté.
+- OpenClaw : diagnostic privé Morice enregistré; deux appareils appairés, un Android connecté. device.status local réussi.
 - MultipleChat Smart : Project MORICE — CORE SYNC créé; dix fichiers GitHub affichés Ready, dont CORE-SYNC.md.
 - CORE consolidé réellement importé et chiffré dans le runtime privé : 67 744 caractères, import confirmé par l’interface.
 - Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe.
 - Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.
 - Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.
-- 80 tests réussis; TypeScript et lint Google validés. Tests OAuth, chiffrement SQL et isolation du compte Gmail inclus.
+- Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.
 
 ## En cours
 
-- Configuration du client OAuth Google et reconnexion du téléphone OpenClaw.
+- Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.
 
 ## À faire
 
@@ -56,7 +56,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 - Work IQ : aucune activation de tenant ou licence confirmée; Graph est opérationnel.
 - MultipleChat : API publique de re-sync non confirmée; mécanisme natif disponible et Project préparé.
-- Téléphone : zéro appareil OpenClaw connecté lors du diagnostic.
+- Android : aucune commande d’installation d’applications ou de pilotage libre de l’écran disponible sur le nœud actuel.
 - Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.
 
 ## Prochaines actions
@@ -67,6 +67,17 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/api/google/read/route.ts
+- app/lib/mail-categories.ts
+- app/lib/mail-triage.ts
+- app/morice-app.tsx
+- docs/GOOGLE-CONNEXION.md
+- docs/core-state.json
+- tests/google-private.test.mjs
+- app/api/google/triage/route.ts
+- app/components/google-mail-review.tsx
+- app/lib/google-mail.ts
+- tests/google-triage.test.mjs
 
 ## Reprise MultipleChat
 

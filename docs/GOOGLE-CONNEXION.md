@@ -8,6 +8,8 @@ Utiliser un projet Google existant si possible. Ne pas activer d’essai payant 
 
 Seuls les boutons de test appellent Gmail. OAuth accepté signifie autorisé; la mention Lecture vérifiée exige un appel réel au profil Gmail. Le connecteur Gmail disponible dans Codex ne fournit pas ses secrets au runtime Morice.
 
+État vérifié : client et API configurés dans le serveur privé, première boîte autorisée et profil lu réellement. L’aperçu dans Emails examine au maximum 20 messages INBOX, uniquement objets, expéditeurs et états lus/non lus. Le classement repose sur les règles communes Outlook, dont Assurances et Newsletters. Il ne lit aucun corps ni pièce jointe, ne modifie aucun message, ne crée aucune tâche et ne couvre pas la boîte entière. Les propositions nécessitent une vérification humaine. Chaque autre boîte nécessite sa propre authentification.
+
 Sources officielles consultées le 30 septembre 2026 :
 - https://developers.google.com/identity/protocols/oauth2/web-server
 - https://developers.google.com/workspace/gmail/api/auth/scopes

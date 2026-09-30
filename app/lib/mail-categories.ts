@@ -1,4 +1,4 @@
-export const MAIL_CATEGORIES = ["Juridique / Notaire", "Juridique / Huissier", "Comptabilité / Comptable", "Comptabilité / Factures", "Immobilier / Location", "Énergie / Travaux", "Informations / Newsletters", "Personnel", "À examiner"] as const;
+export const MAIL_CATEGORIES = ["Assurances", "Juridique / Notaire", "Juridique / Huissier", "Comptabilité / Comptable", "Comptabilité / Factures", "Immobilier / Location", "Énergie / Travaux", "Informations / Newsletters", "Personnel", "À examiner"] as const;
 export type CategoryEntry = { id: string; subject: string; category: string };
 export type CategoryPlan = { account: string; createdAt: string; entries: CategoryEntry[] };
 export type CategoryGraph = (path: string, init?: RequestInit) => Promise<unknown>;

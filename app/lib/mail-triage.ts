@@ -12,6 +12,8 @@ export function isExplicitMailPreview(message: string) {
 }
 
 const rules: [string, RegExp][] = [
+  ["Assurances", /\b(assurance|assurances|assureur|sinistre|mutuelle|attestation d assurance)\b/],
+  ["Informations / Newsletters", /\b(newsletter|lettre d information|digest|bulletin hebdomadaire)\b/],
   ["Juridique / Notaire", /\b(notaire|notaires|notarial|notariale|notariaux)\b/],
   ["Juridique / Huissier", /\b(huissier|huissiers|commissaire de justice|commissaires de justice)\b/],
   ["Comptabilité / Comptable", /\b(comptable|comptables|expertise comptable|bilan comptable)\b/],
@@ -46,4 +48,22 @@ export function mailReviewText(review: MailReview) {
   const counts = new Map<string, number>();
   for (const message of review.messages) for (const category of message.suggestions.length ? message.suggestions : ["À examiner"]) counts.set(category, (counts.get(category) || 0) + 1);
   return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.${review.hasMore ? " Il reste d’autres messages : cet aperçu n’est pas exhaustif." : " Les autres dossiers ne sont pas inclus."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes restent à raccorder. Pour appliquer les catégories, ouvrez Emails, sélectionnez jusqu’à 10 messages et confirmez le lot.`;
+}
+
+export async function inspectGmailInbox(account:string,read:(path:string)=>Promise<unknown>):Promise<MailReview>{
+  const list=await read('/messages?labelIds=INBOX&maxResults=20&fields=messages(id),nextPageToken') as {messages?:{id?:string}[];nextPageToken?:string};
+  if(!list||!Array.isArray(list.messages)&&list.messages!==undefined)throw Error('Incomplete Gmail list');
+  const ids=(list.messages||[]).map(m=>m.id||'');
+  if(ids.length>20||new Set(ids).size!==ids.length||ids.some(id=>!/^[a-f0-9]+$/.test(id)))throw Error('Invalid Gmail messages');
+  const messages:MailSuggestion[]=[];
+  for(let i=0;i<ids.length;i+=4){
+    const batch=await Promise.all(ids.slice(i,i+4).map(async id=>{
+      const d=await read(`/messages/${id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date&fields=id,internalDate,labelIds,payload(headers)`) as {id?:string;internalDate?:string;labelIds?:string[];payload?:{headers?:{name:string;value:string}[]}};
+      if(d.id!==id||!Array.isArray(d.labelIds)||!d.labelIds.includes('INBOX')||!Array.isArray(d.payload?.headers))throw Error('Incomplete Gmail metadata');
+      const header=(name:string)=>d.payload!.headers!.find(h=>h.name.toLowerCase()===name.toLowerCase())?.value||'';
+      const date=Number(d.internalDate);const suggestion=suggestMail({id,subject:header('subject'),from:{emailAddress:{name:header('from')}},receivedDateTime:Number.isFinite(date)&&date>0?new Date(date).toISOString():'',isRead:!d.labelIds.includes('UNREAD')});
+      suggestion.priority=d.labelIds.includes('IMPORTANT')?'Importance signalée par Gmail — à vérifier':'Priorité à examiner';return suggestion;
+    }));messages.push(...batch);
+  }
+  return {account,checkedAt:new Date().toISOString(),hasMore:!!list.nextPageToken,messages};
 }
