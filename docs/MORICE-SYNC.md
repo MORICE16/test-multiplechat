@@ -100,10 +100,15 @@ RADAR filtré : aucun changement matériel plus récent que `docs/TECHNOLOGIES-2
 
 Décisions : CONSERVER l’architecture et les garde-fous actuels ; AMÉLIORER ultérieurement la réconciliation `executing`, l’extension multi-comptes et la rotation de clé seulement après validation Alan. Aucun travail nouveau transmis à 02 ; `MC-SYNC-001` reste un TEST À VALIDER pour tout transport automatique.
 
+### 2026-09-30 19:00 Europe/Paris — vérification de reprise Work
+- Le journal de la première exécution fusionnée a été relu sur GitHub ; l’écriture du bilan par cette exécution est confirmée. Les mentions NON CONFIRMÉES des entrées précédentes décrivent leur état historique.
+- Le planificateur indique 04 MORICE SYNC activée, dernière exécution le 30/09 à 18:02:55 Europe/Paris ; Veille Morice et 03 RADAR restent désactivées.
+- Cette vérification ne prouve pas un accès au Git local, au runtime ou à MultipleChat. MC-SYNC-001 reste EN ATTENTE MULTIPLECHAT ; aucun nouveau travail applicatif autorisé.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
 2. Exécuter « Va te briefer » selon la section Protocole commun ; compléter les sources manquantes, sans réécrire l'historique.
-3. Contrôler le premier résultat de la tâche fusionnée et sa persistance ; les droits/outils du planificateur peuvent différer de Work.
+3. Le premier bilan de la tâche fusionnée et son écriture dans ce journal sont confirmés ; vérifier les changements depuis cette preuve et les sources encore inaccessibles. Les droits/outils du planificateur peuvent différer de Work.
 4. Présenter MC-SYNC-001 à MultipleChat et conserver les réponses lorsque l'accès existe. Aucune API/connexion inventée.
 5. Aucune refonte ni installation applicative n'est validée. Demander une décision uniquement après dossier concret et confrontation pour les changements importants.
