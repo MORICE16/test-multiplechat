@@ -480,7 +480,7 @@ export default function MoriceApp() {
               <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" title="Ouvrir Gmail dans un nouvel onglet"><img className="brand-icon" src="/brand-icons/gmail.png" alt="" /><span>Gmail ↗</span></a>
               <a href="https://www.google.com/" target="_blank" rel="noopener noreferrer" title="Ouvrir Google dans un nouvel onglet"><img className="brand-icon" src="/brand-icons/google.png" alt="" /><span>Google ↗</span></a>
               <button onClick={() => setView("todo")} title="Mes tâches Microsoft To Do"><BrandIcon name="todo" /><span>To Do</span></button>
-              <button className="horizon-mascot" onClick={() => setView("chat")} title="Parler avec Morice"><MoriceCompanion label="Morice, ouvrir la conversation" state={assistantBusy ? "working" : approvals.length ? "waiting" : "idle"} /></button>
+              <button className="horizon-mascot" onClick={toggleDictation} disabled={assistantBusy || dictationState === "stopping" || Boolean(recordedAudio)} title="Cliquer sur Morice pour dicter"><MoriceCompanion label="Parler à Morice" state={assistantBusy ? "working" : voiceActive ? "waiting" : "idle"} /><span>Parler à Morice</span></button>
             </div>
             <p className="horizon-caption">Gmail et Google s’ouvrent dans leur application Web. Leur intégration à Morice reste à connecter.</p>
           </div><aside className="context-rail">
@@ -566,9 +566,12 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   const locked = listening || Boolean(audioUrl) || voicePhase === "stopping" || assistantBusy;
   const logRef = useRef<HTMLDivElement>(null);
   const [compact,setCompact]=useState(false);
+  const [collapsedDraft,setCollapsedDraft]=useState("");
+  const collapsed = compact && (!message || message === collapsedDraft) && voicePhase !== "error";
   const [attachmentsOpen,setAttachmentsOpen]=useState(false);
   const [attachmentsCreated,setAttachmentsCreated]=useState(false);
-  function sendCompact(){setCompact(true);onSend();}
+  function sendCompact(){if(!listening && (!message.trim() || message.length>1200))return;setCollapsedDraft(message);setCompact(true);onSend();}
+  function speak(){setCompact(false);onMic();}
   useEffect(() => { const log = logRef.current; if (log) log.scrollTop = log.scrollHeight; }, [messages, assistantBusy]);
   const labels: Record<string, [string, string]> = {
     idle: ["Microphone éteint", "Un clic démarre l’écoute. Aucun maintien appuyé."],
@@ -583,17 +586,17 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   };
   const [phaseLabel, phaseDetail] = labels[voicePhase];
   return <section className="command-panel" aria-label="Conversation avec Morice">
-    <div className="command-heading"><div><span className="command-mark">✦</span><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>À vous la parole.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
-    <div className={"composer"+(compact?" composer-compact":"")}>
-      <div className="composer-toolbar"><button type="button" aria-expanded={!compact} onClick={()=>setCompact(!compact)}>{compact?'Écrire / agrandir':'Réduire la saisie'}</button><button type="button" disabled={locked} aria-expanded={attachmentsOpen} onClick={()=>{setAttachmentsCreated(true);setAttachmentsOpen(!attachmentsOpen);}}>Joindre une photo / un PDF</button></div>
+    <div className="command-heading"><div><button type="button" className="conversation-companion" disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} onClick={speak} aria-label={listening?"Morice : arrêter la dictée":"Morice : démarrer la dictée"}><MoriceCompanion state={assistantBusy?"working":listening?"waiting":"idle"}/></button><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>À vous la parole.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
+    <div className={"composer"+(collapsed?" composer-compact":"")}>
+      <div className="composer-toolbar"><button type="button" aria-expanded={!collapsed} onClick={()=>{setCollapsedDraft(message);setCompact(!collapsed);}}>{collapsed?'Écrire / agrandir':'Réduire la saisie'}</button><button type="button" className="attachment-trigger" aria-expanded={attachmentsOpen} onClick={()=>{setAttachmentsCreated(true);setAttachmentsOpen(!attachmentsOpen);}}>＋ Photo / fichier / PDF</button></div>
       <div className={"voice-progress " + voicePhase} role="status"><div className="voice-indicator" aria-hidden="true"><span /><span /><span /><span /></div><div><b>{phaseLabel}</b><small>{voicePhase === "error" && dictationError ? dictationError : phaseDetail}</small></div></div>
-      {compact&&message&&<p className="draft-summary">Brouillon conservé · {message.length} caractères</p>}
-      <div hidden={compact}>
+      {collapsed&&message&&<p className="draft-summary">Brouillon conservé · {message.length} caractères</p>}
+      <div hidden={collapsed}>
       <label className="sr-only" htmlFor="morice-message">Votre message à Morice</label>
       <textarea id="morice-message" aria-describedby="composer-help" readOnly={locked} value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); sendCompact(); } }} placeholder="Écrivez ici, ou démarrez le microphone…" rows={3} />
       <div className="composer-help" id="composer-help"><span>{listening ? "Gardez cette page ouverte pendant la dictée." : "Ctrl / ⌘ + Entrée pour envoyer"}</span><span className={message.length > 1200 ? "over-limit" : ""}>{message.length} / 1 200</span></div>
       </div>
-      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls">{(voicePhase === "listening" || voicePhase === "paused") && <button className="secondary" onClick={onPause}>{voicePhase === "paused" ? "Reprendre" : "Pause"}</button>}<button disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={onMic} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={sendCompact} disabled={assistantBusy || voicePhase === "stopping" || voicePhase === "starting" || Boolean(audioUrl) || (!listening && (!message.trim() || message.length > 1200))}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
+      <div className="command-actions"><div className="mode-row" role="group" aria-label="Type d’action">{[["auto", "Auto"], ["task", "Tâche"], ["memory", "Mémoire"], ["approval", "À valider"]].map(([mode, title]) => <button key={mode} disabled={assistantBusy} aria-pressed={assistantMode === mode} className={assistantMode === mode ? "selected" : ""} onClick={() => setAssistantMode(mode)}>{title}</button>)}</div><div className="primary-controls">{(voicePhase === "listening" || voicePhase === "paused") && <button className="secondary" onClick={onPause}>{voicePhase === "paused" ? "Reprendre" : "Pause"}</button>}<button disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} className={"main-mic " + (listening ? "listening" : "")} aria-pressed={listening} onClick={speak} aria-label={listening ? "Arrêter l’écoute" : "Démarrer l’écoute"}><span aria-hidden="true">{listening ? "■" : <MicIcon />}</span>{listening ? "Arrêter" : "Dicter"}</button><button className="send-command" onClick={sendCompact} disabled={assistantBusy || voicePhase === "stopping" || voicePhase === "starting" || Boolean(audioUrl) || (!listening && (!message.trim() || message.length > 1200))}>{assistantBusy ? "En cours…" : "Envoyer"}<span aria-hidden="true"> ↗</span></button></div></div>
     </div>
     <div hidden={!attachmentsOpen} className="chat-attachments"><p>Analyse privée de fichiers · le résultat et sa trace apparaissent dans Travaux.</p>{attachmentsCreated&&<IdeaComposer initialText={message} onSaved={()=>onOpenAction('jobs')}/>}</div>
     {audioUrl && voicePhase !== "stopping" && <div className="audio-recovery" role="group" aria-label="Audio conservé"><p>Votre audio reste disponible dans cette page jusqu’à sa fermeture.</p><button onClick={onRetry}>Réessayer la transcription</button><a href={audioUrl} download={`morice-dictee.${audioExtension}`}>Télécharger l’audio</a><button className="secondary" onClick={onDiscard}>Effacer l’audio</button></div>}

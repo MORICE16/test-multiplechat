@@ -15,7 +15,8 @@
     "CORE privé : import TXT, chiffrement AES-GCM, copie précédente, consultation authentifiée et extraits pertinents pour les analyses et questions CORE.",
     "Documents : recherche OneDrive en lecture seule depuis l’interface.",
     "Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.",
-    "Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes."
+    "Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.",
+    "Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -28,7 +29,8 @@
     "Analyse réelle du CORE depuis Nouvelle idée : modèle gpt-5-mini, extraits signalés, résultat visible et enregistré, aucune action externe.",
     "Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.",
     "Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.",
-    "Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication."
+    "Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.",
+    "Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication."

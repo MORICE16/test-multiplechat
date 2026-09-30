@@ -294,7 +294,7 @@ small { line-height:1.5; }
 .topbar>div,.panel-heading>div,.horizon-section-heading>div { min-width:0; }
 .horizon-home .horizon-app-dock { order:-2; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; padding:8px 0; border-top:0; }
 .horizon-home .horizon-app-dock>* { min-width:0; margin:0; }
-.horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:64px; height:70px; }
+.horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:min(100%,180px); height:150px; }
 .horizon-home .horizon-main { gap:14px; }
 .horizon-home .horizon-layout { gap:18px; }
 .horizon-home .horizon-layout>aside { gap:14px; }
@@ -348,7 +348,7 @@ small { line-height:1.5; }
   .horizon-home .horizon-weather button { padding:7px 10px; font-size:12px; }
   .horizon-home .horizon-app-dock button,.horizon-home .horizon-app-dock a { font-size:10px; gap:5px; padding:4px 0; }
   .horizon-home .horizon-app-dock .brand-icon { width:29px; height:29px; }
-  .horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:53px; height:58px; }
+  .horizon-home .horizon-app-dock .horizon-mascot .morice-companion { width:100%; height:96px; }
   .horizon-home .horizon-journal-preview h2 { font-size:20px; }
   .horizon-home .panel-heading { gap:8px; }
   .horizon-home .horizon-journal-preview .eyebrow { font-size:9px; }
@@ -377,3 +377,9 @@ html[data-weather="rain"] body::before { filter:saturate(.55) brightness(.8); }
 html[data-weather="snow"] body::before { filter:saturate(.35) brightness(1.3); }
 html[data-weather="clear"][data-temperature="warm"] body::before { filter:sepia(.25) saturate(1.3); }
 html[data-weather="night"] body::before { filter:brightness(.65) saturate(.8); }
+.command-heading .conversation-companion { padding:0; border:0; background:none; box-shadow:none; flex:none; }
+.command-heading .conversation-companion .morice-companion { width:112px; height:122px; }
+.horizon-home .horizon-app-dock .horizon-mascot { width:100%; display:flex; flex-direction:column; align-items:center; }
+.command-panel .attachment-trigger { background:#255479; border:1px solid #78c3e0; color:#fff; font-weight:700; }
+.command-panel .chat-attachments { padding:14px; margin-block:12px; border:1px solid #78c3e0; border-radius:16px; }
+@media(max-width:650px) { .command-heading .conversation-companion .morice-companion { width:86px; height:94px; } }

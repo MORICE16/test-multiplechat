@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T09:19:05.995Z
-Commit source au moment de la génération : `229a79978c6c829b95c1e3dc5b5fa7a31fb96d7b`
+Généré : 2026-09-30T14:22:58.888Z
+Commit source au moment de la génération : `40119d1d61b5a2ac20e0e9322905953567db008c`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -24,6 +24,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Documents : recherche OneDrive en lecture seule depuis l’interface.
 - Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.
 - Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.
+- Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.
 
 ## Tests
 
@@ -38,6 +39,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.
 - Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.
 - Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.
+- Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider.
 
 ## En cours
 
@@ -67,17 +69,9 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/google/read/route.ts
-- app/lib/mail-categories.ts
-- app/lib/mail-triage.ts
+- app/horizon.css
 - app/morice-app.tsx
-- docs/GOOGLE-CONNEXION.md
 - docs/core-state.json
-- tests/google-private.test.mjs
-- app/api/google/triage/route.ts
-- app/components/google-mail-review.tsx
-- app/lib/google-mail.ts
-- tests/google-triage.test.mjs
 
 ## Reprise MultipleChat
 
