@@ -1,7 +1,7 @@
 export type Citation = { start: number; end: number; url: string; title: string };
 export type WebResult = { text: string; citations: Citation[]; sources: { url: string; title: string }[]; responseId: string; checkedAt: string; tool: string };
 export type ModelResponse = {
-  id?: string; status?: string; error?: { code?: string };
+  id?: string; status?: string; model?: string; usage?: {input_tokens?:number;output_tokens?:number}; error?: { code?: string };
   output?: Array<{ type?: string; status?: string; content?: Array<{ type?: string; text?: string; annotations?: Array<{ type?: string; start_index?: number; end_index?: number; url?: string; title?: string }> }> }>;
 };
 export function safeWebUrl(value: unknown): value is string {

@@ -428,7 +428,7 @@ export default function MoriceApp() {
   }
 
   function exploreIdea(text: string) { setMessage(`Recherche sur le Web des articles fiables et récents sur ce sujet : ${text}`.slice(0, 1200)); setAssistantMode("auto"); setView("chat"); }
-  async function saveIdea(text: string) { await addItem("memory", text.slice(0, 90), text); }
+  async function saveIdea(text: string) { if (text) await addItem("memory", text.slice(0, 90), text); else { await refresh(); await queue.refresh(); } }
 
   const dateText = clock ? new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(clock) : "Aujourd’hui";
 
@@ -615,15 +615,15 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
   async function checkMicrosoft() {
     setChecking(true);
     try {
-      const data = await api<{ result: string; checkedAt: string }>("/api/microsoft/read");
-      setVerification(`Lecture Microsoft confirmée à ${new Date(data.checkedAt).toLocaleTimeString("fr-FR")} : ${data.result}`);
+      const data = await api<{ checks: {service:string;status:string;checkedAt:string}[] }>("/api/microsoft/health");
+      setVerification(data.checks.map(c => `${c.service} : ${c.status === "verified" ? "lecture vérifiée" : "non confirmé"}`).join(" · "));
     } catch (error) { setVerification(error instanceof Error ? error.message : "Vérification impossible."); }
     finally { setChecking(false); }
   }
   return <section className="panel"><p className="eyebrow">SERVICES AUTORISÉS</p><h2>Connexions</h2><p>Les secrets restent côté serveur. Les actions externes sensibles attendent toujours ta validation.</p><div className="connection-grid">
     <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Configurée · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
-    <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Connecté · ${state.microsoft.account}` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
-    <article><div><b>Autres boîtes Microsoft</b>{state?.microsoft.accounts?.filter(account => account.id).map(account => <span className="connected" key={account.id}>{account.email} · Connectée</span>)}<span>Les comptes ajoutés sont conservés séparément. Choisissez votre boîte dans Emails. Agenda, To Do et conversation utilisent encore le compte principal.</span></div><a className="secondary" href="/api/microsoft/start?categories=1">Ajouter une boîte Microsoft</a></article>
+    <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Autorisé · ${state.microsoft.account} · vérifier les services` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
+    <article><div><b>Autres boîtes Microsoft</b>{state?.microsoft.accounts?.filter(account => account.id).map(account => <span className="connected" key={account.id}>{account.email} · Autorisée, à tester</span>)}<span>Les comptes ajoutés sont conservés séparément. Choisissez votre boîte dans Emails. Agenda, To Do et conversation utilisent encore le compte principal.</span></div><a className="secondary" href="/api/microsoft/start?categories=1">Ajouter une boîte Microsoft</a></article>
     <article><div><b>Google / Gmail</b><span>Raccordement à Morice à configurer. Une connexion Gmail dans Codex ne connecte pas automatiquement cette application.</span></div></article>
     <article><div><b>Make + Microsoft To Do</b><span className={state?.make.configured ? "connected" : "waiting"}>{state?.make.configured ? "Webhook configuré · vérifié lors de l’exécution" : "Webhook à ajouter"}</span></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>

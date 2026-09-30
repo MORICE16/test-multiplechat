@@ -6,6 +6,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "core:sync": "node scripts/core-sync.mjs",
+    "prebuild": "node scripts/core-sync.mjs",
     "predev": "pnpm run db:migrate:local",
     "dev": "vinext dev",
     "build": "vinext build",

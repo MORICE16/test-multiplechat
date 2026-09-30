@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import { now } from "./runtime";
 import { createWebResponse, retrieveWebResponse } from "./web-search";
 import { webResult } from "./web-result";
+import { ideaResult } from "./idea-result";
 
 export type Job = { id: string; user_id: string; title: string; request: string; operation: string; status: string; response_id: string; result: string; evidence: string; error: string; created_at: string; updated_at: string };
 
@@ -59,6 +60,16 @@ export async function refreshResearch(uid: string) {
   const jobs = await env.DB.prepare("SELECT * FROM morice_jobs WHERE user_id=? AND status IN ('queued','running','submitting') ORDER BY created_at LIMIT 6").bind(uid).all<Job>();
   for (const job of jobs.results) {
     if (job.status === "queued" && job.operation === "web_search") { await startResearch(uid, job.id, job.request); continue; }
+    if (job.operation === "idea_analysis" && job.response_id) {
+      try {
+        const response = await retrieveWebResponse(job.response_id);
+        if (response.status === "completed") {
+          const result = ideaResult(response);
+          await transitionJob(uid, job.id, "done", "Analyse reçue et enregistrée", result.text, { ...JSON.parse(job.evidence), ...result });
+        } else if (!["queued", "in_progress"].includes(response.status || "")) await transitionJob(uid, job.id, "blocked", "Analyse arrêtée sans résultat complet.");
+      } catch { /* Retain response ID: retrieval may resume without another paid submission. */ }
+      continue;
+    }
     if (job.operation !== "web_search") {
       if (Date.now() - Date.parse(job.updated_at) > 120_000) await transitionJob(uid, job.id, "blocked", "La lecture a été interrompue. Aucun résultat confirmé n’a été enregistré.");
       continue;

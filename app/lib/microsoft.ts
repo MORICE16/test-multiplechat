@@ -84,6 +84,14 @@ export async function reviewMicrosoftMailbox(uid: string, accountId = "") {
   return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId));
 }
 
+export async function probeMicrosoft(uid:string,path:string) {
+  const allowed=['/me/messages?$top=1&$select=id','/me/calendars?$top=1&$select=id','/me/todo/lists','/me/drive/root?$select=id'];
+  if(!allowed.includes(path)) throw new Error('Diagnostic non autorisé.');
+  const result=await graph(uid,path);
+  if(!result || result.error) throw new Error('Aucun résultat confirmé.');
+  return true;
+}
+
 export async function readMicrosoftTodo(uid: string, listId: string) {
   const stored = await connection(uid);
   if (!stored) throw new Error("Connectez Microsoft dans Connexions.");
@@ -134,12 +142,15 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     return rows.length ? rows.map(file => `${file.name || "Document"}${file.webUrl ? ` — ${file.webUrl}` : ""}`).join("\n") : "Aucun document correspondant dans OneDrive.";
   }
   if (operation === "mail_draft") {
-    await graph(uid, "/me/messages", { method: "POST", body: JSON.stringify({
+    const created = await graph(uid, "/me/messages", { method: "POST", body: JSON.stringify({
       subject: payload.subject || "Brouillon préparé par Morice",
       body: { contentType: "Text", content: payload.body || payload.notes || "" },
       toRecipients: payload.to ? [{ emailAddress: { address: payload.to } }] : [],
     }) });
-    return "Le brouillon Outlook a été créé.";
+    if (typeof created?.id !== 'string') throw new ActionError('Création acceptée sans identifiant vérifiable. Vérifiez Brouillons avant de réessayer.', false);
+    const checked = await graph(uid, `/me/messages/${encodeURIComponent(created.id)}?$select=id,isDraft`);
+    if (checked?.isDraft !== true) throw new ActionError('Le statut brouillon n’a pas été confirmé. Vérifiez Outlook avant de réessayer.', false);
+    return "Le brouillon Outlook a été créé et son statut brouillon vérifié. Aucun envoi effectué.";
   }
   if (operation === "mail_send") {
     if (!payload.to) throw new ActionError("L’adresse du destinataire manque.", true);

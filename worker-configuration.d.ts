@@ -3,6 +3,7 @@
 // Runtime types generated with workerd@1.20260515.1 2026-08-01 nodejs_compat
 interface __BaseEnv_MoriceBindings {
 	DB: D1Database;
+	FILES: R2Bucket;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_MoriceBindings {}

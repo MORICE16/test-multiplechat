@@ -52,3 +52,9 @@ export const jobs = sqliteTable("morice_jobs", {
 export const jobEvents = sqliteTable("morice_job_events", {
   id: integer("id").primaryKey({ autoIncrement: true }), jobId: text("job_id").notNull(), userId: text("user_id").notNull(), status: text("status").notNull(), detail: text("detail").notNull(), createdAt: text("created_at").notNull(),
 }, table => [index("idx_morice_job_events").on(table.userId, table.jobId, table.id)]);
+
+export const files = sqliteTable("morice_files", {
+  id: text("id").primaryKey(), userId: text("user_id").notNull(), name: text("name").notNull(), mime: text("mime").notNull(),
+  size: integer("size").notNull(), sha256: text("sha256").notNull(), objectKey: text("object_key").notNull(),
+  jobId: text("job_id").notNull().default(""), createdAt: text("created_at").notNull(),
+}, table => [index("idx_morice_files_owner").on(table.userId, table.jobId)]);

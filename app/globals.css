@@ -202,3 +202,11 @@ input { padding:11px; color:var(--text); background:#f7faff; border:1px solid #c
 .job-card summary{cursor:pointer}
 .backlog-controls{display:flex;flex-wrap:wrap;gap:12px}
 .backlog-controls input{flex:1;min-width:180px}
+
+.idea-composer { display:grid;gap:12px;padding:16px 0; }
+.idea-composer textarea { width:100%;box-sizing:border-box;min-height:88px; }
+.idea-files { display:flex;gap:12px;flex-wrap:wrap; }
+.idea-files figure { margin:0;max-width:140px;overflow-wrap:anywhere; }
+.idea-files img { width:120px;height:90px;object-fit:contain;border-radius:12px; }
+.idea-file-button { position:relative;overflow:hidden;cursor:pointer;padding:10px; }
+.idea-file-button input { position:absolute;inset:0;opacity:0;width:100%;cursor:pointer; }

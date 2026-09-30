@@ -1,0 +1,11 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const decisions=JSON.parse(readFileSync('docs/core-state.json','utf8'));
+const commit=git('rev-parse','HEAD');
+const files=[...new Set([...git('diff','--name-only','HEAD').split('\n'),...git('ls-files','--others','--exclude-standard').split('\n')])].filter(Boolean).filter(p=>!/(^|\/)(\.env|tokens|credentials)|\.(key|db|sqlite|pem)$/.test(p));
+const lines=['# CORE-SYNC — MORICE', '', `Généré : ${new Date().toISOString()}`, `Commit source au moment de la génération : \`${commit}\``, '', 'Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.', ''];
+for(const [heading,items] of Object.entries(decisions)) lines.push(`## ${heading}`, '', ...items.map(item=>`- ${item}`), '');
+lines.push('## Fichiers modifiés lors de la génération','',...files.map(f=>`- ${f}`),'','## Reprise MultipleChat','','Importer le dépôt GitHub existant, branche main, puis CORE-SYNC.md. Utiliser Re-sync dans le Project. Aucune API publique de synchronisation automatique n’a été confirmée. Ne pas importer le CORE privé complet dans un dépôt public.','');
+writeFileSync('CORE-SYNC.md',lines.join('\n'));
+console.log(JSON.stringify({commit,files:files.length,output:'CORE-SYNC.md'}));

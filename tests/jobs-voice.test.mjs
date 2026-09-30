@@ -4,6 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 import { webResult, safeWebUrl } from '../app/lib/web-result.ts';
+import { ideaResult } from '../app/lib/idea-result.ts';
 import { synthesizeSpeech } from '../app/lib/speech.ts';
 
 const completed = () => ({ id:'resp_test', status:'completed', output:[{type:'web_search_call',status:'completed'},{type:'message',content:[{type:'output_text',text:'Source officielle.',annotations:[{type:'url_citation',start_index:0,end_index:6,url:'https://example.org/source',title:'Source officielle'}]}]}] });
@@ -32,14 +33,14 @@ test('speech validates input, keeps provider errors private and returns playable
 async function fixture() {
   const sql=new DatabaseSync(':memory:');
   for(const name of ['0002_conversation_history','0003_jobs']) sql.exec(await readFile(new URL(`../drizzle/${name}.sql`,import.meta.url),'utf8'));
-  const f={sql,created:0,retrieved:0,failStart:false,failRead:false,response:completed(),webResult};
+  const f={sql,created:0,retrieved:0,failStart:false,failRead:false,response:completed(),webResult,ideaResult};
   f.env={DB:{prepare(query){return {bind(...args){return {run(){const r=sql.prepare(query).run(...args);return {meta:{changes:Number(r.changes)}};},async all(){return {results:sql.prepare(query).all(...args)};},async first(){return sql.prepare(query).get(...args)||null;}};}};},async batch(items){sql.exec('BEGIN');try{const out=items.map(item=>item.run());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
   f.createWebResponse=async()=>{f.created++;if(f.failStart)throw Error('Connection lost');return {id:'resp_test',status:'queued'};};
   f.retrieveWebResponse=async()=>{f.retrieved++;if(f.failRead)throw Error('Network offline');return f.response;};
   const key=crypto.randomUUID();globalThis[key]=f;
   let source=await readFile(new URL('../app/lib/jobs.ts',import.meta.url),'utf8');
   source=source.replace(/^import .*;\r?\n/gm,'');
-  const prefix=`const {env,webResult,createWebResponse,retrieveWebResponse}=globalThis[${JSON.stringify(key)}]; const now=()=>new Date().toISOString();\n`;
+  const prefix=`const {env,webResult,ideaResult,createWebResponse,retrieveWebResponse}=globalThis[${JSON.stringify(key)}]; const now=()=>new Date().toISOString();\n`;
   const code=ts.transpileModule(prefix+source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   f.module=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
   f.job=id=>sql.prepare('SELECT * FROM morice_jobs WHERE id=?').get(id);
@@ -127,4 +128,16 @@ test('unknown owners and duplicate transitions create no misleading job history'
     await f.module.transitionJob('alice',id,'running','Late retry');
     assert.equal(f.job(id).status,'blocked');
   } finally {f.close();}
+});
+
+test('analysis resumes from saved response ID without another paid request',async()=>{
+ const f=await fixture();try {
+ const id=await f.module.createJob('alice','Analyse','Document','idea_analysis');
+ f.sql.prepare("UPDATE morice_jobs SET status='submitting',response_id='resp_test',evidence=? WHERE id=?").run(JSON.stringify({model:'actual-model',trace:'Morice → analyse'}),id);
+ await f.module.refreshResearch('bob');assert.equal(f.retrieved,0);
+ await Promise.all([f.module.refreshResearch('alice'),f.module.refreshResearch('alice')]);
+ assert.equal(f.created,0);assert.equal(f.job(id).status,'done');
+ assert.equal(JSON.parse(f.job(id).evidence).model,'actual-model');
+ assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_job_events WHERE job_id=? AND status='done'").get(id).n,1);
+ }finally{f.close();}
 });

@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { userId } from "../../lib/runtime";
 import { refreshResearch, type Job } from "../../lib/jobs";
+import { sameOrigin } from "../../lib/attachment-validation";
 
 export async function GET(request: Request) {
   const uid = userId(request);
@@ -9,6 +10,7 @@ export async function GET(request: Request) {
   return Response.json({ jobs: jobs.results.map(job => ({ id: job.id, title: job.title, request: job.request, operation: job.operation, status: job.status, result: job.result, error: job.error, created_at: job.created_at, updated_at: job.updated_at, evidence: JSON.parse(job.evidence) })), events: events.results }, { headers: { "Cache-Control": "no-store" } });
 }
 export async function POST(request: Request) {
+  if (!sameOrigin(request)) return new Response(null, {status:403});
   await refreshResearch(userId(request));
   return GET(request);
 }
