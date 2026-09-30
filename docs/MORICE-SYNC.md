@@ -110,10 +110,19 @@ Couverture : protocole, dernier journal, CORE-SYNC et core-state LU sur GitHub m
 
 Aucun changement matériel. Aucune contradiction nouvelle, aucune nouveauté RADAR dédupliquée à retenir, aucune décision à valider et aucun nouveau travail transmis à 02. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun code fonctionnel modifié.
 
+
+### 2026-09-30 21:03 Europe/Paris — clôture de consolidation et reprise DEV
+- Contrôle direct du planificateur : 04 MORICE SYNC activée avec récurrence quotidienne ; Veille Morice et 03 RADAR désactivées. Le prompt de 04 lit le protocole commun et son dernier journal dans ce fichier.
+- Le bilan persistant de 17:58 et les contrôles ultérieurs sont présents dans main. La consolidation documentaire et des automatisations est terminée ; cela ne constitue pas une connexion applicative directe RADAR vers CORE ni une API MultipleChat.
+- Les anciennes mentions de persistance non prouvée dans CORE-SYNC/core-state sont historiques ; le statut courant est corrigé dans leur nouvelle section de reprise.
+- Reprise DEV : lire automatiquement ce journal et CORE-SYNC au début du travail ; reprendre les vérifications et raccordements déjà prévus dans le périmètre validé. MC-SYNC-001 reste une dépendance pour les changements architecturaux concernés, pas un blocage global des lectures, diagnostics ou travaux existants autorisés.
+- Ne pas déléguer à l’utilisateur le copier-coller des dossiers ou la collecte d’avis MultipleChat. En l’absence d’accès, conserver EN ATTENTE MULTIPLECHAT et poursuivre les tâches indépendantes accessibles.
+- Limite recontrôlée : une commande shell en lecture seule échoue avec sandbox provisioning failed ; aucun contrôle Git local, navigateur ou diagnostic runtime réussi dans cette session. Aucun changement de conversation dans l’interface ni raccordement runtime revendiqué.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
 2. Exécuter « Va te briefer » selon la section Protocole commun ; compléter les sources manquantes, sans réécrire l'historique.
 3. Le premier bilan de la tâche fusionnée et son écriture dans ce journal sont confirmés ; vérifier les changements depuis cette preuve et les sources encore inaccessibles. Les droits/outils du planificateur peuvent différer de Work.
-4. Présenter MC-SYNC-001 à MultipleChat et conserver les réponses lorsque l'accès existe. Aucune API/connexion inventée.
+4. L’agent traite MC-SYNC-001 lorsque son accès MultipleChat est opérationnel et conserve les avis réels. Sans accès, laisser ce dossier en attente et poursuivre les diagnostics/raccordements indépendants déjà autorisés ; ne pas demander à l’utilisateur de copier-coller le dossier.
 5. Aucune refonte ni installation applicative n'est validée. Demander une décision uniquement après dossier concret et confrontation pour les changements importants.
