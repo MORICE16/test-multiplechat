@@ -96,3 +96,11 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - Références main relues ; bilan d'essai enregistré par Work dans docs/MORICE-SYNC.md, distinct d'un résultat du planificateur.
 - Lecture locale/commande Git indisponible dans la session d'essai ; PC Desktop Commander hors ligne. Aucun checkout local mis à jour.
 - MC-SYNC-001 : EN ATTENTE MULTIPLECHAT ; aucun navigateur contrôlable ni avis récupéré ; aucune implémentation nouvelle validée.
+
+## Synchronisation — reprise DEV 2026-09-30 21:03
+
+- Consolidation briefing/RADAR/synchronisation terminée : une tâche quotidienne 04 MORICE SYNC active ; Veille Morice et 03 RADAR désactivées, contrôle planificateur le 30/09 à 21:03 Europe/Paris.
+- Le journal docs/MORICE-SYNC.md contient le premier bilan persistant de 17:58 et les contrôles ultérieurs ; les mentions NON ENCORE PROUVÉES ci-dessus décrivent des étapes antérieures.
+- 02 MORICE DEV lit le protocole et le dernier bilan depuis main ; reprise des diagnostics et raccordements existants autorisés sans transfert manuel par l’utilisateur.
+- MC-SYNC-001 demeure EN ATTENTE MULTIPLECHAT ; ne bloque que les changements architecturaux qui exigent cette confrontation.
+- Commande locale de lecture échouée : sandbox provisioning failed. Git local, navigateur et runtime non contrôlés dans cette session ; aucun branchement applicatif revendiqué.
