@@ -76,6 +76,14 @@ Tâches mises à jour et relues le 30/09 : 04 MORICE SYNC activée (tâche exist
 Statut de la nouvelle exécution quotidienne : PAS ENCORE TESTÉE. Persistance quotidienne : NON PROUVÉE.
 Résultat initial persistant : ce dossier de synchronisation ; état technique applicatif inchangé.
 
+### 2026-09-30T16:01:22.641Z — essai de reprise depuis Work
+- Action réelle : lancement immédiat de 04 MORICE SYNC demandé et accepté par le planificateur ; calendrier inchangé.
+- Vérification : protocole, CORE-SYNC et core-state lus depuis main. Aucun nouveau résultat original du planificateur récupéré ; fin d'exécution et persistance NON CONFIRMÉES. Ne pas relancer aveuglément.
+- Accès local : exécution shell indisponible dans cette session ; aucun checkout modifié ni synchronisé ici. Le dernier état local vérifié reste b45da39, à recontrôler lorsque l'accès revient.
+- Contrôle du navigateur/PC : aucun runtime de contrôle disponible dans la session ; appareil Desktop Commander signalé hors ligne. Confrontation MC-SYNC-001 bloquée, aucun avis IA reçu.
+- Bilan de ce test enregistré par Work dans ce journal ; cette écriture ne prouve pas la persistance de la tâche planifiée.
+- Reprise : récupérer le résultat de 04 lorsqu'il devient disponible ; utiliser une session PC accessible pour lire Git local et ouvrir le Project MultipleChat existant. Aucune refonte applicative autorisée.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
