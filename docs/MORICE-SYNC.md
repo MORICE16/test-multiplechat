@@ -72,7 +72,7 @@ Décision proposée : TESTER ; À VALIDER PAR ALAN pour tout nouveau transport/i
 Couverture : fichiers/automatisations/dépôt lus ; conversations partielles ; aucun nouveau test applicatif.
 Périmètre validé : consolidation documentaire et des tâches uniquement.
 Anciennes consignes et horaires archivés intégralement dans automations-before.json privé ; historiques ChatGPT conservés.
-La consolidation sera close après relecture des modifications documentaires et des trois états d'automatisation.
+Tâches mises à jour et relues le 30/09 : 04 MORICE SYNC activée (tâche existante et calendrier quotidien conservés), Veille Morice désactivée, 03 RADAR désactivée. Aucun historique supprimé.
 Statut de la nouvelle exécution quotidienne : PAS ENCORE TESTÉE. Persistance quotidienne : NON PROUVÉE.
 Résultat initial persistant : ce dossier de synchronisation ; état technique applicatif inchangé.
 
