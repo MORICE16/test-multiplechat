@@ -119,6 +119,29 @@ Aucun changement matériel. Aucune contradiction nouvelle, aucune nouveauté RAD
 - Ne pas déléguer à l’utilisateur le copier-coller des dossiers ou la collecte d’avis MultipleChat. En l’absence d’accès, conserver EN ATTENTE MULTIPLECHAT et poursuivre les tâches indépendantes accessibles.
 - Limite recontrôlée : une commande shell en lecture seule échoue avec sandbox provisioning failed ; aucun contrôle Git local, navigateur ou diagnostic runtime réussi dans cette session. Aucun changement de conversation dans l’interface ni raccordement runtime revendiqué.
 
+### 2026-10-01 19:57 Europe/Paris — reprise DEV confirmée et nouveau modèle à tester
+Couverture : protocole, dernier journal, CORE-SYNC, core-state et TECHNOLOGIES LU sur GitHub main `ec804762` ; comparaison GitHub `58265006…ec804762` LU ; contexte Work récent PARTIEL ; Git local, version réellement servie, diagnostics authentifiés actuels, MultipleChat et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Changements matériels depuis le dernier bilan quotidien :
+- La consolidation briefing/RADAR/synchronisation est terminée et 02 MORICE DEV a repris les travaux indépendants déjà validés. Alan a explicitement demandé de ne plus lui déléguer les copies ou manipulations intermédiaires ; cette consigne est déjà intégrée au passage DEV.
+- Le dépôt a avancé d’un commit Sites jusqu’à `ec804762`. La comparaison prouve trois fichiers modifiés : `app/horizon.css`, `CORE-SYNC.md` et ce journal. Le compagnon secondaire a été agrandi ; l’ancien logo officiel est conservé. Les preuves consignées indiquent TypeScript, 83 tests et build réussis, mais la vérification visuelle PC/Fold n’a pas été renouvelée.
+- Diagnostic OpenClaw consigné après reprise : version 2026.8.1, nœud Android connecté et `device.status ok=true`; aucune commande téléphone exécutée.
+- Runtime : des routes récentes ont répondu HTTP 200, mais les lectures directes via le mécanisme disponible ont répondu HTTP 401. Ne pas transformer ces statuts en preuve de lecture complète des boîtes. Ce blocage reste à diagnostiquer dans 02.
+- `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT et ne bloque pas les travaux indépendants déjà autorisés.
+
+RADAR filtré :
+- OpenAI a annoncé GPT-6.1 Sol le 29 septembre 2026, DISPONIBLE dans ChatGPT Work et Codex pour Plus, Pro, Business, Enterprise et Edu, ainsi que par API sous `gpt-6.1-sol`; il n’est pas encore disponible dans Chat. Prix API officiels : 2 $/million de jetons en entrée, 0,10 $ en entrée mise en cache et 10 $ en sortie. Source : https://openai.com/index/introducing-gpt-6-1-sol/
+- Gain potentiel Morice : meilleur compromis capacité/coût pour développement, audits et workflows complexes, sans consommer automatiquement les quotas MultipleChat. Disponibilité publique et accès du runtime Morice restent distincts.
+- Work IQ reste en preview avec déploiement commencé le 30 septembre et poursuivi en octobre ; aucune licence/activation du compte Morice n’est prouvée. Conserver Microsoft Graph. Source : https://www.microsoft.com/en-us/dynamics-365/blog/it-professional/2026/09/25/work-iq-business-and-workplace-intelligence-in-the-flow-of-work/
+- Aucun changement officiel matériel retenu pour MultipleChat, ARTEMIS, Tasker, Make, Claude, Gemini ou Grok.
+
+Dossier `OAI-ROUTE-001` — statut TESTER / À VALIDER :
+Problème : choisir si GPT-6.1 Sol doit compléter le routage actuel pour les tâches complexes. Options : conserver les modèles actuels ; tester GPT-6.1 Sol sur un petit corpus DEV/audit ; le remplacer globalement. Recommandation : test borné uniquement, avec qualité, coût réel, latence, disponibilité du catalogue du compte et retour arrière vers la route actuelle. Aucun remplacement global, achat ou changement de fournisseur autorisé par cette veille.
+
+Contradictions : les mentions historiques « persistance non prouvée » sont dépassées par les écritures vérifiées ultérieures ; elles restent conservées comme historique. Aucune autre contradiction nouvelle.
+
+Transmission 02 : poursuivre les diagnostics et raccordements existants, notamment le HTTP 401 et la vérification visuelle/Fold. Aucun nouveau travail architectural transmis tant que `OAI-ROUTE-001` n’est pas validé par Alan. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
