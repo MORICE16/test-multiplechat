@@ -306,6 +306,20 @@ Contradictions : le scénario Make était historiquement à « vérifier sans d�
 
 Transmission 02 : traiter `MAKE-NOTIF-001` avant les autres raccordements ; suspendre le scénario sans supprimer son historique, identifier son déclencheur, confirmer l’arrêt des alertes et conserver un retour arrière. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-03 19:39 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main ; commits récents LU jusqu’à `c9cebb3e` (02/10/2026 17:51 UTC) ; contexte accessible PARTIEL. Git local, version réellement servie, diagnostics Make authentifiés, MultipleChat et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Aucun changement matériel depuis le bilan du 02/10. Aucun nouveau commit applicatif ni documentaire observé après `c9cebb3e`.
+
+Blocages existants inchangés :
+- `MAKE-NOTIF-001` reste OUVERT et son arrêt reste NON PROUVÉ : aucune preuve nouvelle de pause ou de désactivation de la programmation, et aucun accès Make authentifié dans cette exécution. La décision validée le 02/10 demeure : suspendre le scénario sans supprimer son historique, puis confirmer l’absence de nouvelles exécutions et alertes. Aucun achat ni auto-rechargement autorisé.
+- `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT ; aucun accès automatique officiel ni collecte de plusieurs avis identifiables prouvés.
+
+RADAR filtré : aucune nouveauté officielle dédupliquée et matériellement pertinente retenue. GPT-6 Sol/Luna, GPT-6.1 Sol, dots et Work IQ sont déjà consignés ; aucune nouvelle décision, licence, dépense, installation ou migration proposée.
+
+Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà transmise sur `MAKE-NOTIF-001`. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
