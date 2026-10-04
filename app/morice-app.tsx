@@ -412,6 +412,7 @@ export default function MoriceApp() {
     if (voiceActive) { browserDictationRef.current?.stop(); dictationRef.current?.stop(); return; }
     if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
     if (!connections?.openai.apiAllowed) {
+      setNotice(""); setDictationError("");
       const speechWindow = window as unknown as {SpeechRecognition?:new()=>Recognition;webkitSpeechRecognition?:new()=>Recognition};
       const Constructor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
       if (!Constructor) {setNotice('Dictée sans API : utilisez le microphone du clavier de votre téléphone, ou la dictée dans ChatGPT.');return;}
@@ -509,7 +510,7 @@ export default function MoriceApp() {
         {view === "todo" && <TodoPanel />}
         {view === "journal" && <div className="horizon-layout"><HorizonJournal messages={messages} memories={memories} jobs={queue.data.jobs} onExplore={exploreIdea} onAdd={saveIdea} voiceActive={voiceActive} error={queue.error} /><aside className="context-rail"><HorizonDay connected={Boolean(connections?.microsoft.connected)} onCalendar={() => setView(connections?.microsoft.connected ? "calendar" : "connections")} /></aside></div>}
 
-        {view === "chat" && <div className="single-column"><CommandPanel apiAllowed={connections?.openai.apiAllowed === true} message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}
+        {view === "chat" && <div className="single-column"><CommandPanel apiAllowed={connections?.openai.apiAllowed === true} message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => { if (browserDictationRef.current) browserDictationRef.current.setAvailable(dictationState === "paused"); else dictationRef.current?.pause(); }} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "jobs" && <JobsPanel queue={queue} waiting={approvals.length} tasks={tasks} onTasks={() => setView("tasks")} onApprovals={() => setView("approvals")} />}
