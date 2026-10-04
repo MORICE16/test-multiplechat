@@ -401,3 +401,11 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - 91/91 tests, TypeScript, lint ciblé et build réussis. Dictée navigateur testée automatiquement, pas de test microphone humain dans ce lot. Ne pas promettre sa disponibilité sur tous les navigateurs.
 - La liaison SIWC au forfait reste une proposition documentée, pas une intégration active. Éligibilité du site hébergé, consentement OAuth et confrontation architecturale restent nécessaires; aucun achat ni nouvelle permission accordée.
 - Les deux tâches To Do synthétiques du lot précédent ont été supprimées par Alan; cette suppression ne remet pas en cause la preuve de création/relecture conservée.
+
+## 4 octobre 2026 — tentative de connexion au forfait ChatGPT
+- Demande Alan : connecter ChatGPT sans achat de crédits API. Documentation officielle relue : SIWC website, client ID et OSS/limitations. Site hébergé soumis à éligibilité/autorisation OpenAI; aucun client SIWC propre trouvé dans le code du projet.
+- Session ChatGPT personnelle accessible dans le navigateur intégré; cela ne prouve pas le droit d’inférence du runtime Morice.
+- Formulaire officiel d’intérêt ouvert et préparé avec uniquement URL publique, dépôt public et description du projet personnel. Aucun envoi; identité/contact/organisation obligatoires non inventés. Il s’agit d’une demande d’éligibilité, pas d’une connexion instantanée.
+- Aucun jeton Codex/cookie récupéré, aucun accès élargi, aucun achat; garde API payante conservée. Une installation locale OSS dispose d’un parcours distinct mais n’a pas été substituée au site ni connectée dans ce lot.
+- Blocage : client autorisé pour le site hébergé absent/non vérifié. Prochaine étape : compléter la demande d’éligibilité avec les coordonnées choisies par Alan; attendre une autorisation réelle avant OAuth hébergé.
+- Sources : https://developers.openai.com/siwc/request-client-id ; https://developers.openai.com/siwc/website ; https://developers.openai.com/siwc/token-sharing-open-source .

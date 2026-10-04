@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-04T14:05:15.762Z
-Commit source au moment de la génération : `fc4b2412ae356bca94ea551ce634f5e2b731c718`
+Généré : 2026-10-04T21:25:40.433Z
+Commit source au moment de la génération : `42dc969ddcc75ae40aafb145c71e11c9f9a137fe`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
