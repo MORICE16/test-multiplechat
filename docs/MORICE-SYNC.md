@@ -359,3 +359,9 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Test conversation synthétique sans action : refus affiché « OpenAI limite temporairement les demandes ». Aucune réponse utile obtenue ; aucun achat, renvoi automatique ni tâche créée. Ne pas assimiler cette erreur au seul diagnostic de crédit Make historique.
 - Diagnostic OpenClaw lancé en lecture seule : aucun résultat terminal conservé dans cette vérification ; statut non confirmé.
 - La version en ligne reste celle du 30 septembre ; les corrections locales et leurs tests ne constituent pas une preuve du nouveau routage en production.
+
+## Make — arrêt vérifié le 4 octobre 2026
+- Session Make authentifiée dans le navigateur intégré. Scénario « MORICE V1 - Actions vers Microsoft To Do » marqué Inactive.
+- Historique : désactivation par le propriétaire le 2 octobre à 04:35:38, après la dernière erreur affichée à 04:32:48 ; aucune exécution plus récente dans cette liste.
+- 29 éléments en file d’attente conservés ; aucun rejeu, achat, suppression ni réactivation. MAKE-NOTIF-001 : arrêt actuel prouvé ; correction du scénario reste à faire avant reprise.
+- Accès local/publication rétabli dans cette session ; reprise de la publication des corrections déjà testées. Le refus précédent reste historique.
