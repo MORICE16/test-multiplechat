@@ -119,3 +119,9 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - TypeScript, lint, 86 tests et build réussis localement. Tests externes et publication consignés séparément après leur résultat.
 - MAKE-NOTIF-001 reste prioritaire : session Make non authentifiée dans le navigateur accessible ; arrêt du scénario non prouvé. Aucun déclenchement de webhook.
 - Sources officielles consultées : https://developers.openai.com/api/docs/guides/model-selection ; https://developers.openai.com/api/docs/models ; https://developers.openai.com/api/reference/resources/models .
+
+## Vérifications réelles — 4 octobre 2026
+- Connexion ChatGPT existante rétablie automatiquement ; Alan n’a pas eu à ressaisir ses identifiants.
+- Runtime publié : Outlook, Calendar, To Do et OneDrive du compte principal ont chacun renvoyé « lecture vérifiée ». Deux profils Gmail ont également été lus avec succès, sans modification de messages. Les comptes secondaires Microsoft ne sont pas retestés dans ce lot.
+- Correction du routage conservée dans un commit local. GitHub main distant reste 01172745 : authentification Git Windows indisponible pour le push. Sites : envoi du justificatif de publication par stdin refusé par la politique de la session ; aucun déploiement effectué. Ne pas considérer la correction comme servie.
+- MAKE-NOTIF-001 : accès Make encore à authentifier ; aucune preuve d’arrêt.

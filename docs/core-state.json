@@ -30,10 +30,12 @@
     "Deux boîtes Microsoft supplémentaires autorisées puis lues depuis le runtime : 100 messages examinés par boîte, sans modification.",
     "Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.",
     "Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.",
-    "Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider."
+    "Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider.",
+    "4 octobre : 86 tests, TypeScript, lint et build locaux réussis ; lecture Outlook/Calendar/To Do/OneDrive et deux profils Gmail renouvelée sur le site actuel."
   ],
   "En cours": [
-    "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication."
+    "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",
+    "4 octobre : routage commun codé/testé localement ; publication et benchmark runtime bloqués par les accès de la session."
   ],
   "À faire": [
     "Routage global de tous les modules selon capacités, difficulté et échecs; le routeur actuel concerne les analyses et vérifie le catalogue du compte.",
