@@ -320,6 +320,33 @@ RADAR filtré : aucune nouveauté officielle dédupliquée et matériellement pe
 
 Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà transmise sur `MAKE-NOTIF-001`. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-04 20:10 Europe/Paris — Make arrêté, To Do direct et mode sans API payante
+Couverture : protocole commun et dernier journal LU ; CORE-SYNC, core-state et SUBSCRIPTION-BRIDGE LU sur GitHub main `42dc969d` ; comparaison `c9cebb3e…42dc969d` LU (12 commits, 21 fichiers modifiés) ; attestations DEV/runtime datées du 04/10 LU comme preuves consignées, sans nouveau test direct par 04 ; documentation officielle OpenAI Sign in with ChatGPT LU. Git local, runtime privé authentifié, session Make, MultipleChat et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Changements matériels :
+- `MAKE-NOTIF-001` — ARRÊT PROUVÉ par la trace DEV : scénario « MORICE V1 - Actions vers Microsoft To Do » Inactive, désactivé le 02/10 à 04:35:38 après la dernière erreur à 04:32:48. Les 29 éléments en file ont été conservés, sans rejeu, achat, suppression ni réactivation. Le blocage d’alertes est résolu ; le scénario reste à corriger avant toute éventuelle reprise.
+- Remplacement ciblé validé par Alan : pour la création To Do, Morice réutilise désormais Microsoft Graph directement, sans Make ni nouvel abonnement. Préparation sans IA, validation persistante, verrou concurrent, création et relecture du même identifiant ont été publiés puis prouvés au runtime. Les deux tâches synthétiques de test ont ensuite été supprimées par Alan. Statut : `REMPLACER / OPÉRATIONNEL` pour ce seul parcours To Do ; aucune équivalence générale des autres scénarios Make n’est revendiquée.
+- Le dépôt a avancé de 12 commits. Le routage commun conversation/recherche/analyse, la trace du modèle, le chemin To Do direct et la politique de blocage des API payantes sont présents sur main ; 91 tests, TypeScript, lint ciblé et build sont consignés réussis. Un déploiement privé revision 6 est consigné, mais 04 ne l’a pas retesté directement.
+- Lectures runtime consignées réussies le 04/10 pour Outlook, Calendar, To Do, OneDrive du compte principal et deux profils Gmail, sans modification de messages. Les comptes Microsoft secondaires n’ont pas été retestés.
+- Décision Alan : ne pas rendre Morice dépendant de recharges API OpenAI. Les appels payants sont désactivés par défaut ; aucune clé supprimée, aucun achat. Une question synthétique a été refusée avant appel et n’a créé aucune action. La dictée navigateur reste une solution partielle, non testée humainement sur Fold.
+
+Contradictions résolues :
+- Le bilan du 03/10 disait l’arrêt Make NON PROUVÉ ; la preuve authentifiée du 04/10 le remplace pour l’état courant.
+- Les HTTP 401 du 30/09 ne décrivent plus toutes les lectures courantes : les services principaux ci-dessus ont depuis réussi. Ils ne prouvent toujours ni les comptes Microsoft secondaires ni toutes les boîtes.
+- La présence de modèles dans le catalogue et l’affichage du routage ne prouvent pas une génération réussie : le test conversation reste bloqué par l’absence de crédit API. `OAI-ROUTE-001` demeure `TESTER`.
+
+Dossier `OAI-SUBSCRIPTION-001` — `TESTER / À VALIDER` :
+- Problème : utiliser le forfait ChatGPT existant sans recharger l’API.
+- Option officielle : ChatGPT plan usage via Sign in with ChatGPT, actuellement en preview. Les applications locales/open source peuvent demander un consentement OAuth ; un service payant ou hébergé à distance doit passer par l’éligibilité/partenariat OpenAI. Cette voie n’accorde aucun accès aux conversations ChatGPT.
+- Contraintes : `store=false`, `stream=true`, contexte renvoyé à chaque requête ; background, conversations persistantes, audio/transcription et plusieurs outils hébergés ne sont pas pris en charge. La solution actuelle en arrière-plan ne doit donc pas être remplacée sans adaptateur, test minimal terminé et retour arrière.
+- État Morice : documentation et garde-fou disponibles dans `docs/SUBSCRIPTION-BRIDGE.md` ; liaison au forfait NON CONNECTÉE, consentement et éligibilité du site hébergé non obtenus. Ne jamais récupérer cookies, jetons Codex ou routes privées.
+- Sources officielles vérifiées le 04/10 : https://developers.openai.com/siwc/token-sharing-open-source ; https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference ; https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations ; https://developers.openai.com/siwc/request-client-id .
+
+RADAR filtré : le récapitulatif OpenAI DevDay retrouvé aujourd’hui regroupe des annonces déjà couvertes ; aucune autre nouveauté officielle dédupliquée et matériellement pertinente retenue pour MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ, Android/ARTEMIS, Tasker, Claude, Gemini ou Grok.
+
+Transmission 02 : diagnostiquer sans achat le blocage de génération ; ne benchmarker les modèles autorisés qu’après réponse du service ; maintenir Make inactif et inspecter/corriger son scénario avant toute réactivation ; poursuivre `OAI-SUBSCRIPTION-001` seulement après éligibilité, consentement explicite et confrontation MultipleChat. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
