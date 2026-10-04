@@ -354,3 +354,8 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Runtime publié : Outlook, Calendar, To Do et OneDrive du compte principal ont chacun renvoyé « lecture vérifiée ». Deux profils Gmail ont également été lus avec succès, sans modification de messages. Les comptes secondaires Microsoft ne sont pas retestés dans ce lot.
 - Correction du routage conservée dans un commit local. GitHub main distant reste 01172745 : authentification Git Windows indisponible pour le push. Sites : envoi du justificatif de publication par stdin refusé par la politique de la session ; aucun déploiement effectué. Ne pas considérer la correction comme servie.
 - MAKE-NOTIF-001 : accès Make encore à authentifier ; aucune preuve d’arrêt.
+
+### Contrôle final runtime — 4 octobre 2026
+- Test conversation synthétique sans action : refus affiché « OpenAI limite temporairement les demandes ». Aucune réponse utile obtenue ; aucun achat, renvoi automatique ni tâche créée. Ne pas assimiler cette erreur au seul diagnostic de crédit Make historique.
+- Diagnostic OpenClaw lancé en lecture seule : aucun résultat terminal conservé dans cette vérification ; statut non confirmé.
+- La version en ligne reste celle du 30 septembre ; les corrections locales et leurs tests ne constituent pas une preuve du nouveau routage en production.
