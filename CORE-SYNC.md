@@ -136,3 +136,10 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - Historique : désactivation par le propriétaire le 2 octobre à 04:35:38, après la dernière erreur affichée à 04:32:48 ; aucune exécution plus récente dans cette liste.
 - 29 éléments en file d’attente conservés ; aucun rejeu, achat, suppression ni réactivation. MAKE-NOTIF-001 : arrêt actuel prouvé ; correction du scénario reste à faire avant reprise.
 - Accès local/publication rétabli dans cette session ; reprise de la publication des corrections déjà testées. Le refus précédent reste historique.
+
+## Publication et contrôle — 4 octobre 2026
+- Correction du routage publiée en privé : commit source d1e4fab30a656c079b30a13bba8fa65961743b6d ; même référence main GitHub vérifiée.
+- Déploiement appgdep_6ac23d8735ac8191a15b48dc15e9cf03 succeeded ; environnement revision 6. Affichage « Routage automatique · catalogue du compte » confirmé après rechargement du vrai site.
+- Test conversation minimal après publication : limitation OpenAI toujours affichée, aucune réponse utile ni action créée. Pas de preuve d’exécution d’un autre modèle ; aucun achat ou nouvel essai répété.
+- Make : inactif, désactivation du 2 octobre confirmée dans l’historique ; file conservée. Aucun autre scénario modifié.
+- Prochaines actions : diagnostiquer précisément la limitation OpenAI sans achat ; benchmark borné des modèles autorisés lorsque le service répond ; inspecter/corriger Make avant toute réactivation.
