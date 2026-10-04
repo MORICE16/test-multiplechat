@@ -393,3 +393,11 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Interface : statut liaison au forfait non connectée, accès direct ChatGPT et avertissement explicite. Authentification Sites ne signifie pas consentement au forfait.
 - Piste officielle SIWC plan usage trouvée en preview : applications locales/open-source et éligibilité distincte pour site hébergé; pas de capture de jetons Codex, cookies ou routes backend privées. Contraintes et étapes dans docs/SUBSCRIPTION-BRIDGE.md.
 - 91 tests, TypeScript, lint ciblé et build réussis. Test production et publication consignés après résultat. Les fonctions nécessitant un modèle restent partielles, pas déclarées connectées.
+
+### Publication sans API payante — preuve du 4 octobre 2026
+- Source fc4b2412ae356bca94ea551ce634f5e2b731c718 publiée en privé; déploiement appgdep_6ac25bb454c48191a67017f046421af4 succeeded, environnement revision 6, terminé à 13:59:39 UTC.
+- Vrai site : « API payante désactivée · liaison à votre abonnement non connectée » confirmé; connexions Microsoft conservées.
+- Question synthétique sans action : refus explicite avant appel OpenAI, texte conservé, aucune tâche ni action créée. Capture privée MORICE-SANS-API-20261004.jpg dans outputs.
+- 91/91 tests, TypeScript, lint ciblé et build réussis. Dictée navigateur testée automatiquement, pas de test microphone humain dans ce lot. Ne pas promettre sa disponibilité sur tous les navigateurs.
+- La liaison SIWC au forfait reste une proposition documentée, pas une intégration active. Éligibilité du site hébergé, consentement OAuth et confrontation architecturale restent nécessaires; aucun achat ni nouvelle permission accordée.
+- Les deux tâches To Do synthétiques du lot précédent ont été supprimées par Alan; cette suppression ne remet pas en cause la preuve de création/relecture conservée.
