@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { readWidgetDraft } from "./lib/widget-draft";
 import { createRecording, type RecordingState as DictationState } from "./lib/recording";
+import { createDictation, type Recognition } from './lib/dictation';
 import { ResponsePlayer } from "./components/response-player";
 import { CopyMessage } from "./components/copy-message";
 import { IdeaComposer } from "./components/idea-composer";
@@ -64,7 +65,7 @@ type AssistantResult = { reply: string; action: AssistantAction; warning?: strin
 type BrandIconName = "hubspot" | "outlook" | "todo" | "notes" | "onedrive" | "bitcoin";
 
 type ConnectionState = {
-  openai: { configured: boolean; model: string };
+  openai: { configured: boolean; model: string; apiAllowed?: boolean; subscriptionConnected?: boolean };
   microsoft: { configured: boolean; connected: boolean; account: string; accounts?: Array<{ id: string; email: string }> };
   make: { configured: boolean };
   hubspot: { configured: false; disabled: true; reason: string };
@@ -166,6 +167,8 @@ export default function MoriceApp() {
   const audioUrlRef = useRef("");
   const [clock, setClock] = useState<Date | null>(null);
   const dictationRef = useRef<ReturnType<typeof createRecording> | null>(null);
+  const browserDictationRef = useRef<ReturnType<typeof createDictation> | null>(null);
+  const browserInputRef = useRef({text:'',send:false});
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const sendingRef = useRef(false);
 
@@ -266,7 +269,7 @@ export default function MoriceApp() {
     };
   }, []);
 
-  useEffect(() => () => { dictationRef.current?.dispose(); dictationRef.current = null; }, []);
+  useEffect(() => () => { dictationRef.current?.dispose(); dictationRef.current = null; browserDictationRef.current?.dispose(); }, []);
 
   useEffect(() => {
     const receiveWidgetDraft = () => {
@@ -406,8 +409,18 @@ export default function MoriceApp() {
 
   function toggleDictation() {
     setView("chat");
-    if (voiceActive) { dictationRef.current?.stop(); return; }
+    if (voiceActive) { browserDictationRef.current?.stop(); dictationRef.current?.stop(); return; }
     if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
+    if (!connections?.openai.apiAllowed) {
+      const speechWindow = window as unknown as {SpeechRecognition?:new()=>Recognition;webkitSpeechRecognition?:new()=>Recognition};
+      const Constructor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+      if (!Constructor) {setNotice('Dictée sans API : utilisez le microphone du clavier de votre téléphone, ou la dictée dans ChatGPT.');return;}
+      browserDictationRef.current?.dispose();
+      browserInputRef.current={text:message,send:false};
+      browserDictationRef.current = createDictation({create:()=>new Constructor(),onText:text=>{browserInputRef.current.text=text;setMessage(text);},onState:state=>{setDictationState(state==='reconnecting'?'listening':state);if(state==='ready'&&browserInputRef.current.send){browserInputRef.current.send=false;void askMorice(browserInputRef.current.text);}},onError:error=>{browserInputRef.current.send=false;setDictationError(error);setNotice(error);}});
+      browserDictationRef.current.start(message);
+      return;
+    }
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
       setNotice("Le microphone nécessite un navigateur compatible en HTTPS. Essayez Chrome ou Edge."); return;
     }
@@ -435,11 +448,13 @@ export default function MoriceApp() {
   }
 
   function sendMessage() {
+    if (voiceActive && browserDictationRef.current) {browserInputRef.current.send=true;browserDictationRef.current.stop();return;}
     if (voiceActive) dictationRef.current?.stop(true);
     else void askMorice();
   }
 
   function discardAudio() {
+    browserDictationRef.current?.dispose(); browserDictationRef.current=null;
     dictationRef.current?.dispose(); dictationRef.current = null;
     keepRecordedAudio(null); setDictationState(message ? "ready" : "idle"); setDictationError(""); setNotice("");
   }
@@ -494,7 +509,7 @@ export default function MoriceApp() {
         {view === "todo" && <TodoPanel />}
         {view === "journal" && <div className="horizon-layout"><HorizonJournal messages={messages} memories={memories} jobs={queue.data.jobs} onExplore={exploreIdea} onAdd={saveIdea} voiceActive={voiceActive} error={queue.error} /><aside className="context-rail"><HorizonDay connected={Boolean(connections?.microsoft.connected)} onCalendar={() => setView(connections?.microsoft.connected ? "calendar" : "connections")} /></aside></div>}
 
-        {view === "chat" && <div className="single-column"><CommandPanel message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}
+        {view === "chat" && <div className="single-column"><CommandPanel apiAllowed={connections?.openai.apiAllowed === true} message={message} setMessage={setMessage} messages={messages} assistantMode={assistantMode} setAssistantMode={setAssistantMode} assistantBusy={assistantBusy} voicePhase={voicePhase} dictationError={dictationError} onMic={toggleDictation} onSend={sendMessage} onPause={() => dictationRef.current?.pause()} audioUrl={audioUrl} audioExtension={recordedAudio?.type.includes("mp4") ? "mp4" : "webm"} onRetry={() => dictationRef.current?.retry()} onDiscard={discardAudio} onOpenAction={(nextView) => setView(nextView)} /></div>}
 
         {view === "tasks" && <ListPanel title="Tâches Morice" items={tasks} value={newValue} setValue={setNewValue} add={() => addItem("task", newValue)} update={updateItem} />}
         {view === "jobs" && <JobsPanel queue={queue} waiting={approvals.length} tasks={tasks} onTasks={() => setView("tasks")} onApprovals={() => setView("approvals")} />}
@@ -546,7 +561,8 @@ function NavigationIcon({ id, fallback }: { id: string; fallback: string }) {
   return brand ? <BrandIcon name={brand} /> : <>{fallback}</>;
 }
 
-function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction }: {
+function CommandPanel({ apiAllowed, onPause, audioUrl, audioExtension, onRetry, onDiscard, dictationError, messages, message, setMessage, assistantMode, setAssistantMode, assistantBusy, voicePhase, onMic, onSend, onOpenAction }: {
+  apiAllowed: boolean;
   onPause: () => void;
   audioUrl: string;
   audioExtension: string;
@@ -588,6 +604,7 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
   };
   const [phaseLabel, phaseDetail] = labels[voicePhase];
   return <section className="command-panel" aria-label="Conversation avec Morice">
+    {!apiAllowed && <p role="status">Mode sans API payante. La liaison automatique à votre abonnement reste à connecter. <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Ouvrir ChatGPT ↗</a>. La dictée du navigateur ne consomme pas de crédits OpenAI; sa disponibilité dépend du navigateur.</p>}
     <div className="command-heading"><div><button type="button" className="conversation-companion" disabled={assistantBusy || voicePhase === "stopping" || Boolean(audioUrl)} onClick={speak} aria-label={listening?"Morice : arrêter la dictée":"Morice : démarrer la dictée"}><MoriceCompanion state={assistantBusy?"working":listening?"waiting":"idle"}/></button><div><p className="eyebrow">VOTRE ASSISTANT</p><h2>À vous la parole.</h2></div></div><span className="session-label">Historique sauvegardé · 40 derniers messages</span></div>
     <div className={"composer"+(collapsed?" composer-compact":"")}>
       <div className="composer-toolbar"><button type="button" aria-expanded={!collapsed} onClick={()=>{setCollapsedDraft(message);setCompact(!collapsed);}}>{collapsed?'Écrire / agrandir':'Réduire la saisie'}</button><button type="button" className="attachment-trigger" aria-expanded={attachmentsOpen} onClick={()=>{setAttachmentsCreated(true);setAttachmentsOpen(!attachmentsOpen);}}>＋ Photo / fichier / PDF</button></div>
@@ -651,7 +668,7 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
     finally { setChecking(false); }
   }
   return <section className="panel"><p className="eyebrow">SERVICES AUTORISÉS</p><h2>Connexions</h2><p>Les secrets restent côté serveur. Les actions externes sensibles attendent toujours ta validation.</p><div className="connection-grid">
-    <article><div><b>Intelligence OpenAI</b><span className={state?.openai.configured ? "connected" : "waiting"}>{state?.openai.configured ? `Configurée · ${state.openai.model}` : "À configurer sur le site"}</span></div></article>
+    <article><div><b>IA et abonnement ChatGPT</b><span className="waiting">{state?.openai.apiAllowed ? `API payante autorisée · ${state.openai.model}` : 'API payante désactivée · liaison à votre abonnement non connectée'}</span><p>La connexion actuelle au site identifie votre compte; elle ne donne pas accès à votre forfait pour les réponses de Morice.</p><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Utiliser mon abonnement dans ChatGPT ↗</a></div></article>
     <article><div><b>Microsoft 365</b><span className={state?.microsoft.connected ? "connected" : "waiting"}>{state?.microsoft.connected ? `Autorisé · ${state.microsoft.account} · vérifier les services` : state?.microsoft.configured ? "Prêt à être autorisé" : "Configuration de l’application requise"}</span></div>{state?.microsoft.connected ? <button className="secondary" onClick={disconnectMicrosoft}>Déconnecter</button> : <button disabled={!state?.microsoft.configured} onClick={() => { window.location.href = "/api/microsoft/start"; }}>Connecter Microsoft</button>}</article>
     <article><div><b>Autres boîtes Microsoft</b>{state?.microsoft.accounts?.filter(account => account.id).map(account => <span className="connected" key={account.id}>{account.email} · Autorisée, à tester</span>)}<span>Les comptes ajoutés sont conservés séparément. Choisissez votre boîte dans Emails. Agenda, To Do et conversation utilisent encore le compte principal.</span></div><a className="secondary" href="/api/microsoft/start?categories=1">Ajouter une boîte Microsoft</a></article>
     <article><GoogleConnections /></article>

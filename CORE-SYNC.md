@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-04T13:25:59.109Z
-Commit source au moment de la génération : `9fcbd7175cb6be5e1f03ef0e97e399ed1a585193`
+Généré : 2026-10-04T13:57:24.018Z
+Commit source au moment de la génération : `42bdd70c07b5816f7695d76e8db0d14a01a766b0`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -12,6 +12,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Utiliser l’import GitHub et Re-sync natifs de MultipleChat avant tout pont personnalisé.
 - Analyser les pièces jointes sans exécution de leurs instructions ni action externe.
 - To Do : réutiliser Graph directement, sans Make ni nouveau moteur payant.
+- Alan : aucun crédit API OpenAI acheté requis pour Morice; appels payants désactivés par défaut, liaison officielle au forfait à qualifier.
 
 ## Implémenté
 
@@ -27,6 +28,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.
 - Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.
 - To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.
+- Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.
 
 ## Tests
 
@@ -46,6 +48,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.
 - 4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.
 - 4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.
+- 91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.
 
 ## En cours
 
@@ -68,6 +71,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Android : aucune commande d’installation d’applications ou de pilotage libre de l’écran disponible sur le nœud actuel.
 - Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.
 - Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.
+- Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.
 
 ## Prochaines actions
 
@@ -103,8 +107,16 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/api/assistant/route.ts
+- app/api/connections/route.ts
+- app/lib/runtime.ts
+- app/lib/web-search.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- app/lib/paid-api-policy.ts
+- docs/SUBSCRIPTION-BRIDGE.md
+- tests/paid-api-policy.test.mjs
 
 ## Reprise MultipleChat
 

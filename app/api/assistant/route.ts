@@ -60,7 +60,7 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
   const key = runtimeValue("OPENAI_API_KEY");
   if (!key) {
     if (mode === "approval") return localPlan(message, mode);
-    throw new Error("OPENAI_NOT_CONFIGURED");
+    throw new Error("Les appels API payants sont désactivés ou indisponibles. La liaison à votre abonnement ChatGPT reste à connecter. Votre texte reste dans la saisie.");
   }
   const schema = {
     type: "object",
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
     }
     plan = await intelligentPlan(message, mode, history, memory);
   } catch (error) {
-    const safe = error instanceof Error && /^(La (clé|réponse)|Le (crédit|modèle)|OpenAI limite|L’analyse OpenAI)/.test(error.message) ? error.message : "L’analyse OpenAI est momentanément indisponible.";
+    const safe = error instanceof Error && /^(La (clé|réponse)|Le (crédit|modèle)|Les appels API|OpenAI limite|L’analyse OpenAI)/.test(error.message) ? error.message : "L’analyse OpenAI est momentanément indisponible.";
     return Response.json({ error: `${safe} Aucune tâche ni action n’a été créée.` }, { status: 502 });
   }
 

@@ -22,6 +22,7 @@ export async function searchWeb(query: string) { return webResult(await createWe
 
 export async function retrieveWebResponse(id: string) {
   if (!/^resp_[a-zA-Z0-9_-]+$/.test(id)) throw new Error("Identifiant de recherche invalide.");
+  if (!runtimeValue('OPENAI_API_KEY')) throw new Error('Les appels API payants sont désactivés. Le travail existant est conservé.');
   const response = await fetch(`https://api.openai.com/v1/responses/${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${runtimeValue("OPENAI_API_KEY")}` }, signal: AbortSignal.timeout(30_000) });
   if (!response.ok) throw new Error("La récupération du travail a échoué. La demande reste conservée; aucune nouvelle recherche n’a été lancée.");
   return await response.json() as ModelResponse;

@@ -386,3 +386,10 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Preuve runtime finale : nouvelle tâche synthétique préparée puis validée dans la liste MORICE; Microsoft confirme création et relecture, titre visible dans la liste. Aucun appel IA ni Make, aucun rappel configuré. Deux tâches synthétiques conservées; première demande de test non rejouée.
 - 89 tests, TypeScript, lint ciblé et build réussis. Les autres scénarios Make ne sont pas migrés; aucune promesse d’équivalence générale.
 - Réconciliation du premier test : demande initiale refusée dans Validations; aucune validation en attente confirmée. Tâche déjà créée conservée, aucun rejeu ni suppression.
+
+## 4 octobre 2026 — mandat sans crédit API acheté
+- Décision Alan : ne pas faire dépendre Morice de recharges API OpenAI. Clé payante masquée par défaut dans runtimeValue; aucune modification de clé ni achat. Les accès Microsoft/Google sont conservés.
+- Dictée navigateur existante réutilisée en mode sans API; reprise manuelle, texte conservé, aucun transfert vers transcription OpenAI. Validation vocale Fold reste humaine.
+- Interface : statut liaison au forfait non connectée, accès direct ChatGPT et avertissement explicite. Authentification Sites ne signifie pas consentement au forfait.
+- Piste officielle SIWC plan usage trouvée en preview : applications locales/open-source et éligibilité distincte pour site hébergé; pas de capture de jetons Codex, cookies ou routes backend privées. Contraintes et étapes dans docs/SUBSCRIPTION-BRIDGE.md.
+- 91 tests, TypeScript, lint ciblé et build réussis. Test production et publication consignés après résultat. Les fonctions nécessitant un modèle restent partielles, pas déclarées connectées.
