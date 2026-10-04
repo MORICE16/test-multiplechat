@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-04T13:16:00.986Z
-Commit source au moment de la génération : `ab0d7509ea52a165ea36f7336c7b8e8634d7e2de`
+Généré : 2026-10-04T13:21:09.445Z
+Commit source au moment de la génération : `9809f242fc60110c403216e661d6fb26c4c4547d`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -102,16 +102,9 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/assistant/route.ts
-- app/api/microsoft/todo/route.ts
-- app/components/todo-panel.tsx
-- app/lib/assistant-context.ts
 - app/lib/microsoft.ts
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
-- docs/core-state.json
 - tests/backend.test.mjs
-- tests/morice-source.test.mjs
 
 ## Reprise MultipleChat
 

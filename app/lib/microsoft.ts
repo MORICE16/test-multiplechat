@@ -181,7 +181,10 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     const path = `/me/todo/lists/${encodeURIComponent(list.id)}/tasks`;
     const created = await graph(uid, path, { method: "POST", body: JSON.stringify({ title, body: { content: payload.notes || "", contentType: "text" } }) });
     if (typeof created?.id !== "string") throw new ActionError("Création To Do acceptée sans identifiant vérifiable. Vérifie la liste avant de réessayer.", false);
-    const checked = await graph(uid, `${path}/${encodeURIComponent(created.id)}?$select=id,title`);
+    await progress(`Tâche To Do créée : ${created.id}. Relecture en cours; ne pas relancer la création.`);
+    let checked: Record<string, unknown> | null;
+    try { checked = await graph(uid, `${path}/${encodeURIComponent(created.id)}`); }
+    catch { throw new ActionError("Tâche To Do créée, mais relecture refusée. Vérifie la liste avant de réessayer.", false); }
     if (checked?.id !== created.id || checked?.title !== title) throw new ActionError("La tâche To Do n’a pas pu être vérifiée. Vérifie la liste avant de réessayer.", false);
     return "La tâche Microsoft To Do a été créée puis relue. Exécution directe, sans Make ni appel IA.";
   }

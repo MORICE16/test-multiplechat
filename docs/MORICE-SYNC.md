@@ -381,3 +381,4 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Diagnostic facturation API confirmé en session privée : blocage financier; aucun achat. Erreurs de quota différenciées des limites temporaires, y compris error.type sans code.
 - 89 tests réussis. Publication et preuve runtime consignées après résultat; les tests substituent le transport externe et ne constituent pas une preuve Microsoft réelle.
 - Sources : https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0 ; https://docs.n8n.io/hosting/community-edition-features ; https://www.activepieces.com/docs/install/overview .
+- Test runtime initial : tâche synthétique visible dans la liste après un refus 400 pendant sa relecture. Aucun rejeu de cette demande; correction de la relecture sans projection OData et protection needs_review si elle échoue après création. Identifiant enregistré avant relecture.

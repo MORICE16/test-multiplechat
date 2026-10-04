@@ -128,16 +128,17 @@ test('direct To Do preparation records an approval without AI, Make or a task wr
 test('direct To Do verifies the created task and never falls back to another requested list',async()=>{
   const f=await fixture();try {
     f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh',?,'primary@example.invalid','Tasks.ReadWrite','connected','now')").run(new Date(Date.now()+3600000).toISOString());
-    let writes=0;let broken=false;
+    let writes=0;let broken=false;let rejected=false;
     f.fetch=async(url,init)=>{
       if(url.endsWith('/me/todo/lists'))return Response.json({value:[{id:'list-one',displayName:'Tasks'}]});
       if(init.method==='POST'){writes++;return Response.json({id:'task-one'});}
-      assert.match(url,/list-one\/tasks\/task-one/);return Response.json({id:'task-one',title:broken?'Wrong':'Test direct'});
+      assert.match(url,/list-one\/tasks\/task-one$/);if(rejected)return Response.json({error:{}},{status:400});return Response.json({id:'task-one',title:broken?'Wrong':'Test direct'});
     };
     const ms=await f.route('app/lib/microsoft.ts');
     await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'missing'}));assert.equal(writes,0);
     assert.match(await ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'list-one'}),/créée puis relue/);assert.equal(writes,1);
     broken=true;await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'list-one'}),error=>actionFailure(error).status==='needs_review');assert.equal(writes,2);
+    rejected=true;await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'list-one'}),error=>actionFailure(error).status==='needs_review');assert.equal(writes,3);
   }finally{f.close();}
 });
 
