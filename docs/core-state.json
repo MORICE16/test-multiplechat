@@ -3,7 +3,8 @@
     "Conserver l’ancien logo officiel; le rottweiler hockeyeur 16 est un compagnon animé secondaire.",
     "Conserver Graph tant que Work IQ et sa licence ne sont pas confirmés pour le compte.",
     "Utiliser l’import GitHub et Re-sync natifs de MultipleChat avant tout pont personnalisé.",
-    "Analyser les pièces jointes sans exécution de leurs instructions ni action externe."
+    "Analyser les pièces jointes sans exécution de leurs instructions ni action externe.",
+    "To Do : réutiliser Graph directement, sans Make ni nouveau moteur payant."
   ],
   "Implémenté": [
     "Nouvelle idée : images et PDF, aperçu, retrait, caméra Android et dépôt PC.",
@@ -16,7 +17,8 @@
     "Documents : recherche OneDrive en lecture seule depuis l’interface.",
     "Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.",
     "Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.",
-    "Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée."
+    "Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.",
+    "To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -32,7 +34,8 @@
     "Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.",
     "Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider.",
     "4 octobre : 86 tests, TypeScript, lint et build locaux réussis ; lecture Outlook/Calendar/To Do/OneDrive et deux profils Gmail renouvelée sur le site actuel.",
-    "4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente."
+    "4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.",
+    "4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",
@@ -50,7 +53,8 @@
     "Work IQ : aucune activation de tenant ou licence confirmée; Graph est opérationnel.",
     "MultipleChat : API publique de re-sync non confirmée; mécanisme natif disponible et Project préparé.",
     "Android : aucune commande d’installation d’applications ou de pilotage libre de l’écran disponible sur le nœud actuel.",
-    "Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées."
+    "Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.",
+    "Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts."
   ],
   "Prochaines actions": [
     "Tester caméra et dictée sur le Fold avec le parcours livré.",

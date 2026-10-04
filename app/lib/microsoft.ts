@@ -175,10 +175,15 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
   if (operation === "todo_create") {
     const lists = await graph(uid, "/me/todo/lists") as { value?: Array<{ id?: string; displayName?: string }> };
     const wanted = (payload.list || "Tasks").toLocaleLowerCase("fr");
-    const list = (lists?.value || []).find(item => item.displayName?.toLocaleLowerCase("fr") === wanted) || lists?.value?.[0];
+    const list = (lists?.value || []).find(item => item.id === payload.list || item.displayName?.toLocaleLowerCase("fr") === wanted) || (!payload.list ? lists?.value?.[0] : undefined);
     if (!list?.id) throw new ActionError("Aucune liste Microsoft To Do n’est disponible.", true);
-    await graph(uid, `/me/todo/lists/${encodeURIComponent(list.id)}/tasks`, { method: "POST", body: JSON.stringify({ title: payload.subject || payload.body || "Tâche Morice", body: { content: payload.notes || "", contentType: "text" } }) });
-    return "La tâche a été créée dans Microsoft To Do.";
+    const title = payload.subject || payload.body || "Tâche Morice";
+    const path = `/me/todo/lists/${encodeURIComponent(list.id)}/tasks`;
+    const created = await graph(uid, path, { method: "POST", body: JSON.stringify({ title, body: { content: payload.notes || "", contentType: "text" } }) });
+    if (typeof created?.id !== "string") throw new ActionError("Création To Do acceptée sans identifiant vérifiable. Vérifie la liste avant de réessayer.", false);
+    const checked = await graph(uid, `${path}/${encodeURIComponent(created.id)}?$select=id,title`);
+    if (checked?.id !== created.id || checked?.title !== title) throw new ActionError("La tâche To Do n’a pas pu être vérifiée. Vérifie la liste avant de réessayer.", false);
+    return "La tâche Microsoft To Do a été créée puis relue. Exécution directe, sans Make ni appel IA.";
   }
   throw new ActionError("Cette action Microsoft n’est pas encore prise en charge.", true);
 }

@@ -102,8 +102,8 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
       max_output_tokens: 2400,
     }),
   });
-  const result = await response.json() as { model?: string; status?: string; output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }>; error?: { code?: string } };
-  if (!response.ok) throw new Error(planningError(response.status, result.error?.code));
+  const result = await response.json() as { model?: string; status?: string; output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }>; error?: { code?: string; type?: string } };
+  if (!response.ok) throw new Error(planningError(response.status, result.error?.code, result.error?.type));
   if (result.status === "incomplete") throw new Error("La réponse OpenAI est incomplète. Réessaie avec une demande plus courte.");
   const outputText = result.output_text || result.output?.flatMap(item => item.content || []).map(item => item.text || "").join("") || "";
   const plan = JSON.parse(outputText) as Plan;
@@ -207,12 +207,8 @@ export async function POST(request: Request) {
   }
 
   if (writeIntents.has(plan.intent)) {
-    const makeHandlesTodo = plan.intent === "todo_create" && Boolean(runtimeValue("MAKE_WEBHOOK_URL")) && !runtimeValue("MICROSOFT_CLIENT_ID");
-    const provider = plan.intent === "make_trigger" || makeHandlesTodo ? "make" : "microsoft";
-    if (makeHandlesTodo) {
-      plan.payload.webhookEvent = "todo_create";
-      plan.payload.body ||= plan.payload.subject || message;
-    }
+    if (plan.intent === "make_trigger") return Response.json({ error: "Make est retiré des nouvelles automatisations. Cette action doit encore être raccordée à un exécutant direct. Aucune demande envoyée." }, { status: 409 });
+    const provider = "microsoft";
     const id = crypto.randomUUID();
     await env.DB.batch([
       env.DB.prepare("INSERT INTO morice_items(id,user_id,kind,title,content,status,priority,position,created_at,updated_at) VALUES(?,?,'approval',?,?,'pending','normal',0,?,?)").bind(id, uid, plan.title, message, now(), now()),

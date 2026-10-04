@@ -372,3 +372,12 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Test conversation minimal après publication : limitation OpenAI toujours affichée, aucune réponse utile ni action créée. Pas de preuve d’exécution d’un autre modèle ; aucun achat ou nouvel essai répété.
 - Make : inactif, désactivation du 2 octobre confirmée dans l’historique ; file conservée. Aucun autre scénario modifié.
 - Prochaines actions : diagnostiquer précisément la limitation OpenAI sans achat ; benchmark borné des modèles autorisés lorsque le service répond ; inspecter/corriger Make avant toute réactivation.
+
+## 4 octobre 2026 — exécution To Do directe et diagnostic API
+- Décision Alan : remplacer Make payant pour cette automatisation. Réutilisation de Microsoft Graph déjà raccordé, sans nouveau moteur ni abonnement.
+- Nouvelle tâche To Do préparée depuis sa liste, sans OpenAI : validation persistante obligatoire, verrou concurrent existant, création puis relecture du même identifiant/titre.
+- Aucune bascule vers une autre liste si la liste demandée manque. Résultat ambigu conservé en needs_review, aucun renvoi automatique.
+- Conversation : To Do passe directement par Microsoft; nouvelles demandes make_trigger bloquées explicitement. Ancien scénario et file Make préservés.
+- Diagnostic facturation API confirmé en session privée : blocage financier; aucun achat. Erreurs de quota différenciées des limites temporaires, y compris error.type sans code.
+- 89 tests réussis. Publication et preuve runtime consignées après résultat; les tests substituent le transport externe et ne constituent pas une preuve Microsoft réelle.
+- Sources : https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0 ; https://docs.n8n.io/hosting/community-edition-features ; https://www.activepieces.com/docs/install/overview .

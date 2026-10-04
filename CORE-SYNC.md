@@ -1,10 +1,9 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-09-30T15:47:12.635Z
-Commit source au moment de la génération : `b9ab5333b2bf4ac8ce6d5f3c49242b22a1d1c911`
+Généré : 2026-10-04T13:16:00.986Z
+Commit source au moment de la génération : `ab0d7509ea52a165ea36f7336c7b8e8634d7e2de`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
-Les résultats applicatifs ci-dessous sont les preuves consignées antérieurement ; ils n'ont pas été retestés pendant la consolidation documentaire.
 
 ## Décisions nouvelles
 
@@ -12,6 +11,7 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 - Conserver Graph tant que Work IQ et sa licence ne sont pas confirmés pour le compte.
 - Utiliser l’import GitHub et Re-sync natifs de MultipleChat avant tout pont personnalisé.
 - Analyser les pièces jointes sans exécution de leurs instructions ni action externe.
+- To Do : réutiliser Graph directement, sans Make ni nouveau moteur payant.
 
 ## Implémenté
 
@@ -26,6 +26,7 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 - Compagnon OpenAI existant réutilisé : animations de travail, attente et salut; pose assise corrigée, ancien logo principal conservé.
 - Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.
 - Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.
+- To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.
 
 ## Tests
 
@@ -41,10 +42,14 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 - Gmail Codex : profil et lecture de libellé accessibles via connecteur existant; distinct du runtime Morice.
 - Une boîte Gmail réellement autorisée puis profil lu depuis Morice; aperçu de messages à vérifier après publication.
 - Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider.
+- 4 octobre : 86 tests, TypeScript, lint et build locaux réussis ; lecture Outlook/Calendar/To Do/OneDrive et deux profils Gmail renouvelée sur le site actuel.
+- 4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.
+- 4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.
 
 ## En cours
 
 - Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.
+- 4 octobre : routage commun publié et affichage confirmé ; génération IA refusée par limitation OpenAI, benchmark réel non réussi.
 
 ## À faire
 
@@ -61,6 +66,7 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 - MultipleChat : API publique de re-sync non confirmée; mécanisme natif disponible et Project préparé.
 - Android : aucune commande d’installation d’applications ou de pilotage libre de l’écran disponible sur le nœud actuel.
 - Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.
+- Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.
 
 ## Prochaines actions
 
@@ -79,17 +85,6 @@ Les résultats applicatifs ci-dessous sont les preuves consignées antérieureme
 - Exécution de la nouvelle tâche et persistance quotidienne NON ENCORE PROUVÉES ; aucun accès complet aux conversations ni aux autres sessions Work garanti.
 - Reprise 02 : lire main et le journal de synchronisation ; contrôler divergence locale ; tester collecte/persistance ; aucune refonte applicative autorisée.
 
-## Fichiers modifiés lors de la consolidation
-
-- AGENTS.md
-- docs/MORICE-SYNC.md
-- docs/core-state.json
-- CORE-SYNC.md
-
-## Reprise MultipleChat
-
-Importer les fichiers techniques actuels du dépôt existant, branche main, puis utiliser Re-sync dans le Project. Le dossier MC-SYNC-001 est dans docs/MORICE-SYNC.md. API de synchronisation et interrogation automatique non confirmées ; EN ATTENTE MULTIPLECHAT jusqu'à récupération d'avis réels. Aucun CORE privé dans le dépôt public.
-
 ## Synchronisation — essai Work 2026-09-30
 
 - Lancement immédiat 04 MORICE SYNC demandé et accepté ; résultat original et persistance planifiée non encore confirmés.
@@ -105,41 +100,19 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - MC-SYNC-001 demeure EN ATTENTE MULTIPLECHAT ; ne bloque que les changements architecturaux qui exigent cette confrontation.
 - Commande locale de lecture échouée : sandbox provisioning failed. Git local, navigateur et runtime non contrôlés dans cette session ; aucun branchement applicatif revendiqué.
 
-## Reprise DEV — compagnon et accès, 30 septembre 2026
-- Compagnon secondaire agrandi sur une ligne dédiée à l’accueil; dimensions doublées dans la conversation. Ancien logo officiel conservé.
-- Code, main GitHub et Sites accessibles. Navigateur de contrôle indisponible après relance; tests visuels et voix Fold non renouvelés.
-- Runtime : journaux récents assistant, calendrier et travaux HTTP 200. Relecture des boîtes via accès direct refusée HTTP 401; ne pas annoncer ces lectures comme prouvées.
-- Conserver le briefing quotidien 04 existant. MultipleChat reste une dépendance uniquement pour les décisions architecturales correspondantes.
+## Fichiers modifiés lors de la génération
 
-## Reprise DEV — 4 octobre 2026 : routage commun
-- Main 01172745 lu et intégré sans écraser de changement local ; derniers journaux et core-state consultés.
-- Conversation, recherche et analyse raccordées au routeur existant : sélection par difficulté parmi le catalogue réel, sans dépendre du pin OPENAI_MODEL pour toutes les demandes.
-- Modèle utilisé enregistré dans l’historique de conversation et affiché sous la réponse. La présence au catalogue ne constitue pas une preuve d’exécution.
-- GPT-6 : activation automatique conditionnée à OPENAI_ROUTING_VERIFIED_MODELS après benchmark runtime borné ; Astra/pro exclus pour limiter les coûts. Aucun achat ni rechargement.
-- TypeScript, lint, 86 tests et build réussis localement. Tests externes et publication consignés séparément après leur résultat.
-- MAKE-NOTIF-001 reste prioritaire : session Make non authentifiée dans le navigateur accessible ; arrêt du scénario non prouvé. Aucun déclenchement de webhook.
-- Sources officielles consultées : https://developers.openai.com/api/docs/guides/model-selection ; https://developers.openai.com/api/docs/models ; https://developers.openai.com/api/reference/resources/models .
+- app/api/assistant/route.ts
+- app/api/microsoft/todo/route.ts
+- app/components/todo-panel.tsx
+- app/lib/assistant-context.ts
+- app/lib/microsoft.ts
+- app/morice-app.tsx
+- docs/MORICE-SYNC.md
+- docs/core-state.json
+- tests/backend.test.mjs
+- tests/morice-source.test.mjs
 
-## Vérifications réelles — 4 octobre 2026
-- Connexion ChatGPT existante rétablie automatiquement ; Alan n’a pas eu à ressaisir ses identifiants.
-- Runtime publié : Outlook, Calendar, To Do et OneDrive du compte principal ont chacun renvoyé « lecture vérifiée ». Deux profils Gmail ont également été lus avec succès, sans modification de messages. Les comptes secondaires Microsoft ne sont pas retestés dans ce lot.
-- Correction du routage conservée dans un commit local. GitHub main distant reste 01172745 : authentification Git Windows indisponible pour le push. Sites : envoi du justificatif de publication par stdin refusé par la politique de la session ; aucun déploiement effectué. Ne pas considérer la correction comme servie.
-- MAKE-NOTIF-001 : accès Make encore à authentifier ; aucune preuve d’arrêt.
+## Reprise MultipleChat
 
-### Contrôle final runtime — 4 octobre 2026
-- Test conversation synthétique sans action : refus affiché « OpenAI limite temporairement les demandes ». Aucune réponse utile obtenue ; aucun achat, renvoi automatique ni tâche créée. Ne pas assimiler cette erreur au seul diagnostic de crédit Make historique.
-- Diagnostic OpenClaw lancé en lecture seule : aucun résultat terminal conservé dans cette vérification ; statut non confirmé.
-- La version en ligne reste celle du 30 septembre ; les corrections locales et leurs tests ne constituent pas une preuve du nouveau routage en production.
-
-## Make — arrêt vérifié le 4 octobre 2026
-- Session Make authentifiée dans le navigateur intégré. Scénario « MORICE V1 - Actions vers Microsoft To Do » marqué Inactive.
-- Historique : désactivation par le propriétaire le 2 octobre à 04:35:38, après la dernière erreur affichée à 04:32:48 ; aucune exécution plus récente dans cette liste.
-- 29 éléments en file d’attente conservés ; aucun rejeu, achat, suppression ni réactivation. MAKE-NOTIF-001 : arrêt actuel prouvé ; correction du scénario reste à faire avant reprise.
-- Accès local/publication rétabli dans cette session ; reprise de la publication des corrections déjà testées. Le refus précédent reste historique.
-
-## Publication et contrôle — 4 octobre 2026
-- Correction du routage publiée en privé : commit source d1e4fab30a656c079b30a13bba8fa65961743b6d ; même référence main GitHub vérifiée.
-- Déploiement appgdep_6ac23d8735ac8191a15b48dc15e9cf03 succeeded ; environnement revision 6. Affichage « Routage automatique · catalogue du compte » confirmé après rechargement du vrai site.
-- Test conversation minimal après publication : limitation OpenAI toujours affichée, aucune réponse utile ni action créée. Pas de preuve d’exécution d’un autre modèle ; aucun achat ou nouvel essai répété.
-- Make : inactif, désactivation du 2 octobre confirmée dans l’historique ; file conservée. Aucun autre scénario modifié.
-- Prochaines actions : diagnostiquer précisément la limitation OpenAI sans achat ; benchmark borné des modèles autorisés lorsque le service répond ; inspecter/corriger Make avant toute réactivation.
+Importer le dépôt GitHub existant, branche main, puis CORE-SYNC.md. Utiliser Re-sync dans le Project. Aucune API publique de synchronisation automatique n’a été confirmée. Ne pas importer le CORE privé complet dans un dépôt public.

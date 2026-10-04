@@ -44,7 +44,7 @@ test("Morice exposes the persistent application, connected actions and notificat
   assert.match(actionRoute, /runMakeAction/);
   assert.match(microsoftRoute, /graph\.microsoft\.com\/v1\.0/);
   assert.match(microsoftRoute, /Morice Online/);
-  assert.match(assistantRoute, /makeHandlesTodo/);
+  assert.match(assistantRoute, /const provider = "microsoft"/);
   assert.match(assistantRoute, /Aucune tâche ni action n’a été créée/);
   assert.doesNotMatch(assistantRoute, /catch \{\s*plan = localPlan/);
   assert.match(connectionsRoute, /hubspot: \{ configured: false, disabled: true/);

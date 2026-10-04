@@ -43,6 +43,7 @@ async function fixture() {
       const connection=(...a)=>f.microsoftConnection(...a);
       const fetch=(...a)=>f.fetch(...a);
       const routeModel=async()=>({model:'gpt-5-mini',reason:'Test de transport isolé'});
+      ${path.endsWith('/microsoft.ts') ? '' : 'const readMicrosoftTodo=(...a)=>f.readMicrosoftTodo(...a);'}
       const coreContext=(...a)=>f.coreContext?.(...a) || Promise.resolve(null);
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
@@ -110,6 +111,36 @@ test('refreshing an additional account cannot overwrite primary or another owner
 });
 const request = (body, uid='alice') => new Request('https://morice.test/api', { method: 'POST', headers: { 'Content-Type': 'application/json', 'test-user': uid }, body: JSON.stringify(body) });
 
+test('direct To Do preparation records an approval without AI, Make or a task write', async()=>{
+  const f=await fixture();try {
+    f.readMicrosoftTodo=async(uid)=>{assert.equal(uid,'alice');return {lists:[{id:'list-one'}]};};
+    f.fetch=async()=>{throw new Error('Unexpected provider request');};
+    const route=await f.route('app/api/microsoft/todo/route.ts');
+    assert.equal((await route.POST(request({title:'Test direct',list:'other'}))).status,400);
+    const response=await route.POST(request({title:'Test direct',list:'list-one'}));
+    assert.equal(response.status,200);const {id}=await response.json();
+    const action=f.sql.prepare('SELECT provider,operation,payload FROM morice_action_payloads WHERE item_id=? AND user_id=?').get(id,'alice');
+    assert.equal(action.provider,'microsoft');assert.equal(action.operation,'todo_create');assert.equal(JSON.parse(action.payload).list,'list-one');
+    assert.equal(f.sql.prepare('SELECT status FROM morice_items WHERE id=?').get(id).status,'pending');assert.equal(f.sent,0);
+  }finally{f.close();}
+});
+
+test('direct To Do verifies the created task and never falls back to another requested list',async()=>{
+  const f=await fixture();try {
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh',?,'primary@example.invalid','Tasks.ReadWrite','connected','now')").run(new Date(Date.now()+3600000).toISOString());
+    let writes=0;let broken=false;
+    f.fetch=async(url,init)=>{
+      if(url.endsWith('/me/todo/lists'))return Response.json({value:[{id:'list-one',displayName:'Tasks'}]});
+      if(init.method==='POST'){writes++;return Response.json({id:'task-one'});}
+      assert.match(url,/list-one\/tasks\/task-one/);return Response.json({id:'task-one',title:broken?'Wrong':'Test direct'});
+    };
+    const ms=await f.route('app/lib/microsoft.ts');
+    await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'missing'}));assert.equal(writes,0);
+    assert.match(await ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'list-one'}),/créée puis relue/);assert.equal(writes,1);
+    broken=true;await assert.rejects(ms.runMicrosoftAction('alice','todo_create',{subject:'Test direct',list:'list-one'}),error=>actionFailure(error).status==='needs_review');assert.equal(writes,2);
+  }finally{f.close();}
+});
+
 test('concurrent confirmations dispatch the external action exactly once', async () => {
   const f=await fixture(); try {
     f.pending(); const route=await f.route('app/api/actions/execute/route.ts');
@@ -161,13 +192,20 @@ test('conversation persists across route instances and only owner memory reaches
 test('incomplete and quota responses create no task, action or successful history', async () => {
   const f=await fixture(); try {
     const route=await f.route('app/api/assistant/route.ts');
-    for(const response of [Response.json({status:'incomplete'}),Response.json({error:{code:'insufficient_quota'}},{status:429})]) {
+    for(const response of [Response.json({status:'incomplete'}),Response.json({error:{code:'insufficient_quota'}},{status:429}),Response.json({error:{code:null,type:'insufficient_quota'}},{status:429})]) {
       f.fetch=async()=>response;
       assert.equal((await route.POST(request({message:'Une question',mode:'auto'}))).status,502);
     }
     assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
     assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_messages').get().n,0);
   } finally { f.close(); }
+});
+
+test('quota and transient rate limits are distinguished without exposing provider text', () => {
+  assert.match(planningError(429,'','insufficient_quota'),/crédit ou le plafond/);
+  assert.match(planningError(429,'rate_limit_exceeded'),/fréquence ou le volume/);
+  assert.match(planningError(429),/quota API ou la fréquence/);
+  assert.doesNotMatch(planningError(429),/Réessaie/);
 });
 test('Microsoft distinguishes preflight, explicit rejection and ambiguous transport failure', async () => {
   const f=await fixture(); try {
