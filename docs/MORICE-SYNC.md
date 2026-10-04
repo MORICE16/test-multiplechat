@@ -385,3 +385,4 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - Publication corrective privée réussie : source 9fcbd7175cb6be5e1f03ef0e97e399ed1a585193 ; déploiement appgdep_6ac253392fe4819194fc50d8b6c46dc6 succeeded.
 - Preuve runtime finale : nouvelle tâche synthétique préparée puis validée dans la liste MORICE; Microsoft confirme création et relecture, titre visible dans la liste. Aucun appel IA ni Make, aucun rappel configuré. Deux tâches synthétiques conservées; première demande de test non rejouée.
 - 89 tests, TypeScript, lint ciblé et build réussis. Les autres scénarios Make ne sont pas migrés; aucune promesse d’équivalence générale.
+- Réconciliation du premier test : demande initiale refusée dans Validations; aucune validation en attente confirmée. Tâche déjà créée conservée, aucun rejeu ni suppression.
