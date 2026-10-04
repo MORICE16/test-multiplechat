@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-04T13:21:09.445Z
-Commit source au moment de la génération : `9809f242fc60110c403216e661d6fb26c4c4547d`
+Généré : 2026-10-04T13:25:59.109Z
+Commit source au moment de la génération : `9fcbd7175cb6be5e1f03ef0e97e399ed1a585193`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -45,6 +45,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 4 octobre : 86 tests, TypeScript, lint et build locaux réussis ; lecture Outlook/Calendar/To Do/OneDrive et deux profils Gmail renouvelée sur le site actuel.
 - 4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.
 - 4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.
+- 4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.
 
 ## En cours
 
@@ -102,9 +103,8 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/lib/microsoft.ts
 - docs/MORICE-SYNC.md
-- tests/backend.test.mjs
+- docs/core-state.json
 
 ## Reprise MultipleChat
 

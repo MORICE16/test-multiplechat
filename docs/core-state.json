@@ -35,7 +35,8 @@
     "Conversation : 83 tests, TypeScript et lint réussis; dictée humaine sur Fold encore à valider.",
     "4 octobre : 86 tests, TypeScript, lint et build locaux réussis ; lecture Outlook/Calendar/To Do/OneDrive et deux profils Gmail renouvelée sur le site actuel.",
     "4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.",
-    "4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué."
+    "4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.",
+    "4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

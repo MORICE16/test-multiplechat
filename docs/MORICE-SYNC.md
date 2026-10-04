@@ -382,3 +382,6 @@ Transmission 02 : aucune consigne nouvelle ; maintenir la priorité déjà trans
 - 89 tests réussis. Publication et preuve runtime consignées après résultat; les tests substituent le transport externe et ne constituent pas une preuve Microsoft réelle.
 - Sources : https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0 ; https://docs.n8n.io/hosting/community-edition-features ; https://www.activepieces.com/docs/install/overview .
 - Test runtime initial : tâche synthétique visible dans la liste après un refus 400 pendant sa relecture. Aucun rejeu de cette demande; correction de la relecture sans projection OData et protection needs_review si elle échoue après création. Identifiant enregistré avant relecture.
+- Publication corrective privée réussie : source 9fcbd7175cb6be5e1f03ef0e97e399ed1a585193 ; déploiement appgdep_6ac253392fe4819194fc50d8b6c46dc6 succeeded.
+- Preuve runtime finale : nouvelle tâche synthétique préparée puis validée dans la liste MORICE; Microsoft confirme création et relecture, titre visible dans la liste. Aucun appel IA ni Make, aucun rappel configuré. Deux tâches synthétiques conservées; première demande de test non rejouée.
+- 89 tests, TypeScript, lint ciblé et build réussis. Les autres scénarios Make ne sont pas migrés; aucune promesse d’équivalence générale.
