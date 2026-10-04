@@ -436,3 +436,11 @@ Transmission 02 : diagnostiquer sans achat le blocage de génération ; ne bench
 - Aucun jeton Codex/cookie récupéré, aucun accès élargi, aucun achat; garde API payante conservée. Une installation locale OSS dispose d’un parcours distinct mais n’a pas été substituée au site ni connectée dans ce lot.
 - Blocage : client autorisé pour le site hébergé absent/non vérifié. Prochaine étape : compléter la demande d’éligibilité avec les coordonnées choisies par Alan; attendre une autorisation réelle avant OAuth hébergé.
 - Sources : https://developers.openai.com/siwc/request-client-id ; https://developers.openai.com/siwc/website ; https://developers.openai.com/siwc/token-sharing-open-source .
+
+## 4 octobre 2026 — continuation sans crédit API acheté
+- Connexion MultipleChat Smart et Project CORE SYNC vérifiés; CORE-SYNC re-synchronisé, test OK reçu. Confrontation ultérieure persistée mais réponse tronquée; aucun avis complet ni pont automatique prouvé.
+- Demande officielle d’éligibilité SIWC reçue par OpenAI (confirmation visible). Demande technique envoyée au support MultipleChat avec accord humain; copie retrouvée dans Outlook. Aucun droit d’inférence obtenu à cette étape; aucun achat.
+- Correction applicative : Pause/Reprendre commande désormais le contrôleur de dictée navigateur en mode sans API, au lieu de ne viser que MediaRecorder. Le nouveau démarrage efface l’ancienne erreur vocale. Texte conservé; pas d’envoi automatique.
+- Vérification : 91/91 tests, TypeScript, lint ciblé sans erreur et build réussis. Tests du contrôleur couvrent pause/reprise et arrêt pendant pause; microphone réel/Fold non utilisé dans ce lot.
+- Source b90d03fdf580e7f8bca3e3b9e79953c50b54322e publiée en privé : appgdep_6ac2cb379dac8191b67a114273394f52 succeeded, revision 6. Clé API payante toujours masquée par défaut.
+- Prochaines actions : essai vocal Fold quand Alan est disponible; poursuivre les actions Microsoft déterministes; intégrer seulement un transport IA autorisé et testé lorsque disponible.
