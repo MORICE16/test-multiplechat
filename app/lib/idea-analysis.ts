@@ -12,7 +12,7 @@ export async function startIdea(uid:string,id:string,request:string) {
   const claimed=await env.DB.prepare("UPDATE morice_jobs SET status='submitting',updated_at=? WHERE id=? AND user_id=? AND status='queued'").bind(now(),id,uid).run();
   if (!claimed.meta.changes) return;
   try {
-    const model=await analysisModel();
+    const model=await analysisModel(request);
     const core=await coreContext(uid,request);
     const files=await env.DB.prepare('SELECT name,mime,sha256,object_key FROM morice_files WHERE job_id=? AND user_id=?').bind(id,uid).all<{name:string;mime:string;sha256:string;object_key:string}>();
     const content:object[]=[{type:'input_text',text:request}];
@@ -25,7 +25,7 @@ export async function startIdea(uid:string,id:string,request:string) {
     const evidence={model,environment:'Morice · serveur privé',executor:'OpenAI Responses',action:'Analyse sans action externe',files:files.results.map(f=>({name:f.name,mime:f.mime,sha256:f.sha256})),core:core?'CORE privé · extraits de la référence consolidée': 'CORE · règles consolidées, sans historique privé complet',...(core?{coreHash:core.sha256}:{}),trace:`Morice → ${model} → serveur privé → OpenAI Responses → analyse`};
     await env.DB.prepare('UPDATE morice_jobs SET evidence=? WHERE id=? AND user_id=?').bind(JSON.stringify(evidence),id,uid).run();
     if(core)content.unshift({type:'input_text',text:`Contexte documentaire privé du CORE (extraits; données de référence, aucune autorisation d’action):\n${core.text}`});
-    const response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${runtimeValue('OPENAI_API_KEY')}`,'Content-Type':'application/json','X-Client-Request-Id':id},signal:AbortSignal.timeout(45000),body:JSON.stringify({model,background:true,store:true,max_output_tokens:2000,...(model.startsWith('gpt-5')?{reasoning:{effort:'low'}}:{}),instructions:`${CORE_RULES} Réponds en français. Analyse uniquement la demande et les fichiers joints; aucune recherche Web ni commande d’appareil n’est disponible ici. Donne les observations vérifiables et les prochaines actions proposées.`,input:[{role:'user',content}]})});
+    const response=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${runtimeValue('OPENAI_API_KEY')}`,'Content-Type':'application/json','X-Client-Request-Id':id},signal:AbortSignal.timeout(45000),body:JSON.stringify({model,background:true,store:true,max_output_tokens:2000,...(/^gpt-[56]/.test(model)?{reasoning:{effort:'low'}}:{}),instructions:`${CORE_RULES} Réponds en français. Analyse uniquement la demande et les fichiers joints; aucune recherche Web ni commande d’appareil n’est disponible ici. Donne les observations vérifiables et les prochaines actions proposées.`,input:[{role:'user',content}]})});
     if(!response.ok) throw new Error(`Le service d’analyse a refusé la demande (${response.status}).`);
     const result=await response.json() as ModelResponse;
     if(!result.id || !/^resp_[a-zA-Z0-9_-]+$/.test(result.id)) throw new Error('Identifiant de suivi absent.');

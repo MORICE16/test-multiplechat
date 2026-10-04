@@ -7,8 +7,12 @@ import { createJob, startResearch, transitionJob } from "@/app/lib/jobs";
 import { isExplicitMailPreview } from "@/app/lib/mail-triage";
 import { fetchOpenClawDiagnostic } from "@/app/lib/openclaw-diagnostic";
 
+import { routeModel } from "@/app/lib/model-router";
+
 type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "answer";
 type Plan = {
+  model?: string;
+  routingReason?: string;
   intent: Intent;
   title: string;
   reply: string;
@@ -77,12 +81,13 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
     },
     required: ["intent", "title", "reply", "requiresApproval", "provider", "operation", "payload"],
   };
+  const routing = await routeModel("conversation", message);
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     signal: AbortSignal.timeout(60_000),
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: runtimeValue("OPENAI_MODEL") || "gpt-5-mini",
+      model: routing.model,
       store: false,
       input: [
         { role: "system", content: "L’intention mail_triage est maintenant disponible pour préparer un classement de mails : lecture réelle de 100 messages récents au maximum dans la boîte de réception du seul compte Microsoft connecté, depuis janvier 2025; propositions par mots-clés dans les objets et expéditeurs, sans déplacement ni modification. Utilise cette intention pour examiner, organiser ou préparer le tri demandé. Le résultat serveur précise le périmètre; plusieurs comptes ou tous les dossiers ne sont pas encore couverts. Ne confonds jamais comptes et messages. Pour appliquer les catégories, Alan doit ouvrir Emails, sélectionner jusqu’à 10 messages et confirmer le lot. Une permission Microsoft supplémentaire peut être nécessaire. Ne prétends pas avoir appliqué des catégories depuis cet aperçu." },
@@ -97,7 +102,7 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
       max_output_tokens: 2400,
     }),
   });
-  const result = await response.json() as { status?: string; output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }>; error?: { code?: string } };
+  const result = await response.json() as { model?: string; status?: string; output_text?: string; output?: Array<{ content?: Array<{ text?: string }> }>; error?: { code?: string } };
   if (!response.ok) throw new Error(planningError(response.status, result.error?.code));
   if (result.status === "incomplete") throw new Error("La réponse OpenAI est incomplète. Réessaie avec une demande plus courte.");
   const outputText = result.output_text || result.output?.flatMap(item => item.content || []).map(item => item.text || "").join("") || "";
@@ -107,6 +112,8 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
   if (!plan.title?.trim()) plan.title = conciseTitle(message);
   if (mode === "approval" && !writeIntents.has(plan.intent)) return localPlan(message, "approval");
   if (writeIntents.has(plan.intent)) plan.requiresApproval = true;
+  plan.model = result.model || routing.model;
+  plan.routingReason = routing.reason;
   return plan;
 }
 
@@ -129,6 +136,7 @@ export async function POST(request: Request) {
   if (!["auto", "task", "memory", "approval"].includes(mode)) return Response.json({ error: "Type de demande invalide." }, { status: 400 });
 
   const respond = async (payload: { ok: boolean; reply: string; action: Record<string, unknown> }) => {
+    if (plan?.model) payload.action = { ...payload.action, model: plan.model, routingReason: plan.routingReason };
     try {
       await env.DB.batch([
         env.DB.prepare("INSERT INTO morice_messages(user_id,role,text,action,created_at) VALUES(?,'user',?,'',?)").bind(uid, message, now()),

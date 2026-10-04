@@ -44,6 +44,8 @@ type InstallState = "checking" | "available" | "manual" | "installed";
 type ChatMessage = { id: string; role: "user" | "assistant" | "error"; text: string; action?: AssistantAction };
 
 type AssistantAction = {
+  model?: string;
+  routingReason?: string;
   jobId?: string;
   citations?: Citation[];
   checkedAt?: string;
@@ -602,7 +604,7 @@ function CommandPanel({ onPause, audioUrl, audioExtension, onRetry, onDiscard, d
     {audioUrl && voicePhase !== "stopping" && <div className="audio-recovery" role="group" aria-label="Audio conservé"><p>Votre audio reste disponible dans cette page jusqu’à sa fermeture.</p><button onClick={onRetry}>Réessayer la transcription</button><a href={audioUrl} download={`morice-dictee.${audioExtension}`}>Télécharger l’audio</a><button className="secondary" onClick={onDiscard}>Effacer l’audio</button></div>}
     <div className="conversation-log" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions text" ref={logRef}>
       {messages.length === 0 && <div className="conversation-empty"><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /><h3>Qu’avez-vous en tête ?</h3><p>Écrivez votre demande ou dictez-la. Vous gardez la main sur chaque action.</p></div>}
-      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><ResultText text={entry.text} citations={entry.action?.citations} /><CopyMessage text={entry.text}/>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<ResponsePlayer disabled={listening || voicePhase === "stopping"} text={entry.text.replace(/[^]*/g, "")} /></div>}</article>)}
+      {messages.map(entry => <article key={entry.id} className={"chat-message " + entry.role}><span className="message-author">{entry.role === "user" ? "Vous" : entry.role === "error" ? "Demande non aboutie" : "Morice"}</span><ResultText text={entry.text} citations={entry.action?.citations} /><CopyMessage text={entry.text}/>{entry.action && <div className="message-actions"><span>{entry.action.label}</span>{entry.action.model && <span title={entry.action.routingReason}>Modèle : {entry.action.model}</span>}{entry.action.view !== "chat" && <button onClick={() => onOpenAction(entry.action!.view)}>Voir le résultat →</button>}<ResponsePlayer disabled={listening || voicePhase === "stopping"} text={entry.text.replace(/[^]*/g, "")} /></div>}</article>)}
       {assistantBusy && <article className="chat-message assistant pending"><span className="message-author">Morice</span><MoriceCompanion state="working" label="Morice travaille" /><p>Je m’occupe de votre demande<span className="thinking-dots" aria-hidden="true">…</span></p></article>}
     </div>
     {messages.length === 0 && <div className="examples"><button disabled={locked} onClick={() => setMessage("Quelles sont mes tâches prioritaires ?")}>Organiser ma journée</button><button disabled={locked} onClick={() => setMessage("Prépare un mail de suivi à mon client")}>Préparer un email</button><button disabled={locked} onClick={() => setMessage("Mémorise une information importante : ")}>Garder une idée</button></div>}

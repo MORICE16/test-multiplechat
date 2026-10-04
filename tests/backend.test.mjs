@@ -42,6 +42,7 @@ async function fixture() {
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const connection=(...a)=>f.microsoftConnection(...a);
       const fetch=(...a)=>f.fetch(...a);
+      const routeModel=async()=>({model:'gpt-5-mini',reason:'Test de transport isolé'});
       const coreContext=(...a)=>f.coreContext?.(...a) || Promise.resolve(null);
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
@@ -150,7 +151,7 @@ test('conversation persists across route instances and only owner memory reaches
     await route.POST(request({message:'Secret Bob',mode:'memory'},'bob'));
     await route.POST(request({message:'Vérifier le suivi projet',mode:'task'}));
     const result=await route.POST(request({message:'Quel est mon code de test ?',mode:'auto'}));
-    assert.equal(result.status,200); const sent=JSON.stringify(f.lastInput);
+    assert.equal(result.status,200); const answer=await result.clone().json(); assert.equal(answer.action.model,'gpt-5-mini'); const sent=JSON.stringify(f.lastInput);
     assert.match(sent,/LILAS/); assert.match(sent,/task, open/); assert.doesNotMatch(sent,/Secret Bob/); assert.equal(f.lastInput.store,false);
     const data=await (await route.GET(new Request('https://morice.test/api'))).json(); assert.equal(data.messages.length,6);
     assert.equal(data.messages[0].role,'user'); assert.equal(data.messages[1].role,'assistant');

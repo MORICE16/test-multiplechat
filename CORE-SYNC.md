@@ -110,3 +110,12 @@ Importer les fichiers techniques actuels du dépôt existant, branche main, puis
 - Code, main GitHub et Sites accessibles. Navigateur de contrôle indisponible après relance; tests visuels et voix Fold non renouvelés.
 - Runtime : journaux récents assistant, calendrier et travaux HTTP 200. Relecture des boîtes via accès direct refusée HTTP 401; ne pas annoncer ces lectures comme prouvées.
 - Conserver le briefing quotidien 04 existant. MultipleChat reste une dépendance uniquement pour les décisions architecturales correspondantes.
+
+## Reprise DEV — 4 octobre 2026 : routage commun
+- Main 01172745 lu et intégré sans écraser de changement local ; derniers journaux et core-state consultés.
+- Conversation, recherche et analyse raccordées au routeur existant : sélection par difficulté parmi le catalogue réel, sans dépendre du pin OPENAI_MODEL pour toutes les demandes.
+- Modèle utilisé enregistré dans l’historique de conversation et affiché sous la réponse. La présence au catalogue ne constitue pas une preuve d’exécution.
+- GPT-6 : activation automatique conditionnée à OPENAI_ROUTING_VERIFIED_MODELS après benchmark runtime borné ; Astra/pro exclus pour limiter les coûts. Aucun achat ni rechargement.
+- TypeScript, lint, 86 tests et build réussis localement. Tests externes et publication consignés séparément après leur résultat.
+- MAKE-NOTIF-001 reste prioritaire : session Make non authentifiée dans le navigateur accessible ; arrêt du scénario non prouvé. Aucun déclenchement de webhook.
+- Sources officielles consultées : https://developers.openai.com/api/docs/guides/model-selection ; https://developers.openai.com/api/docs/models ; https://developers.openai.com/api/reference/resources/models .
