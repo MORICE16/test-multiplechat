@@ -347,6 +347,25 @@ RADAR filtré : le récapitulatif OpenAI DevDay retrouvé aujourd’hui regroupe
 
 Transmission 02 : diagnostiquer sans achat le blocage de génération ; ne benchmarker les modèles autorisés qu’après réponse du service ; maintenir Make inactif et inspecter/corriger son scénario avant toute réactivation ; poursuivre `OAI-SUBSCRIPTION-001` seulement après éligibilité, consentement explicite et confrontation MultipleChat. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-05 19:55 Europe/Paris — accès fournisseurs en attente et dictée corrigée
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `4ecd83ae` ; comparaison `3de37d0f…4ecd83ae` LU (5 commits, 3 fichiers modifiés) ; journal DEV du 04/10 LU ; contexte conversationnel récent PARTIEL ; documentation officielle et actualités fournisseurs vérifiées le 05/10. Git local, runtime privé, session OpenClaw/Android, MultipleChat interactif et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Changements matériels depuis le bilan du 04/10 :
+- `OAI-SUBSCRIPTION-001` : la demande officielle d’éligibilité Sign in with ChatGPT pour le site hébergé a été envoyée avec validation humaine et sa réception a été confirmée. Aucun client autorisé, jeton d’inférence ni droit au forfait n’a encore été accordé. Statut : `TESTER / BLOQUÉ FOURNISSEUR` ; attendre une autorisation réelle avant tout OAuth ou adaptateur.
+- `MC-SYNC-001` : la connexion MultipleChat Smart et le Project CORE SYNC ont été vérifiés ; CORE-SYNC a été re-synchronisé et un test « OK » a été reçu. Une confrontation ultérieure a produit une réponse tronquée : aucun ensemble de deux avis complets et identifiables, aucune API/MCP/CLI ni récupération automatique ne sont prouvés. Statut : `PARTIEL / EN ATTENTE MULTIPLECHAT`, pas OPÉRATIONNEL. Une demande technique a été envoyée au support avec accord humain ; aucune réponse utile consignée.
+- Dictée sans API payante : Pause/Reprendre pilote maintenant le contrôleur de reconnaissance navigateur et un nouveau démarrage efface l’ancienne erreur vocale. Source `b90d03fd` publiée ; déploiement privé réussi selon le journal DEV. 91 tests, TypeScript, lint ciblé et build réussis sont consignés. Le microphone réel sur Fold reste NON TESTÉ ; ne pas annoncer une validation mobile.
+- Contexte récent : Alan signale un parcours OpenClaw/Android affiché « connecté/appairé » après autorisation biométrique, puis aucun effet visible et un bug. Les captures et le runtime ne sont pas accessibles à 04 ; aucune cause ni correction n’est donc revendiquée. Nouveau blocage `OPENCLAW-MOBILE-001` : `À DIAGNOSTIQUER`, sans nouvel appairage, installation ou permission automatique.
+
+Contradictions mises à jour :
+- Le bilan du 04/10 indiquait que le formulaire SIWC était seulement préparé ; il est désormais envoyé, mais cela ne vaut toujours pas autorisation.
+- Le test MultipleChat « OK » prouve le Re-sync manuel du Project, pas la collecte automatique multi-modèles exigée par `MC-SYNC-001`.
+- La dictée est testée automatiquement au niveau code, pas humainement sur le Fold.
+
+RADAR filtré : aucune nouveauté officielle publiée le 05/10 et dédupliquée ne remplace ou n’améliore immédiatement une brique Morice. Les résultats trouvés concernent des annonces déjà couvertes ou sans pertinence directe ; aucune nouvelle licence, dépense, installation ou migration proposée.
+
+Transmission 02 : attendre les retours OpenAI/MultipleChat sans répéter les demandes ; réaliser un unique test vocal Fold lorsque l’accès humain est disponible ; diagnostiquer `OPENCLAW-MOBILE-001` à partir de l’état réel du nœud et des logs avant de modifier permissions ou installation. Make reste inactif. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
