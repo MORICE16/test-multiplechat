@@ -366,6 +366,23 @@ RADAR filtré : aucune nouveauté officielle publiée le 05/10 et dédupliquée 
 
 Transmission 02 : attendre les retours OpenAI/MultipleChat sans répéter les demandes ; réaliser un unique test vocal Fold lorsque l’accès humain est disponible ; diagnostiquer `OPENCLAW-MOBILE-001` à partir de l’état réel du nœud et des logs avant de modifier permissions ou installation. Make reste inactif. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-06 20:26 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `4dc2a6f8` ; commits récents LU ; contexte conversationnel récent PARTIEL ; RADAR officiel vérifié le 06/10. Git local, runtime privé, OpenClaw/Android, MultipleChat interactif, Make authentifié et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Aucun changement matériel depuis le bilan du 05/10. Aucun commit postérieur à `4dc2a6f8` observé ; aucune nouvelle preuve runtime, décision Alan ou contradiction technique pertinente n’est accessible.
+
+Blocages existants inchangés :
+- `OAI-SUBSCRIPTION-001` reste BLOQUÉ FOURNISSEUR : demande d’éligibilité envoyée, aucun client ni droit au forfait accordé.
+- `MC-SYNC-001` reste PARTIEL / EN ATTENTE MULTIPLECHAT : Re-sync manuel prouvé, collecte automatique de deux avis complets non prouvée.
+- `OPENCLAW-MOBILE-001` reste À DIAGNOSTIQUER : appairage affiché, aucune action Android confirmée.
+- Dictée Pause/Reprendre publiée et testée au niveau code ; microphone Fold toujours NON TESTÉ.
+- Make reste consigné inactif ; aucun contrôle authentifié renouvelé aujourd’hui.
+
+RADAR filtré : aucune nouveauté officielle publiée le 06/10 et matériellement pertinente pour remplacer ou améliorer immédiatement une brique Morice. Les résultats retrouvés sur dots, GPT-6 Sol/Luna et Work IQ sont déjà consignés. L’information secondaire sur Codex Auto-review gratuit n’a pas été retenue faute de source officielle correspondante vérifiable. Aucune nouvelle licence, dépense, installation ou migration proposée.
+
+Transmission 02 : aucune consigne nouvelle. Attendre les retours fournisseurs sans relance répétée ; conserver les tests Fold/OpenClaw prévus. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
