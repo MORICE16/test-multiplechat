@@ -383,6 +383,22 @@ RADAR filtré : aucune nouveauté officielle publiée le 06/10 et matériellemen
 
 Transmission 02 : aucune consigne nouvelle. Attendre les retours fournisseurs sans relance répétée ; conserver les tests Fold/OpenClaw prévus. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-07 19:52 Europe/Paris — alerte HTTP Shortcuts répétitive identifiée
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `fe3133b0` ; commits récents LU ; capture Android autonome du 07/10 LU ; contexte conversationnel récent PARTIEL ; RADAR officiel vérifié le 07/10. Git local, runtime privé Morice, journaux HTTP Shortcuts, HubSpot, OpenClaw/Android, MultipleChat interactif, Make authentifié et historique exhaustif des conversations INACCESSIBLES dans cette exécution.
+
+Changement matériel :
+- Nouveau blocage `HTTP-SHORTCUTS-001` : la capture Android affiche une notification émise par l’application **HTTP Shortcuts** pour le raccourci **« Morice - HubSpot Auto Silent »**. L’exécution échoue avec `400 (Bad Request)`, puis `Queue is full`. Le nom rattache ce raccourci à l’écosystème Morice/HubSpot, mais ne prouve pas que la notification vient du site Morice ni que le serveur Morice est la cause du 400.
+- L’alerte est signalée comme répétitive et interruptive. Aucun arrêt n’est effectué par 04 : l’appareil, la configuration du raccourci, son déclencheur et ses journaux ne sont pas accessibles ici ; désactiver globalement HTTP Shortcuts risquerait de couper d’autres automatisations non inventoriées.
+- Statut : `À DIAGNOSTIQUER / PRIORITAIRE`. La file pleine indique des déclenchements qui s’accumulent après échec ; la cause précise (charge utile, URL, authentification, planification ou concurrence) reste NON PROUVÉE.
+
+Contradictions et état existant : aucun commit postérieur à `fe3133b0`, aucune nouvelle preuve runtime et aucune décision fournisseur. `OAI-SUBSCRIPTION-001`, `MC-SYNC-001` et `OPENCLAW-MOBILE-001` restent inchangés. Make reste consigné inactif.
+
+RADAR filtré : les annonces officielles du 07/10 relues ne remplacent ni ne simplifient une brique Morice immédiatement. La provenance textuelle OpenAI annoncée pour l’Union européenne n’est pas retenue comme changement d’architecture. Aucune nouvelle licence, dépense, installation ou migration proposée.
+
+Transmission 02 : identifier dans HTTP Shortcuts le déclencheur de « Morice - HubSpot Auto Silent », lire son historique et l’URL de destination sans exposer de secret, puis suspendre uniquement ce raccourci ou son déclencheur si le lien avec les alertes est confirmé. Conserver la configuration avant modification et vérifier l’arrêt des notifications sans désactiver globalement l’application. Diagnostiquer le premier `400` avant tout rejeu. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
