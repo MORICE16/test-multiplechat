@@ -399,6 +399,22 @@ RADAR filtré : les annonces officielles du 07/10 relues ne remplacent ni ne sim
 Transmission 02 : identifier dans HTTP Shortcuts le déclencheur de « Morice - HubSpot Auto Silent », lire son historique et l’URL de destination sans exposer de secret, puis suspendre uniquement ce raccourci ou son déclencheur si le lien avec les alertes est confirmé. Conserver la configuration avant modification et vérifier l’arrêt des notifications sans désactiver globalement l’application. Diagnostiquer le premier `400` avant tout rejeu. Aucun code fonctionnel modifié par 04.
 
 
+
+### 2026-10-08 20:17 Europe/Paris — changement fournisseur OpenAI, aucun changement applicatif
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `444b7956` ; commits récents et recherche de référence `gpt-5.5` dans le dépôt LU ; contexte conversationnel récent PARTIEL ; documentation officielle OpenAI vérifiée le 08/10. Git local, runtime privé, réglages Work/Codex du compte, HTTP Shortcuts/Android, MultipleChat interactif, Make authentifié et historique exhaustif des conversations INACCESSIBLES.
+
+État technique : aucun commit postérieur à `444b7956`, aucune nouvelle preuve runtime et aucun changement de code fonctionnel. La recherche du dépôt ne retourne aucune référence `GPT-5.5` ou `gpt-5.5`.
+
+RADAR filtré :
+- OpenAI déploie le 08/10 GPT-6 avec Intelligent UI dans l’onglet Chat pour Plus, Pro, Business et Enterprise, puis Free/Go à partir du 09/10. Statut : `DISPONIBLE / DÉPLOIEMENT COMPTE À CONFIRMER`. La source précise que ce lancement ne modifie pas les modèles de ChatGPT Work ni de Codex : il ne fournit donc aucun transport d’inférence supplémentaire au runtime Morice et ne rend pas transférables les quotas MultipleChat.
+- `OAI-MODEL-RETIRE-001` : GPT-5.5 doit être retiré de ChatGPT, ChatGPT Work et Codex le 14/10/2026 ; l’API OpenAI n’est pas concernée. Statut : `À VÉRIFIER / ÉCHÉANCE FOURNISSEUR`. Aucun impact dans le dépôt n’est prouvé, mais les réglages enregistrés, valeurs par défaut d’espace, agents personnalisés, tâches planifiées et scripts hors dépôt pourraient encore sélectionner ce modèle.
+- GPT-6.1 Sol Ultrafast est disponible le 08/10 dans Work/Codex seulement pour Pro 500 et certaines offres Enterprise/Edu. Statut : `DISPONIBLE SOUS DROITS / NE PAS ACHETER` ; aucun gain exploitable pour Morice sans droit existant et aucun changement de routage proposé.
+
+Blocages existants inchangés : `HTTP-SHORTCUTS-001` reste prioritaire et non suspendu par 04 ; `OAI-SUBSCRIPTION-001`, `MC-SYNC-001` et `OPENCLAW-MOBILE-001` restent dans leurs statuts précédents. Make reste consigné inactif.
+
+Transmission 02 : avant le 14/10, vérifier en lecture seule les réglages Work/Codex, agents personnalisés et tâches planifiées accessibles pour une éventuelle sélection GPT-5.5 ; remplacer uniquement une référence réellement trouvée par un modèle déjà autorisé, sans achat ni changement global de routage. Aucun travail applicatif nouveau validé.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
