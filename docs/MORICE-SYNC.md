@@ -415,6 +415,19 @@ Blocages existants inchangés : `HTTP-SHORTCUTS-001` reste prioritaire et non su
 Transmission 02 : avant le 14/10, vérifier en lecture seule les réglages Work/Codex, agents personnalisés et tâches planifiées accessibles pour une éventuelle sélection GPT-5.5 ; remplacer uniquement une référence réellement trouvée par un modèle déjà autorisé, sans achat ni changement global de routage. Aucun travail applicatif nouveau validé.
 
 
+
+### 2026-10-09 19:52 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `b8ac158c` ; commits récents LU ; contexte conversationnel récent PARTIEL ; RADAR officiel vérifié le 09/10. Git local, runtime privé, réglages Work/Codex du compte, HTTP Shortcuts/Android, MultipleChat interactif, Make authentifié et historique exhaustif des conversations INACCESSIBLES.
+
+Aucun changement matériel depuis le bilan du 08/10. Aucun commit postérieur à `b8ac158c`, aucune nouvelle preuve runtime, décision Alan ou contradiction technique relative à Morice n’est accessible.
+
+Blocages et échéance inchangés : `HTTP-SHORTCUTS-001` reste prioritaire ; `OAI-SUBSCRIPTION-001`, `MC-SYNC-001` et `OPENCLAW-MOBILE-001` conservent leurs statuts ; `OAI-MODEL-RETIRE-001` reste à vérifier avant le retrait de GPT-5.5 le 14/10. Make reste consigné inactif.
+
+RADAR filtré : aucune nouveauté officielle publiée le 09/10 et matériellement pertinente pour remplacer ou améliorer immédiatement une brique Morice. Les résultats retrouvés sont des cas clients, annonces déjà couvertes ou offres sans droit confirmé ; aucune nouvelle licence, dépense, installation ou migration proposée.
+
+Transmission 02 : aucune consigne nouvelle. Conserver les vérifications déjà prévues, sans relance fournisseur ni modification globale de routage. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
