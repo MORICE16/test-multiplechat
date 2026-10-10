@@ -428,6 +428,24 @@ RADAR filtré : aucune nouveauté officielle publiée le 09/10 et matériellemen
 Transmission 02 : aucune consigne nouvelle. Conserver les vérifications déjà prévues, sans relance fournisseur ni modification globale de routage. Aucun code fonctionnel modifié par 04.
 
 
+
+### 2026-10-10 19:36 Europe/Paris — Android CLI officiel à confronter à ARTEMIS/OpenClaw
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `c9a85e33` ; commits récents LU ; contexte conversationnel récent PARTIEL ; documentation officielle Android, OpenAI et Make vérifiée le 10/10. Git local, runtime privé, Fold/ADB, Android CLI, HTTP Shortcuts, OpenClaw, MultipleChat interactif et Make authentifié INACCESSIBLES.
+
+État technique : aucun commit applicatif postérieur au dernier contrôle, aucune nouvelle preuve runtime et aucun code fonctionnel modifié.
+
+Changement matériel RADAR :
+- Nouveau dossier `ANDROID-CLI-001` : Google fournit officiellement Android CLI, documenté le 25/09 et mis à jour le 02/10. L’outil peut gérer des appareils virtuels, installer des APK, inspecter l’écran et la hiérarchie UI depuis le terminal, installer une compétence pour des agents comme Codex, et connecter par ADB des appareils physiques distants réservés.
+- Gain possible pour Morice : diagnostic reproductible de l’application Android et de l’état UI, avec commandes officielles et sorties terminales, complémentaire d’OpenClaw et candidat de comparaison avec ARTEMIS. Cela ne prouve ni le contrôle du Fold actuel ni la résolution de `OPENCLAW-MOBILE-001`.
+- Compatibilité/limites : Windows est supporté pour l’installation, mais la commande d’émulateur Android CLI y est actuellement désactivée ; l’usage avec le Fold local exige ADB/débogage autorisé et un accès PC réel. La télémétrie de commandes est active par défaut mais peut être désactivée avec `--no-metrics`. Les appareils distants exigent authentification Google et projet Cloud ; droits et coûts ne sont pas vérifiés.
+- Décision : `TESTER / À VALIDER PAR ALAN` dans un environnement borné avant toute installation. Comparer `Android CLI vs ARTEMIS vs OpenClaw` sur un même scénario de lecture d’écran et de navigation, sans commande sensible ni nouvelle permission permanente.
+- Make Skills pour Claude/Codex est disponible en bêta ouverte avec plus de 100 outils MCP et peut modifier scénarios et connexions en direct. Non retenu pour l’instant : Make est volontairement inactif, To Do passe déjà par Graph et l’installation créerait un nouveau pouvoir d’écriture non validé.
+
+Blocages existants inchangés : `HTTP-SHORTCUTS-001`, `OAI-SUBSCRIPTION-001`, `MC-SYNC-001`, `OPENCLAW-MOBILE-001` et `OAI-MODEL-RETIRE-001`. Aucune licence, dépense, installation ou migration effectuée.
+
+Transmission 02 : aucune installation transmise. Ajouter Android CLI au dossier de confrontation Android et préparer seulement un protocole de test/retour arrière ; exécution après validation Alan et accès PC/Fold. Aucun travail nouveau sur Make.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
