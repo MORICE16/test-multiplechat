@@ -446,6 +446,19 @@ Blocages existants inchangés : `HTTP-SHORTCUTS-001`, `OAI-SUBSCRIPTION-001`, `M
 Transmission 02 : aucune installation transmise. Ajouter Android CLI au dossier de confrontation Android et préparer seulement un protocole de test/retour arrière ; exécution après validation Alan et accès PC/Fold. Aucun travail nouveau sur Make.
 
 
+
+### 2026-10-11 20:04 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `bb76ebe8` ; commits récents LU ; contexte conversationnel récent PARTIEL ; RADAR officiel vérifié le 11/10. Git local, runtime privé, Fold/ADB, Android CLI, HTTP Shortcuts, OpenClaw, MultipleChat interactif, Make authentifié et réglages Work/Codex INACCESSIBLES.
+
+Aucun changement matériel depuis le bilan du 10/10. Aucun commit postérieur à `bb76ebe8`, aucune nouvelle preuve runtime, décision Alan ou contradiction technique relative à Morice n’est accessible.
+
+Blocages, dossiers et échéance inchangés : `ANDROID-CLI-001` reste TESTER / À VALIDER ; `HTTP-SHORTCUTS-001`, `OAI-SUBSCRIPTION-001`, `MC-SYNC-001`, `OPENCLAW-MOBILE-001` et `OAI-MODEL-RETIRE-001` conservent leurs statuts. Make reste consigné inactif.
+
+RADAR filtré : aucune nouveauté officielle publiée le 11/10 ne remplace ou n’améliore immédiatement une brique Morice avec les droits actuels. Le modèle Microsoft-Decision-1 annoncé le 09/10 pourrait théoriquement servir au routage, mais ajouterait un fournisseur et des droits Azure non prouvés alors que le routeur Morice existe déjà ; piste non retenue sans coût, disponibilité compte et bénéfice mesuré. Les autres résultats sont déjà couverts ou hors périmètre. Aucune licence, dépense, installation ou migration proposée.
+
+Transmission 02 : aucune consigne nouvelle. Préparer seulement les vérifications déjà enregistrées, sans installer Android CLI ni modifier le routage avant validation. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
