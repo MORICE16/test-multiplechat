@@ -459,6 +459,18 @@ RADAR filtré : aucune nouveauté officielle publiée le 11/10 ne remplace ou n�
 Transmission 02 : aucune consigne nouvelle. Préparer seulement les vérifications déjà enregistrées, sans installer Android CLI ni modifier le routage avant validation. Aucun code fonctionnel modifié par 04.
 
 
+### 2026-10-12 19:56 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `869510b8` ; commits récents LU ; contexte conversationnel accessible PARTIEL ; RADAR officiel vérifié le 12/10. Git local, runtime privé, Fold/ADB, Android CLI, HTTP Shortcuts, OpenClaw, MultipleChat interactif, Make authentifié et réglages Work/Codex INACCESSIBLES.
+
+Aucun changement matériel depuis le bilan du 11/10. Aucun commit postérieur à `869510b8`, aucune nouvelle preuve runtime, décision Alan ou contradiction technique relative à Morice n’est accessible.
+
+Blocages, dossiers et échéance inchangés : `ANDROID-CLI-001` reste TESTER / À VALIDER ; `HTTP-SHORTCUTS-001`, `OAI-SUBSCRIPTION-001`, `MC-SYNC-001`, `OPENCLAW-MOBILE-001` et `OAI-MODEL-RETIRE-001` conservent leurs statuts. Make reste consigné inactif.
+
+RADAR filtré : aucune nouveauté officielle publiée le 12/10 ne remplace ou n’améliore immédiatement une brique Morice avec les droits actuels. Les mises à jour OpenAI retrouvées pour la semaine du 05 au 09/10 (dot mobile et mode Ultrafast GPT-6.1 Sol sous droits) sont déjà couvertes ou n’apportent aucun accès prouvé au compte Morice. Aucune licence, dépense, installation ou migration proposée.
+
+Transmission 02 : aucune consigne nouvelle. Maintenir les vérifications déjà enregistrées, notamment l’échéance GPT-5.5 du 14/10, sans installer Android CLI ni modifier le routage avant validation. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
