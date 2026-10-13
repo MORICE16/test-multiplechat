@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T22:40:18.010Z
-Commit source au moment de la génération : `9b4d3d903764fb93089e9337b6010d1714203f13`
+Généré : 2026-10-13T22:42:38.079Z
+Commit source au moment de la génération : `e680b4fc401002a4143b5801ac49f8b2f1bd6035`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -114,12 +114,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/lib/dictation.ts
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- public/sw.js
-- tests/dictation.test.mjs
 
 ## Reprise MultipleChat
 
