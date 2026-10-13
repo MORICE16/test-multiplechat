@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T22:15:19.052Z
-Commit source au moment de la génération : `455846eb6b645dba71824f3d909ed7236863d1d1`
+Généré : 2026-10-13T22:40:18.010Z
+Commit source au moment de la génération : `9b4d3d903764fb93089e9337b6010d1714203f13`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -31,6 +31,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.
 - 13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.
 - 14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut.
+- 14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée.
 
 ## Tests
 
@@ -53,6 +54,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.
 - 13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.
 - 14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis.
+- 14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.
 
 ## En cours
 
@@ -112,7 +114,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/lib/dictation.ts
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- public/sw.js
+- tests/dictation.test.mjs
 
 ## Reprise MultipleChat
 

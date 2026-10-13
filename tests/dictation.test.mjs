@@ -73,3 +73,30 @@ test('manual stop while paused prevents automatic resumption',()=>{
   const h=harness();h.controller.setAvailable(false);h.controller.start('Conserver');assert.equal(h.states.at(-1),'paused');
   h.controller.stop();h.controller.setAvailable(true);h.tick();assert.equal(h.states.at(-1),'ready');assert.equal(h.instances.length,0);
 });
+
+test('provisional echo of a final phrase is not displayed twice; actual final repetition survives',()=>{
+  const h=harness();h.controller.start();const r=h.instances[0];
+  result(r,['écouter la dictée',true],['Écouter la dictée.',false]);
+  assert.equal(h.texts.at(-1),'écouter la dictée');
+  result(r,['écouter la dictée',true],['écouter la dictée',true]);
+  assert.equal(h.texts.at(-1),'écouter la dictée écouter la dictée');
+  h.controller.dispose();
+});
+test('automatic restart replaces replayed provisional words and their revisions without losing final text',()=>{
+  const h=harness();h.controller.start('Note :');const first=h.instances[0];
+  result(first,['Bonjour',true],['écouter la dictée',false]);first.onend();h.tick();const second=h.instances[1];
+  result(second,['écouter',false]);assert.equal(h.texts.at(-1),'Note : Bonjour écouter la dictée');
+  result(second,['écouter la dictée demain',true]);
+  assert.equal(h.texts.at(-1),'Note : Bonjour écouter la dictée demain');
+  h.controller.stop();second.onend();assert.equal(h.states.at(-1),'ready');
+  assert.equal(h.texts.at(-1),'Note : Bonjour écouter la dictée demain');
+});
+test('unrelated speech after an automatic restart keeps unconfirmed words instead of dropping them',()=>{
+  const h=harness();h.controller.start();result(h.instances[0],['écouter la dictée',false]);
+  h.instances[0].onend();h.tick();result(h.instances[1],['demain matin',true]);
+  assert.equal(h.texts.at(-1),'écouter la dictée demain matin');h.controller.dispose();
+});
+test('manual new dictation does not remove an intentionally repeated phrase from the initial draft',()=>{
+  const h=harness();h.controller.start('écouter la dictée');result(h.instances[0],['écouter la dictée',true]);
+  assert.equal(h.texts.at(-1),'écouter la dictée écouter la dictée');h.controller.dispose();
+});

@@ -25,7 +25,10 @@ export function createDictation(options: Options) {
   let current: Recognition | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let text = "", failures = 0, quietEnds = 0;
+  let provisionalReplay: { base: string; provisional: string } | null = null;
   const join = (...parts: string[]) => parts.map(p => p.trim()).filter(Boolean).join(" ");
+  const words = (value: string) => value.trim().split(/\s+/).filter(Boolean).map(word => word.normalize('NFC').toLocaleLowerCase('fr').replace(/[.,!?;:]+$/u, ''));
+  const sameWords = (first: string, second: string) => words(first).join(' ') === words(second).join(' ');
   function clearTimer() { if (timer !== null) cancel(timer); timer = null; }
   function detach(recognition: Recognition) {
     recognition.onstart = recognition.onresult = recognition.onerror = recognition.onend = null;
@@ -42,7 +45,23 @@ export function createDictation(options: Options) {
     try { recognition = options.create(); } catch { fail("La reconnaissance vocale est indisponible dans ce navigateur."); return; }
     current = recognition;
     const base = text;
+    const pending = provisionalReplay; provisionalReplay = null;
+    let replaying = false;
     let finalText = "", interimText = "", networkError = false;
+    function render() {
+      const transcript = join(finalText, interimText);
+      if (pending && transcript) {
+        const previous = words(pending.provisional), next = words(transcript);
+        if (previous.length && next.length && next.slice(0, Math.min(previous.length, next.length)).every((word, index) => word === previous[index])) replaying = true;
+      }
+      if (pending && replaying) {
+        // Only provisional text carried across an automatic restart may be
+        // replaced. Final phrases and manually started dictation stay intact.
+        if (!finalText && words(transcript).length < words(pending.provisional).length) return join(pending.base, pending.provisional);
+        return join(pending.base, transcript);
+      }
+      return join(base, transcript);
+    }
     recognition.lang = "fr-FR";
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -54,11 +73,15 @@ export function createDictation(options: Options) {
         const result = event.results[index];
         (result.isFinal ? finals : interim).push(result[0].transcript);
       }
-      const nextFinal = join(...finals), nextInterim = join(...interim);
+      const nextFinal = join(...finals);
+      const candidateInterim = join(...interim);
+      // Some browser events echo the just-finalized phrase as interim text.
+      // Hide that provisional echo, but never deduplicate two final results.
+      const nextInterim = finals.length && sameWords(finals[finals.length - 1], candidateInterim) ? '' : candidateInterim;
       // Empty results sometimes arrive just before onend; keep the useful text.
       if (!nextFinal && !nextInterim) return;
       finalText = nextFinal; interimText = nextInterim;
-      text = join(base, finalText, interimText);
+      text = render();
       failures = 0; quietEnds = 0;
       options.onText(text);
     };
@@ -77,7 +100,9 @@ export function createDictation(options: Options) {
     recognition.onend = () => {
       if (current !== recognition || disposed) return;
       detach(recognition); current = null; clearTimer();
-      text = join(base, finalText, interimText);
+      text = render();
+      provisionalReplay = wanted && interimText ? { base: join(pending && replaying ? pending.base : base, finalText), provisional: interimText }
+        : wanted && !finalText ? pending : null;
       if (!wanted) { stopping = false; options.onState("ready"); return; }
       if (networkError && ++failures >= 3) { fail("Le service vocal est injoignable. Vérifiez votre connexion, puis relancez l’écoute. Votre texte est conservé."); return; }
       options.onState("reconnecting");
@@ -94,12 +119,12 @@ export function createDictation(options: Options) {
   return {
     start(initialText = "") {
       if (disposed || wanted || stopping || current) return;
-      text = initialText; failures = 0; quietEnds = 0; wanted = true;
+      text = initialText; provisionalReplay = null; failures = 0; quietEnds = 0; wanted = true;
       options.onState("starting"); session();
     },
     stop() {
       if (disposed || stopping || !wanted) return;
-      wanted = false; clearTimer();
+      wanted = false; provisionalReplay = null; clearTimer();
       if (!current) { options.onState("ready"); return; }
       stopping = true; options.onState("stopping");
       const old = current;
@@ -123,6 +148,7 @@ export function createDictation(options: Options) {
       if (!wanted || stopping) return;
       clearTimer();
       if (!available) {
+        provisionalReplay = null;
         // Preserve the latest displayed transcript before releasing the browser.
         if (current) { const old = current; current = null; detach(old); try { old.abort(); } catch { /* Already ended. */ } }
         options.onState("paused");
