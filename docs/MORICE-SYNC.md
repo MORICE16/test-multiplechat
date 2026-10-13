@@ -471,6 +471,25 @@ RADAR filtré : aucune nouveauté officielle publiée le 12/10 ne remplace ou n�
 Transmission 02 : aucune consigne nouvelle. Maintenir les vérifications déjà enregistrées, notamment l’échéance GPT-5.5 du 14/10, sans installer Android CLI ni modifier le routage avant validation. Aucun code fonctionnel modifié par 04.
 
 
+### 2026-10-13 20:15 Europe/Paris — finalisation prioritaire validée, PC encore hors ligne
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `35957455` ; commits récents LU ; demande explicite d’Alan du 13/10 et réponse de cadrage accessibles PARTIEL ; état Desktop Commander LU ; RADAR officiel vérifié le 13/10. Git local, runtime privé, version réellement servie, Fold/ADB, HTTP Shortcuts, OpenClaw, MultipleChat interactif, Make authentifié et réglages Work/Codex INACCESSIBLES.
+
+Changement matériel / décision Alan :
+- `DÉCIDÉ / VALIDÉ PAR ALAN le 13/10` : ne pas simplifier Morice par principe si l’architecture actuelle est réellement plus complète, mais cesser d’ajouter des briques tant que le socle existant n’est pas utilisable et mesuré.
+- Objectif immédiat : avancer et finaliser une première version stable. L’ordre validé pour 02 est : établir l’état réel et un point de restauration ; éliminer les notifications/erreurs et consommations inutiles ; faire fonctionner un parcours complet de bout en bout ; stabiliser les modules déjà commencés avec statuts `OPÉRATIONNEL / PARTIEL / BLOQUÉ / BACKLOG`.
+- Critère de réussite : utilisation réelle de Morice sur le téléphone pour plusieurs actions quotidiennes, avec résultat et historique conservés, sans erreur parasite. Cette validation autorise la reprise et les corrections dans le périmètre existant ; elle n’autorise pas une nouvelle architecture, un achat, une installation supplémentaire ou un déploiement non vérifié.
+
+Blocage actuel :
+- Alan prévoit d’allumer son ordinateur pour cette phase, mais Desktop Commander signale l’appareil `Alan` `Offline` au contrôle du 13/10 à 20:15 Europe/Paris (dernière présence indiquée il y a 531 h, application 0.2.51). Aucun diagnostic local, test runtime ou changement applicatif ne peut donc être revendiqué par 04.
+- Le blocage est opérationnel mais temporaire : dès que l’appareil est réellement en ligne, 02 peut reprendre sans demander de nouvelle décision sur ce périmètre et doit d’abord vérifier Git local/main, changements non commités, version servie et point de retour arrière.
+
+État dépôt : aucun commit postérieur à `35957455` avant cet ajout ; CORE-SYNC et core-state n’apportent aucune nouvelle preuve runtime. Les dossiers `ANDROID-CLI-001`, `HTTP-SHORTCUTS-001`, `OAI-SUBSCRIPTION-001`, `MC-SYNC-001`, `OPENCLAW-MOBILE-001` et `OAI-MODEL-RETIRE-001` conservent leurs statuts ; Make reste consigné inactif.
+
+RADAR filtré : aucune nouveauté officielle du 13/10 ne justifie une nouvelle brique. Le retrait de GPT-5.5 de ChatGPT, Work et Codex reste annoncé pour le 14/10 ; l’API n’est pas concernée. Le dépôt ne contenait aucune référence lors du contrôle précédent, mais les réglages locaux, agents et tâches restent à vérifier quand l’accès PC est disponible. Aucun achat, licence, installation ou migration proposé.
+
+Transmission 02 : priorité validée à la finalisation du socle existant dès retour du PC, avec preuves avant/après et sans développement dispersé. Commencer par l’inventaire et la sauvegarde, puis traiter `HTTP-SHORTCUTS-001` et un parcours complet minimal ; ne tester Android CLI/ARTEMIS qu’après stabilisation ou si indispensable au diagnostic Android. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
