@@ -15,6 +15,7 @@ export function useJobs(onCompleted: () => void) {
   useEffect(() => { callback.current = onCompleted; }, [onCompleted]);
   const working = useRef(false);
   const lastDone = useRef("");
+  const active = useRef(false);
   async function refresh() {
     if (working.current) return;
     working.current = true;
@@ -22,6 +23,7 @@ export function useJobs(onCompleted: () => void) {
       const response = await fetch("/api/jobs", { method: "POST" });
       if (!response.ok) throw new Error("Le suivi des travaux est momentanément indisponible.");
       const next = await response.json() as QueueData;
+      active.current = next.jobs.some(job => ["queued", "submitting", "running"].includes(job.status));
       const done = next.jobs.filter(j => j.status === "done").map(j => j.id).join(",");
       if (done !== lastDone.current) { lastDone.current = done; callback.current(); }
       setData(next); setError("");
@@ -30,7 +32,7 @@ export function useJobs(onCompleted: () => void) {
   }
   useEffect(() => {
     const timeout = window.setTimeout(() => { void refresh(); }, 0);
-    const timer = window.setInterval(() => { if (!document.hidden) void refresh(); }, 15_000);
+    const timer = window.setInterval(() => { if (!document.hidden && navigator.onLine && active.current) void refresh(); }, 15_000);
     const visible = () => { if (!document.hidden) void refresh(); };
     document.addEventListener("visibilitychange", visible);
     window.addEventListener("online", visible);

@@ -20,7 +20,8 @@
     "Google OAuth privé configuré : comptes isolés, jetons chiffrés serveur, lecture seule; aperçu de 20 messages INBOX par objets et expéditeurs, sans corps ni pièces jointes.",
     "Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.",
     "To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.",
-    "Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI."
+    "Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.",
+    "13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -39,7 +40,8 @@
     "4 octobre : Make Inactive et désactivation du 2 octobre confirmés ; aucun rejeu des 29 éléments en attente.",
     "4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.",
     "4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.",
-    "91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft."
+    "91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.",
+    "13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",
@@ -59,7 +61,8 @@
     "Android : aucune commande d’installation d’applications ou de pilotage libre de l’écran disponible sur le nœud actuel.",
     "Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.",
     "Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.",
-    "Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie."
+    "Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.",
+    "13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne."
   ],
   "Prochaines actions": [
     "Tester caméra et dictée sur le Fold avec le parcours livré.",

@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { now } from "./runtime";
+import { now, runtimeValue } from "./runtime";
 import { createWebResponse, retrieveWebResponse } from "./web-search";
 import { webResult } from "./web-result";
 import { ideaResult } from "./idea-result";
@@ -59,6 +59,10 @@ export async function refreshResearch(uid: string) {
   // Reconcile the remote response only. This endpoint never submits a new search or repeats an external write.
   const jobs = await env.DB.prepare("SELECT * FROM morice_jobs WHERE user_id=? AND status IN ('queued','running','submitting') ORDER BY created_at LIMIT 6").bind(uid).all<Job>();
   for (const job of jobs.results) {
+    if (["web_search", "idea_analysis"].includes(job.operation) && !runtimeValue("OPENAI_API_KEY")) {
+      await transitionJob(uid, job.id, "blocked", "Moteur IA indisponible : API payante désactivée ou non configurée. Demande et identifiant conservés; aucun renvoi automatique.", job.result, JSON.parse(job.evidence || "{}"));
+      continue;
+    }
     if (job.status === "queued" && job.operation === "web_search") { await startResearch(uid, job.id, job.request); continue; }
     if (job.operation === "idea_analysis" && job.response_id) {
       try {
@@ -88,7 +92,7 @@ export async function refreshResearch(uid: string) {
         await completeResearch(uid, job.id, result);
       }
       else if (!["queued", "in_progress"].includes(response.status || "")) await transitionJob(uid, job.id, "blocked", "La recherche s’est arrêtée sans résultat complet. Demande conservée.");
-    } catch (error) {
+    } catch {
       // Keep the response ID for a later read-only reconciliation, including after reconnecting.
       await env.DB.prepare("UPDATE morice_jobs SET error=? WHERE id=? AND user_id=? AND status IN ('running','submitting')").bind("Résultat momentanément inaccessible. Une prochaine lecture reprendra la récupération sans relancer la recherche.", job.id, uid).run();
     }

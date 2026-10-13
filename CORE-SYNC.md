@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-04T21:55:53.684Z
-Commit source au moment de la génération : `b90d03fdf580e7f8bca3e3b9e79953c50b54322e`
+Généré : 2026-10-13T21:21:49.425Z
+Commit source au moment de la génération : `8bc86be04085137a7e36970810473ce0a384b425`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -29,6 +29,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.
 - To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.
 - Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.
+- 13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.
 
 ## Tests
 
@@ -49,6 +50,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.
 - 4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.
 - 91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.
+- 13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.
 
 ## En cours
 
@@ -72,6 +74,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.
 - Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.
 - Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.
+- 13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne.
 
 ## Prochaines actions
 
@@ -107,7 +110,15 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/api/assistant/route.ts
+- app/components/jobs-panel.tsx
+- app/lib/jobs.ts
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- tests/backend.test.mjs
+- tests/jobs-voice.test.mjs
+- docs/STABILISATION-20261013.md
 
 ## Reprise MultipleChat
 

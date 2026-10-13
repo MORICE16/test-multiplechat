@@ -33,19 +33,38 @@ test('speech validates input, keeps provider errors private and returns playable
 async function fixture() {
   const sql=new DatabaseSync(':memory:');
   for(const name of ['0002_conversation_history','0003_jobs']) sql.exec(await readFile(new URL(`../drizzle/${name}.sql`,import.meta.url),'utf8'));
-  const f={sql,created:0,retrieved:0,failStart:false,failRead:false,response:completed(),webResult,ideaResult};
+  const f={sql,created:0,retrieved:0,failStart:false,failRead:false,apiAvailable:true,response:completed(),webResult,ideaResult};
+  f.runtimeValue=()=>f.apiAvailable?'test-key':'';
   f.env={DB:{prepare(query){return {bind(...args){return {run(){const r=sql.prepare(query).run(...args);return {meta:{changes:Number(r.changes)}};},async all(){return {results:sql.prepare(query).all(...args)};},async first(){return sql.prepare(query).get(...args)||null;}};}};},async batch(items){sql.exec('BEGIN');try{const out=items.map(item=>item.run());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}}};
   f.createWebResponse=async()=>{f.created++;if(f.failStart)throw Error('Connection lost');return {id:'resp_test',status:'queued'};};
   f.retrieveWebResponse=async()=>{f.retrieved++;if(f.failRead)throw Error('Network offline');return f.response;};
   const key=crypto.randomUUID();globalThis[key]=f;
   let source=await readFile(new URL('../app/lib/jobs.ts',import.meta.url),'utf8');
   source=source.replace(/^import .*;\r?\n/gm,'');
-  const prefix=`const {env,webResult,ideaResult,createWebResponse,retrieveWebResponse}=globalThis[${JSON.stringify(key)}]; const now=()=>new Date().toISOString();\n`;
+  const prefix=`const {env,webResult,ideaResult,createWebResponse,retrieveWebResponse,runtimeValue}=globalThis[${JSON.stringify(key)}]; const now=()=>new Date().toISOString();\n`;
   const code=ts.transpileModule(prefix+source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   f.module=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
   f.job=id=>sql.prepare('SELECT * FROM morice_jobs WHERE id=?').get(id);
   f.close=()=>{sql.close();delete globalThis[key];};return f;
 }
+test('disabled API blocks queued and running AI work once without calls or lost evidence',async()=>{
+  const f=await fixture();try {
+    const queued=await f.module.createJob('alice','Recherche','Question','web_search');
+    const running=await f.module.createJob('alice','Analyse','Document','idea_analysis');
+    const foreign=await f.module.createJob('bob','Privé','Autre','web_search');
+    f.sql.prepare("UPDATE morice_jobs SET status='running',response_id='resp_saved',result='Texte conservé',evidence=? WHERE id=?").run(JSON.stringify({model:'verified-model'}),running);
+    f.apiAvailable=false;
+    await Promise.all([f.module.refreshResearch('alice'),f.module.refreshResearch('alice')]);
+    assert.equal(f.created,0);assert.equal(f.retrieved,0);
+    assert.equal(f.job(queued).status,'blocked');assert.equal(f.job(running).status,'blocked');
+    assert.equal(f.job(running).response_id,'resp_saved');assert.equal(f.job(running).result,'Texte conservé');
+    assert.equal(JSON.parse(f.job(running).evidence).model,'verified-model');
+    assert.equal(f.job(foreign).status,'queued');
+    assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM morice_job_events WHERE user_id='alice' AND status='blocked'").get().n,2);
+    f.apiAvailable=true;await f.module.refreshResearch('alice');
+    assert.equal(f.created,0);assert.equal(f.retrieved,0);
+  }finally{f.close();}
+});
 test('durable research claims once and saves result plus conversation after reconnect',async()=>{
   const f=await fixture();try {
     const {createJob,startResearch,refreshResearch}=f.module;

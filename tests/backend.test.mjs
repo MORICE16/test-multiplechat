@@ -45,6 +45,7 @@ async function fixture() {
       const routeModel=async()=>({model:'gpt-5-mini',reason:'Test de transport isolé'});
       ${path.endsWith('/microsoft.ts') ? '' : 'const readMicrosoftTodo=(...a)=>f.readMicrosoftTodo(...a);'}
       const coreContext=(...a)=>f.coreContext?.(...a) || Promise.resolve(null);
+      const createJob=async(...a)=>{f.jobRequest=a;return 'job-test';}, transitionJob=async(...a)=>{f.jobTransitions=(f.jobTransitions||[]).concat([a]);};
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
     const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
@@ -242,5 +243,36 @@ test('mail triage uses the authenticated mailbox and performs only a Graph GET',
     await assert.rejects(()=>ms.reviewMicrosoftMailbox('bob'),/Connecte/);assert.equal(reads,0);
     const result=await ms.reviewMicrosoftMailbox('alice');assert.equal(result.account,'alice@example.invalid');assert.equal(reads,1);
     assert.equal(result.messages[0].suggestions.length,2);
+  }finally{f.close();}
+});
+
+test('explicit mailbox and calendar reads use Graph without an AI key and retain conversation', async () => {
+  for (const [message, operation] of [['Lis mes mails', 'mail_read'], ['Affiche mon agenda', 'calendar_read']]) {
+    const f=await fixture();try {
+      f.vars.OPENAI_API_KEY='';
+      f.fetch=async()=>{throw new Error('No AI call allowed');};
+      f.runMicrosoftAction=async(uid,op)=>{assert.equal(uid,'alice');assert.equal(op,operation);f.sent++;return 'Résultat Graph vérifié par le transport de test';};
+      const route=await f.route('app/api/assistant/route.ts');
+      const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message,mode:'auto'})}));
+      assert.equal(response.status,200);
+      const data=await response.json();assert.equal(data.ok,true);assert.equal(data.action.operation,operation);
+      assert.equal(f.sent,1);assert.equal(f.jobRequest[3],operation);
+      assert.equal(f.jobTransitions.at(-1)[2],'done');
+      assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_messages').get().n,2);
+      assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
+    }finally{f.close();}
+  }
+});
+
+test('mixed or write requests never match the direct read shortcut without AI', async () => {
+  const f=await fixture();try {
+    f.vars.OPENAI_API_KEY='';
+    const route=await f.route('app/api/assistant/route.ts');
+    for(const message of ['Lis mes mails et supprime-les','Affiche mon agenda et ajoute un rendez-vous']) {
+      const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message,mode:'auto'})}));
+      assert.equal(response.status,502);
+    }
+    assert.equal(f.sent,0);assert.equal(f.jobRequest,undefined);
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
   }finally{f.close();}
 });

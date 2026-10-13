@@ -54,6 +54,8 @@ function localPlan(message: string, mode: string): Plan {
 
 async function intelligentPlan(message: string, mode: string, history: HistoryMessage[], memory: string): Promise<Plan> {
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
+  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes (?:mails|emails|courriels)(?: recents)?[.!?]?$/.test(normalized(message))) return { intent: "mail_read", title: "Lire les mails récents", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_read", payload: emptyPayload() };
+  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mon (?:agenda|calendrier)[.!?]?$/.test(normalized(message))) return { intent: "calendar_read", title: "Lire mon agenda", reply: "", requiresApproval: false, provider: "microsoft", operation: "calendar_read", payload: emptyPayload() };
   if (mode === "auto" && /^recherche sur le web\b/.test(normalized(message))) return { intent: "web_search", title: conciseTitle(message), reply: "", requiresApproval: false, provider: "local", operation: "web_search", payload: { ...emptyPayload(), query: message } };
   if (mode === "auto" && /^(?:(?:morice|maurice)[, :]+)?(?:verifie|teste|diagnostic|etat)\b.*\bopenclaw\b/.test(normalized(message))) return { intent: "openclaw_diagnostic", title: "Diagnostic privé OpenClaw", reply: "", requiresApproval: false, provider: "local", operation: "openclaw_diagnostic", payload: emptyPayload() };
   if (mode === "auto" && isExplicitMailPreview(message)) return { intent: "mail_triage", title: "Préparer le classement de la boîte connectée", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_triage", payload: emptyPayload() };
