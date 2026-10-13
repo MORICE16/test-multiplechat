@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T23:05:45.313Z
-Commit source au moment de la génération : `217ca42b3cd8fdafc4476640a840e54ac801be7f`
+Généré : 2026-10-13T23:09:02.598Z
+Commit source au moment de la génération : `fe0a80d615053236a06c87cefe8427cb797e1750`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -120,12 +120,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/components/google-connections.tsx
-- app/lib/google-mail.ts
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- tests/google-private.test.mjs
 
 ## Reprise MultipleChat
 
