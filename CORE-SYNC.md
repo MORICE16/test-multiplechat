@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T22:59:12.048Z
-Commit source au moment de la génération : `65183e728b8b50461dee76cc95905c047b7b9054`
+Généré : 2026-10-13T23:02:20.542Z
+Commit source au moment de la génération : `e79ce8ba8543a10a35008581cce350873945c136`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -117,17 +117,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/microsoft/callback/route.ts
-- app/components/horizon-day.tsx
-- app/components/horizon-weather.tsx
-- app/components/mail-review.tsx
-- app/lib/attachment-validation.ts
-- app/lib/weather.ts
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- integrations/openclaw-readonly/bridge.mjs
-- docs/CONTINUITE-PC-FOLD.md
 
 ## Reprise MultipleChat
 
