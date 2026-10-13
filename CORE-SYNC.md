@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T23:02:20.542Z
-Commit source au moment de la génération : `e79ce8ba8543a10a35008581cce350873945c136`
+Généré : 2026-10-13T23:05:45.313Z
+Commit source au moment de la génération : `217ca42b3cd8fdafc4476640a840e54ac801be7f`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -33,6 +33,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut.
 - 14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée.
 - 14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React.
+- 14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.
 
 ## Tests
 
@@ -57,6 +58,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis.
 - 14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.
 - 14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi.
+- 14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.
 
 ## En cours
 
@@ -82,6 +84,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.
 - 13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne.
 - Réparation Fold : aucun appareil ADB détecté; sauvegarde téléphone, Authenticator et récupération indépendante à vérifier avant remise à zéro.
+- 14 octobre : les deux lectures Gmail échouent au contrôle réel; anciennes preuves historiques conservées mais non suffisantes. Reconnexion lecture seule ouverte, continuation Google en mode test requise.
 
 ## Prochaines actions
 
@@ -117,7 +120,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/components/google-connections.tsx
+- app/lib/google-mail.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- tests/google-private.test.mjs
 
 ## Reprise MultipleChat
 

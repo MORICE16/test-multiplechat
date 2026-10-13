@@ -5,8 +5,9 @@ import {googleAccountProvider} from './google-oauth';
 
 export async function googleMailbox(uid:string,id:string){
  const provider=googleAccountProvider(id);
- const c=await env.DB.prepare("SELECT access_token,refresh_token,expires_at,account_email FROM morice_connections WHERE user_id=? AND provider=? AND status IN ('authorized','verified')").bind(uid,provider).first<{access_token:string;refresh_token:string;expires_at:string;account_email:string}>();
+ const c=await env.DB.prepare("SELECT access_token,refresh_token,expires_at,account_email FROM morice_connections WHERE user_id=? AND provider=? AND status IN ('authorized','verified','unconfirmed')").bind(uid,provider).first<{access_token:string;refresh_token:string;expires_at:string;account_email:string}>();
  if(!c)throw Error('Google account unavailable');
+ try {
  let token=await decryptSecret(c.access_token);
  if(new Date(c.expires_at).getTime()<Date.now()+60000){
   const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:runtimeValue('GOOGLE_CLIENT_ID'),client_secret:runtimeValue('GOOGLE_CLIENT_SECRET'),grant_type:'refresh_token',refresh_token:await decryptSecret(c.refresh_token)})});const t=await r.json() as {access_token?:string;expires_in?:number};if(!r.ok||!t.access_token)throw Error('Google refresh unavailable');token=t.access_token;
@@ -21,4 +22,9 @@ export async function googleMailbox(uid:string,id:string){
  if(profile.emailAddress?.toLowerCase()!==c.account_email.toLowerCase())throw Error('Google identity mismatch');
  const checkedAt=now();await env.DB.prepare("UPDATE morice_connections SET status='verified',updated_at=? WHERE user_id=? AND provider=?").bind(checkedAt,uid,provider).run();
  return {profile,checkedAt,read};
+ } catch (error) {
+  // Retain encrypted credentials for an explicit retry; never present an old success as current.
+  await env.DB.prepare("UPDATE morice_connections SET status='unconfirmed',updated_at=? WHERE user_id=? AND provider=?").bind(now(),uid,provider).run();
+  throw error;
+ }
 }
