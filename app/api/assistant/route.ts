@@ -9,7 +9,7 @@ import { fetchOpenClawDiagnostic } from "@/app/lib/openclaw-diagnostic";
 
 import { routeModel } from "@/app/lib/model-router";
 
-type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "answer";
+type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "todo_lists" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "answer";
 type Plan = {
   model?: string;
   routingReason?: string;
@@ -54,8 +54,17 @@ function localPlan(message: string, mode: string): Plan {
 
 async function intelligentPlan(message: string, mode: string, history: HistoryMessage[], memory: string): Promise<Plan> {
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
-  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes (?:mails|emails|courriels)(?: recents)?[.!?]?$/.test(normalized(message))) return { intent: "mail_read", title: "Lire les mails récents", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_read", payload: emptyPayload() };
-  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mon (?:agenda|calendrier)[.!?]?$/.test(normalized(message))) return { intent: "calendar_read", title: "Lire mon agenda", reply: "", requiresApproval: false, provider: "microsoft", operation: "calendar_read", payload: emptyPayload() };
+  const directMessage = message.replace(/^(?:morice|maurice)[,:\s]+/i, "");
+  const directText = normalized(directMessage);
+  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes (?:mails|emails|courriels)(?: recents)?[.!?]?$/.test(directText)) return { intent: "mail_read", title: "Lire les mails récents", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_read", payload: emptyPayload() };
+  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mon (?:agenda|calendrier)[.!?]?$/.test(directText)) return { intent: "calendar_read", title: "Lire mon agenda", reply: "", requiresApproval: false, provider: "microsoft", operation: "calendar_read", payload: emptyPayload() };
+  if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes listes (?:microsoft )?to do[.!?]?$/.test(directText)) return { intent: "todo_lists", title: "Lire mes listes To Do", reply: "", requiresApproval: false, provider: "microsoft", operation: "todo_lists", payload: emptyPayload() };
+  const driveSearch = /^(?:cherche|recherche) (?:dans|sur) onedrive\s+(.+)$/i.exec(directMessage);
+  if (mode === "auto" && driveSearch) {
+    const query = driveSearch[1].trim();
+    if (query.length > 200) throw new Error("Le mot-clé OneDrive est limité à 200 caractères. Votre texte est conservé.");
+    return { intent: "onedrive_search", title: "Chercher dans OneDrive", reply: "", requiresApproval: false, provider: "microsoft", operation: "onedrive_search", payload: { ...emptyPayload(), query } };
+  }
   if (mode === "auto" && /^recherche sur le web\b/.test(normalized(message))) return { intent: "web_search", title: conciseTitle(message), reply: "", requiresApproval: false, provider: "local", operation: "web_search", payload: { ...emptyPayload(), query: message } };
   if (mode === "auto" && /^(?:(?:morice|maurice)[, :]+)?(?:verifie|teste|diagnostic|etat)\b.*\bopenclaw\b/.test(normalized(message))) return { intent: "openclaw_diagnostic", title: "Diagnostic privé OpenClaw", reply: "", requiresApproval: false, provider: "local", operation: "openclaw_diagnostic", payload: emptyPayload() };
   if (mode === "auto" && isExplicitMailPreview(message)) return { intent: "mail_triage", title: "Préparer le classement de la boîte connectée", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_triage", payload: emptyPayload() };
@@ -68,7 +77,7 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
     type: "object",
     additionalProperties: false,
     properties: {
-      intent: { type: "string", enum: ["task", "memory", "mail_read", "mail_triage", "mail_draft", "mail_send", "calendar_read", "calendar_create", "todo_create", "onedrive_search", "make_trigger", "web_search", "answer"] },
+      intent: { type: "string", enum: ["task", "memory", "mail_read", "mail_triage", "mail_draft", "mail_send", "calendar_read", "calendar_create", "todo_create", "todo_lists", "onedrive_search", "make_trigger", "web_search", "answer"] },
       title: { type: "string" },
       reply: { type: "string" },
       requiresApproval: { type: "boolean" },
@@ -170,7 +179,7 @@ export async function POST(request: Request) {
     return respond({ ok: true, reply: plan.intent === "task" ? "La tâche est enregistrée dans Morice." : "L’information est enregistrée dans la mémoire de Morice.", action: { id, kind: plan.intent, title: plan.title, content: message, status: "open", label: plan.intent === "task" ? "Tâche créée" : "Information mémorisée", view: plan.intent === "task" ? "tasks" : "memory" } });
   }
 
-  if (["mail_read", "mail_triage", "calendar_read", "onedrive_search"].includes(plan.intent)) {
+  if (["mail_read", "mail_triage", "calendar_read", "todo_lists", "onedrive_search"].includes(plan.intent)) {
     const jobId = await createJob(uid, plan.title, message, plan.intent);
     await transitionJob(uid, jobId, "running", "Lecture Microsoft Graph démarrée");
     try {

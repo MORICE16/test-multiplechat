@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T23:09:02.598Z
-Commit source au moment de la génération : `fe0a80d615053236a06c87cefe8427cb797e1750`
+Généré : 2026-10-13T23:20:16.392Z
+Commit source au moment de la génération : `6e5426df8e02029aec28fb24b04efd79e69f7ab6`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -34,6 +34,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée.
 - 14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React.
 - 14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.
+- 14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.
 
 ## Tests
 
@@ -59,6 +60,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.
 - 14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi.
 - 14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.
+- 14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.
 
 ## En cours
 
@@ -120,7 +122,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/api/assistant/route.ts
+- app/lib/microsoft.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- tests/backend.test.mjs
 
 ## Reprise MultipleChat
 

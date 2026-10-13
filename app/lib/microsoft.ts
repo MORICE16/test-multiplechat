@@ -134,6 +134,13 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     const rows = data?.value || [];
     return rows.length ? rows.map(event => `${event.start?.dateTime || "Date inconnue"} — ${event.subject || "Sans titre"}${event.location?.displayName ? ` (${event.location.displayName})` : ""}`).join("\n") : "Aucun rendez-vous dans les sept prochains jours.";
   }
+  if (operation === "todo_lists") {
+    const data = await graph(uid, "/me/todo/lists") as { value?: Array<{ displayName?: string }>; "@odata.nextLink"?: string };
+    if (!Array.isArray(data?.value)) throw new ActionError("Microsoft n’a pas confirmé les listes To Do.", true);
+    const names = data.value.slice(0, 100).map(list => list.displayName || "Liste sans nom");
+    const more = data["@odata.nextLink"] || data.value.length > 100 ? "\nD’autres listes restent à lire. Ouvrez Microsoft To Do pour poursuivre." : "";
+    return (names.length ? `Listes Microsoft To Do du compte principal :\n${names.join("\n")}` : "Aucune liste Microsoft To Do.") + more;
+  }
   if (operation === "onedrive_search") {
     const safeQuery = (payload.query || payload.subject || "").replace(/'/g, "''");
     if (!safeQuery) throw new Error("Indique ce que Morice doit chercher dans OneDrive.");

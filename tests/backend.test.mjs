@@ -246,12 +246,12 @@ test('mail triage uses the authenticated mailbox and performs only a Graph GET',
   }finally{f.close();}
 });
 
-test('explicit mailbox and calendar reads use Graph without an AI key and retain conversation', async () => {
-  for (const [message, operation] of [['Lis mes mails', 'mail_read'], ['Affiche mon agenda', 'calendar_read']]) {
+test('explicit Microsoft reads use Graph without an AI key and retain conversation', async () => {
+  for (const [message, operation] of [['Lis mes mails', 'mail_read'], ['Morice, affiche mon agenda', 'calendar_read'], ['Affiche mes listes To Do', 'todo_lists'], ['Maurice, cherche dans OneDrive état des lieux', 'onedrive_search']]) {
     const f=await fixture();try {
       f.vars.OPENAI_API_KEY='';
       f.fetch=async()=>{throw new Error('No AI call allowed');};
-      f.runMicrosoftAction=async(uid,op)=>{assert.equal(uid,'alice');assert.equal(op,operation);f.sent++;return 'Résultat Graph vérifié par le transport de test';};
+      f.runMicrosoftAction=async(uid,op,payload)=>{assert.equal(uid,'alice');assert.equal(op,operation);if(op==='onedrive_search')assert.equal(payload.query,'état des lieux');f.sent++;return 'Résultat Graph vérifié par le transport de test';};
       const route=await f.route('app/api/assistant/route.ts');
       const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message,mode:'auto'})}));
       assert.equal(response.status,200);
@@ -268,11 +268,23 @@ test('mixed or write requests never match the direct read shortcut without AI', 
   const f=await fixture();try {
     f.vars.OPENAI_API_KEY='';
     const route=await f.route('app/api/assistant/route.ts');
-    for(const message of ['Lis mes mails et supprime-les','Affiche mon agenda et ajoute un rendez-vous']) {
+    for(const message of ['Lis mes mails et supprime-les','Affiche mon agenda et ajoute un rendez-vous','Affiche mes listes To Do et supprime-les','Ne cherche pas dans OneDrive facture','Cherche dans OneDrive '+ 'x'.repeat(201)]) {
       const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message,mode:'auto'})}));
       assert.equal(response.status,502);
     }
     assert.equal(f.sent,0);assert.equal(f.jobRequest,undefined);
     assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
+  }finally{f.close();}
+});
+
+test('To Do list summary is an owner-scoped Graph GET and exposes pagination limits',async()=>{
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');let reads=0;let malformed=false;
+    f.fetch=async(url,init)=>{reads++;assert.equal(init.method,undefined);assert.equal(url,'https://graph.microsoft.com/v1.0/me/todo/lists');return Response.json(malformed?{}:{value:[{displayName:'Suivi technique'}],'@odata.nextLink':'https://graph.microsoft.com/v1.0/me/todo/lists?$skiptoken=synthetic'});};
+    await assert.rejects(()=>ms.runMicrosoftAction('bob','todo_lists',{}));assert.equal(reads,0);
+    const result=await ms.runMicrosoftAction('alice','todo_lists',{});assert.match(result,/Suivi technique/);assert.match(result,/restent à lire/);assert.equal(reads,1);
+    malformed=true;await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{}),/pas confirmé/);
+    await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{accountId:'second'}),/compte principal/);
   }finally{f.close();}
 });
