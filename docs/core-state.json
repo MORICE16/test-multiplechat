@@ -51,7 +51,8 @@
     "14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.",
     "14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi.",
     "14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.",
-    "14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné."
+    "14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.",
+    "14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

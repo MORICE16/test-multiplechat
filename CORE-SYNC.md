@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T23:20:16.392Z
-Commit source au moment de la génération : `6e5426df8e02029aec28fb24b04efd79e69f7ab6`
+Généré : 2026-10-13T23:24:37.549Z
+Commit source au moment de la génération : `523a4a9e98cdf3be3ba4996eae6a90ac7b0fb46b`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -61,6 +61,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi.
 - 14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.
 - 14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.
+- 14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.
 
 ## En cours
 
@@ -122,12 +123,9 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/assistant/route.ts
-- app/lib/microsoft.ts
-- app/morice-app.tsx
+- CORE-SYNC.md
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/backend.test.mjs
 
 ## Reprise MultipleChat
 
