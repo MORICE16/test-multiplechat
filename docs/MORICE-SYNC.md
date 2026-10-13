@@ -597,3 +597,11 @@ Transmission 02 : priorité validée à la finalisation du socle existant dès r
 - Aucun achat, installation, arrêt arbitraire, suppression de file, mail envoyé, notification ou commande téléphone. Publication consignée après résultat.
 
 Publication du lot : source 524699a89b1c47974c4ccc830ed6664fc7c40e46, référence main GitHub relue et identique. Site privé : appgdep_6acea15f1d3c819181cfcd1323c809cd succeeded, version appgprj_6a7c6d7e060c819192f3ec42dfea6eaf~appgver_7c2333ae6cf08191a2c7b9de772ae3da, revision 6. Nouvelle preuve utilisateur authentifiée encore en attente de clé d'accès; publication réussie ne signifie pas lecture Microsoft prouvée dans ce lot. Make demande une reconnexion au contrôle du 13 octobre; statut courant non vérifié, preuve du 4 octobre conservée.
+
+### 2026-10-14 — connexion rétablie et parcours réel sans API
+- Session privée Morice rétablie. Commandes exactes Affiche mon agenda et Lis mes mails exécutées : Microsoft répond réellement, résultat et conversation conservés après rechargement. Aucun mail modifié, aucune écriture Microsoft.
+- Mémoire de test SAFRAN-14 enregistrée depuis Conversation puis retrouvée dans Notes & mémoire après rechargement : écriture/lecture D1 et journal conversationnel prouvés. Entrée synthétique conservée, pas de suppression arbitraire.
+- Lecteur navigateur ajouté : démarrage explicite, voix française disponible avec préférence locale, passages courts, pause par annulation et reprise au dernier mot signalé, vitesse, état/position par texte dans sessionStorage. Aucun appel OpenAI; disponibilité et voix dépendent du navigateur, pas de promesse hors ligne. L'ancien lecteur API est conservé derrière une option non activée par défaut.
+- Démarrer la dictée navigateur interrompt le lecteur via le mécanisme partagé; aucun microphone physique utilisé dans ce lot.
+- 98 tests réussis, dont 4 nouveaux pour lecture longue, reprise, vitesse, annulation, erreurs et états invalides. Transport vocal substitué; sortie sonore et long usage sur Fold restent à vérifier humainement. TypeScript/lint ciblé/build consignés après contrôle.
+- Références : https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis ; https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance ; https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/getVoices .

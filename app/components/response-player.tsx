@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { AudioReader, emptyReader, type ReadingPosition } from "../lib/audio-reader";
+import { BrowserResponsePlayer } from './browser-response-player';
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-export function ResponsePlayer(props: { text: string; disabled?: boolean }) { return <Player key={props.text} {...props} />; }
+export function ResponsePlayer(props: { text: string; disabled?: boolean; paid?: boolean }) { return props.paid ? <Player key={props.text} {...props} /> : <BrowserResponsePlayer key={props.text} {...props} />; }
 
 function Player({ text, disabled = false }: { text: string; disabled?: boolean }) {
   const audio = useRef<HTMLAudioElement>(null);

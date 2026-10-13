@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T21:24:49.920Z
-Commit source au moment de la génération : `524699a89b1c47974c4ccc830ed6664fc7c40e46`
+Généré : 2026-10-13T22:11:54.124Z
+Commit source au moment de la génération : `ac9327921e6ceed5739cbb2a4ff69e968e08ec77`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -30,6 +30,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.
 - Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.
 - 13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.
+- 14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut.
 
 ## Tests
 
@@ -51,6 +52,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.
 - 91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.
 - 13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.
+- 14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis.
 
 ## En cours
 
@@ -110,7 +112,14 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/components/response-player.tsx
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- app/components/browser-response-player.tsx
+- app/lib/browser-reader.ts
+- tests/browser-reader.test.mjs
 
 ## Reprise MultipleChat
 

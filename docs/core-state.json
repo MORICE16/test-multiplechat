@@ -21,7 +21,8 @@
     "Conversation : saisie réductible sans cacher une nouvelle transcription, copie des messages, bouton photo/fichier/PDF et compagnon agrandi cliquable pour la dictée.",
     "To Do : préparation sans IA, validation persistante et création relue via Microsoft Graph; aucune bascule silencieuse vers une autre liste.",
     "Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.",
-    "13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs."
+    "13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.",
+    "14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -41,7 +42,8 @@
     "4 octobre : 89 tests; quota API et limite temporaire distingués; préparation To Do sans IA et relecture testées avec transport substitué.",
     "4 octobre : création To Do directe réellement validée depuis le site privé puis relue via Graph; tâche synthétique visible, sans Make ni appel IA.",
     "91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.",
-    "13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès."
+    "13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.",
+    "14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

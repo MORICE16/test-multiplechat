@@ -413,6 +413,7 @@ export default function MoriceApp() {
     if (assistantBusy || dictationState === "stopping" || recordedAudio) return;
     if (!connections?.openai.apiAllowed) {
       setNotice(""); setDictationError("");
+      window.dispatchEvent(new CustomEvent("morice-audio-play", { detail: null }));
       const speechWindow = window as unknown as {SpeechRecognition?:new()=>Recognition;webkitSpeechRecognition?:new()=>Recognition};
       const Constructor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
       if (!Constructor) {setNotice('Dictée sans API : utilisez le microphone du clavier de votre téléphone, ou la dictée dans ChatGPT.');return;}
