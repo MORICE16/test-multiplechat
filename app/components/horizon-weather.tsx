@@ -18,29 +18,36 @@ export function HorizonWeather() {
   const [position, setPosition] = useState<{latitude:number;longitude:number}|null>(null);
   const searchGeneration = useRef(0);
   useEffect(() => {
-    try {
-      const id = localStorage.getItem(storageKey);
-      if (id && /^[1-9]\d{0,9}$/.test(id)) setSelected(Number(id));
-      setFollow(localStorage.getItem('morice-weather-follow') === 'yes');
-    } catch { /* Browser storage may be unavailable. */ }
-    return () => { delete document.documentElement.dataset.weather; delete document.documentElement.dataset.temperature; searchGeneration.current++; };
+    const restoration = window.setTimeout(() => {
+      try {
+        const id = localStorage.getItem(storageKey);
+        if (id && /^[1-9]\d{0,9}$/.test(id)) setSelected(Number(id));
+        setFollow(localStorage.getItem('morice-weather-follow') === 'yes');
+      } catch { /* Browser storage may be unavailable. */ }
+    }, 0);
+    return () => { window.clearTimeout(restoration); searchGeneration.current++; };
   }, []);
   useEffect(() => {
     if (!follow) return;
-    if (!navigator.geolocation) { setError('Localisation indisponible sur cet appareil. Choisissez une ville.'); return; }
+    if (!navigator.geolocation) {
+      const unavailable = window.setTimeout(() => setError('Localisation indisponible sur cet appareil. Choisissez une ville.'), 0);
+      return () => window.clearTimeout(unavailable);
+    }
+    let active = true;
     let watch: number | undefined;
     function stop() { if (watch !== undefined) navigator.geolocation.clearWatch(watch); watch=undefined; }
     function start() {
       stop();
       if (document.visibilityState !== 'visible') return;
       watch=navigator.geolocation.watchPosition(value => {
+        if (!active) return;
         const next={latitude:Math.round(value.coords.latitude*100)/100,longitude:Math.round(value.coords.longitude*100)/100};
         setPosition(previous => previous?.latitude===next.latitude && previous?.longitude===next.longitude ? previous : next);
         setError('');
-      }, failure => { setPosition(null); setWeather(null); delete document.documentElement.dataset.weather; delete document.documentElement.dataset.temperature; setError(failure.code===1 ? 'Localisation refusée. Autorisez-la dans les réglages du navigateur ou choisissez une ville.' : 'Position indisponible. Réessayez ou choisissez une ville.'); }, {enableHighAccuracy:false,maximumAge:300000,timeout:15000});
+      }, failure => { if (!active) return; setPosition(null); setWeather(null); setError(failure.code===1 ? 'Localisation refusée. Autorisez-la dans les réglages du navigateur ou choisissez une ville.' : 'Position indisponible. Réessayez ou choisissez une ville.'); }, {enableHighAccuracy:false,maximumAge:300000,timeout:15000});
     }
     start(); document.addEventListener('visibilitychange',start);
-    return () => { stop(); document.removeEventListener('visibilitychange',start); };
+    return () => { active = false; stop(); document.removeEventListener('visibilitychange',start); };
   }, [follow,refresh]);
   useEffect(() => {
     if (follow ? !position : !selected) return;
@@ -55,11 +62,10 @@ export function HorizonWeather() {
       try {
         const data = await deviceWeather(selected,follow ? position : null,AbortSignal.any([controller.signal,AbortSignal.timeout(15000)]));
         if (!active || currentRun !== run) return;
-        setWeather(data); document.documentElement.dataset.weather = data.theme;
-        document.documentElement.dataset.temperature = data.temperature>=25 ? 'warm' : data.temperature<=8 ? 'cold' : 'mild';
+        setWeather(data);
       } catch (failure) {
         if (!active || currentRun !== run) return;
-        setWeather(null); delete document.documentElement.dataset.weather; delete document.documentElement.dataset.temperature;
+        setWeather(null);
         setError(failure instanceof Error && failure.name !== 'AbortError' ? failure.message : 'Météo non actualisée.');
       } finally { if (active && currentRun === run) setBusy(false); }
     }
@@ -68,18 +74,28 @@ export function HorizonWeather() {
     const staleTimer = window.setInterval(() => {
       setWeather(previous => {
         if (previous && Date.now() - Date.parse(previous.measuredAt) > 90 * 60 * 1000) {
-          delete document.documentElement.dataset.weather; delete document.documentElement.dataset.temperature; return null;
+          return null;
         }
         return previous;
       });
     }, 60 * 1000);
     const resume = () => { if (document.visibilityState === 'visible') void update(); };
     document.addEventListener('visibilitychange', resume);
-    return () => { active = false; controller?.abort(); clearInterval(timer); clearInterval(staleTimer); document.removeEventListener('visibilitychange',resume); delete document.documentElement.dataset.weather; delete document.documentElement.dataset.temperature; };
+    return () => { active = false; controller?.abort(); clearInterval(timer); clearInterval(staleTimer); document.removeEventListener('visibilitychange',resume); };
   }, [selected, refresh, follow, position]);
+  useEffect(() => {
+    const dataset = document.documentElement.dataset;
+    if (weather) {
+      dataset.weather = weather.theme;
+      dataset.temperature = weather.temperature >= 25 ? 'warm' : weather.temperature <= 8 ? 'cold' : 'mild';
+    } else {
+      delete dataset.weather; delete dataset.temperature;
+    }
+    return () => { delete dataset.weather; delete dataset.temperature; };
+  }, [weather]);
   function locate() {
     setSelected(null); setFollow(true); setEditing(false); setWeather(null); setRefresh(value=>value+1);
-    try { localStorage.setItem('morice-weather-follow','yes'); localStorage.removeItem(storageKey); } catch {}
+    try { localStorage.setItem('morice-weather-follow','yes'); localStorage.removeItem(storageKey); } catch { /* Preference remains usable for this session. */ }
   }
   async function search(event: React.FormEvent) {
     event.preventDefault();
@@ -96,15 +112,15 @@ export function HorizonWeather() {
     finally { if (generation === searchGeneration.current) setBusy(false); }
   }
   function choose(id: number) {
-    setFollow(false); setPosition(null); try { localStorage.removeItem('morice-weather-follow'); } catch {}
-    searchGeneration.current++; setWeather(null); delete document.documentElement.dataset.weather;
+    setFollow(false); setPosition(null); try { localStorage.removeItem('morice-weather-follow'); } catch { /* Preference remains usable for this session. */ }
+    searchGeneration.current++; setWeather(null);
     setSelected(id); setRefresh(value => value + 1); setChoices([]); setEditing(false);
     try { localStorage.setItem(storageKey, String(id)); } catch { /* Selection remains usable this session. */ }
   }
   function disable() {
-    setFollow(false); setPosition(null); delete document.documentElement.dataset.temperature; try { localStorage.removeItem('morice-weather-follow'); } catch {}
+    setFollow(false); setPosition(null);  try { localStorage.removeItem('morice-weather-follow'); } catch { /* Preference remains usable for this session. */ }
     searchGeneration.current++; setSelected(null); setWeather(null); setChoices([]); setError(''); setBusy(false); setEditing(false);
-    delete document.documentElement.dataset.weather;
+
     try {localStorage.removeItem(storageKey);} catch { /* No stored preference. */ }
   }
   return <section className="horizon-weather" aria-label="Météo et ambiance">

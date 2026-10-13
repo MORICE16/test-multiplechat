@@ -6,7 +6,6 @@ import { MAIL_CATEGORIES } from "../lib/mail-categories";
 export function MailReviewPanel() {
   const [accounts, setAccounts] = useState<Array<{ id: string; email: string }>>([]);
   const [accountId, setAccountId] = useState("");
-  useEffect(() => { fetch("/api/connections", { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(); return r.json() as Promise<{ microsoft: { accounts?: Array<{ id: string; email: string }> } }>; }).then(d => setAccounts(d.microsoft.accounts || [])).catch(() => setError("Liste des comptes indisponible.")); }, []);
   const [review, setReview] = useState<MailReview | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,6 +15,14 @@ export function MailReviewPanel() {
   const [selection, setSelection] = useState<Record<string, string>>({});
   const [approval, setApproval] = useState<{ id: string; summary: string } | null>(null);
   const [result, setResult] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/connections", { cache: "no-store", signal: controller.signal })
+      .then(r => { if (!r.ok) throw new Error(); return r.json() as Promise<{ microsoft: { accounts?: Array<{ id: string; email: string }> } }>; })
+      .then(d => { if (!controller.signal.aborted) setAccounts(d.microsoft.accounts || []); })
+      .catch(() => { if (!controller.signal.aborted) setError("Liste des comptes indisponible."); });
+    return () => controller.abort();
+  }, []);
   async function load() {
     setLoading(true); setError("");
     try {

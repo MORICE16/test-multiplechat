@@ -6,7 +6,7 @@ export function weatherCoordinates(latitude: unknown, longitude: unknown) {
 }
 export function cityQuery(value: string) {
   const city = value.trim();
-  if (city.length < 2 || city.length > 80 || /[\x00-\x1f<>]/.test(city)) throw new Error('Ville invalide');
+  if (city.length < 2 || city.length > 80 || Array.from(city).some(character => character.charCodeAt(0) < 32 || '<>'.includes(character))) throw new Error('Ville invalide');
   return city;
 }
 export function cityId(value: string) {

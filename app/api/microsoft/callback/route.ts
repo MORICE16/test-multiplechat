@@ -64,7 +64,7 @@ export async function GET(request: Request) {
     } else await env.DB.prepare("INSERT INTO morice_connections(user_id,provider,access_token,refresh_token,expires_at,account_email,scopes,status,updated_at) VALUES(?,'microsoft',?,?,?,?,?,'connected',?) ON CONFLICT(user_id,provider) DO UPDATE SET access_token=excluded.access_token,refresh_token=excluded.refresh_token,expires_at=excluded.expires_at,account_email=excluded.account_email,scopes=excluded.scopes,status='connected',updated_at=excluded.updated_at")
       .bind(uid, await encryptSecret(token.access_token), await encryptSecret(token.refresh_token), expiresAt, profile.mail || profile.userPrincipalName || "", token.scope || "", now()).run();
     return finish(request, "connected");
-  } catch (error) {
+  } catch {
     return finish(request, "error", "Connexion Microsoft impossible. Les autres comptes sont conservés.");
   }
 }

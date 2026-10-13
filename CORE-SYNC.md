@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T22:42:38.079Z
-Commit source au moment de la génération : `e680b4fc401002a4143b5801ac49f8b2f1bd6035`
+Généré : 2026-10-13T22:59:12.048Z
+Commit source au moment de la génération : `65183e728b8b50461dee76cc95905c047b7b9054`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -32,6 +32,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.
 - 14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut.
 - 14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée.
+- 14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React.
 
 ## Tests
 
@@ -55,6 +56,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.
 - 14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis.
 - 14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.
+- 14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi.
 
 ## En cours
 
@@ -79,6 +81,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.
 - Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.
 - 13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne.
+- Réparation Fold : aucun appareil ADB détecté; sauvegarde téléphone, Authenticator et récupération indépendante à vérifier avant remise à zéro.
 
 ## Prochaines actions
 
@@ -114,7 +117,17 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/api/microsoft/callback/route.ts
+- app/components/horizon-day.tsx
+- app/components/horizon-weather.tsx
+- app/components/mail-review.tsx
+- app/lib/attachment-validation.ts
+- app/lib/weather.ts
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- integrations/openclaw-readonly/bridge.mjs
+- docs/CONTINUITE-PC-FOLD.md
 
 ## Reprise MultipleChat
 

@@ -10,7 +10,10 @@ export function detectFile(bytes: Uint8Array): string {
   throw new Error('Formats acceptés : JPEG, PNG, WebP et PDF.');
 }
 export function safeFilename(value: string) {
-  return value.replace(/[\x00-\x1f\x7f/\\<>:"|?*]/g, '_').slice(0,120) || 'document';
+  return Array.from(value, character => {
+    const code = character.charCodeAt(0);
+    return code < 32 || code === 127 || '/\\<>:"|?*'.includes(character) ? '_' : character;
+  }).join('').slice(0,120) || 'document';
 }
 export function sameOrigin(request: Request) {
   const origin = request.headers.get('Origin');

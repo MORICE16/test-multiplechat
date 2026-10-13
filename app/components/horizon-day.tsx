@@ -17,12 +17,12 @@ export function HorizonDay({ connected, onCalendar }: { connected: boolean; onCa
   useEffect(() => {
     const date = new Date();
     const range = localDayRange(date);
-    setDateLabel(date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }));
-    setDay(null); setError("");
-    if (!connected) { setLoading(false); return; }
     const controller = new AbortController();
-    setLoading(true);
-    void (async () => {
+    const initialLoad = window.setTimeout(() => {
+      setDateLabel(date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }));
+      setDay(null); setError(""); setLoading(connected);
+      if (!connected) return;
+      void (async () => {
       try {
         const response = await fetch(`/api/microsoft/day?${new URLSearchParams(range)}`, { signal: controller.signal, cache: "no-store" });
         const data = await response.json() as Partial<MicrosoftDay> & { error?: string };
@@ -33,11 +33,12 @@ export function HorizonDay({ connected, onCalendar }: { connected: boolean; onCa
       } catch (cause) {
         if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Le calendrier est indisponible.");
       } finally { if (!controller.signal.aborted) setLoading(false); }
-    })();
+      })();
+    }, 0);
     const rollover = () => { if (localDayRange().start !== range.start) setRefresh(value => value + 1); };
     const interval = window.setInterval(rollover, 60_000);
     document.addEventListener("visibilitychange", rollover);
-    return () => { controller.abort(); window.clearInterval(interval); document.removeEventListener("visibilitychange", rollover); };
+    return () => { controller.abort(); window.clearTimeout(initialLoad); window.clearInterval(interval); document.removeEventListener("visibilitychange", rollover); };
   }, [connected, refresh]);
 
   return <section className="horizon-day" aria-label="Votre journée">

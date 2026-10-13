@@ -10,7 +10,7 @@ export const tools = Object.freeze([
 
 export function summarizeNodes(value) {
   if (!value || !Array.isArray(value.nodes) || value.nodes.length > 100) throw Error('Invalid node status');
-  const clean = value => typeof value === 'string' ? value.replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 100) : '';
+  const clean = value => typeof value === 'string' ? Array.from(value).filter(character => character.charCodeAt(0) >= 32 && character.charCodeAt(0) !== 127).join('').slice(0, 100) : '';
   return { nodes: value.nodes.map(node => {
     if (!node || typeof node !== 'object') throw Error('Invalid node');
     return {

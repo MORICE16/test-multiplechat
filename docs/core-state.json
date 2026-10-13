@@ -23,7 +23,8 @@
     "Blocage serveur des clés API payantes et dictée navigateur sans transcription OpenAI.",
     "13 octobre : lectures explicites mails/agenda par Graph sans IA; travaux IA sans accès bloqués avec identifiant conservé; polling pendant travaux actifs.",
     "14 octobre : lecteur des réponses avec voix du navigateur par défaut, sans appel OpenAI; passages, pause/reprise et vitesse; ancien lecteur API conservé sans activation par défaut.",
-    "14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée."
+    "14 octobre : fusion des échos provisoires de dictée et reprise des phrases non finalisées après redémarrage automatique; répétitions finalisées et saisie initiale conservées; version du service worker actualisée.",
+    "14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -45,7 +46,8 @@
     "91 tests réussis; masque de clé payante testé au niveau runtime sans modifier les valeurs Microsoft.",
     "13 octobre : 94 tests, TypeScript, lint ciblé et build réussis; lint complet préexistant non résolu; nouvelle validation runtime attend clé d'accès.",
     "14 octobre : agenda et mails lus réellement par commandes exactes depuis Morice; historique conservé après rechargement; mémoire SAFRAN-14 enregistrée et retrouvée; 98 tests automatiques réussis.",
-    "14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil."
+    "14 octobre : 102 tests, TypeScript, lint ciblé et build réussis; doublon signalé sur Fold reproduit par deux séquences simulées, correction vocale humaine à vérifier au réveil.",
+    "14 octobre : 102 tests, TypeScript et lint complet réussis, zéro erreur; build réussi."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",
@@ -66,7 +68,8 @@
     "Autres boîtes : authentifications distinctes encore nécessaires; seules les permissions déjà présentes sont utilisées.",
     "Génération IA : blocage financier API confirmé, aucun achat; abonnements ChatGPT et crédits API distincts.",
     "Liaison au forfait ChatGPT non connectée : preview SIWC, éligibilité distincte du site hébergé à confirmer; background et audio non pris en charge par cette voie.",
-    "13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne."
+    "13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne.",
+    "Réparation Fold : aucun appareil ADB détecté; sauvegarde téléphone, Authenticator et récupération indépendante à vérifier avant remise à zéro."
   ],
   "Prochaines actions": [
     "Tester caméra et dictée sur le Fold avec le parcours livré.",
