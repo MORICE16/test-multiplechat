@@ -595,3 +595,5 @@ Transmission 02 : priorité validée à la finalisation du socle existant dès r
 - Corrections : polling pendant travaux actifs; Bloqué explicite sans API avec identifiant conservé; lectures exactes Microsoft sans IA. Graph substitué dans les tests; pas de nouvelle preuve runtime Microsoft.
 - 94 tests, TypeScript, lint ciblé et build réussis. Erreurs préexistantes de lint complet conservées comme limite. Statuts : docs/STABILISATION-20261013.md.
 - Aucun achat, installation, arrêt arbitraire, suppression de file, mail envoyé, notification ou commande téléphone. Publication consignée après résultat.
+
+Publication du lot : source 524699a89b1c47974c4ccc830ed6664fc7c40e46, référence main GitHub relue et identique. Site privé : appgdep_6acea15f1d3c819181cfcd1323c809cd succeeded, version appgprj_6a7c6d7e060c819192f3ec42dfea6eaf~appgver_7c2333ae6cf08191a2c7b9de772ae3da, revision 6. Nouvelle preuve utilisateur authentifiée encore en attente de clé d'accès; publication réussie ne signifie pas lecture Microsoft prouvée dans ce lot. Make demande une reconnexion au contrôle du 13 octobre; statut courant non vérifié, preuve du 4 octobre conservée.

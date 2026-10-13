@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T21:21:49.425Z
-Commit source au moment de la génération : `8bc86be04085137a7e36970810473ce0a384b425`
+Généré : 2026-10-13T21:24:49.920Z
+Commit source au moment de la génération : `524699a89b1c47974c4ccc830ed6664fc7c40e46`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -110,15 +110,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/assistant/route.ts
-- app/components/jobs-panel.tsx
-- app/lib/jobs.ts
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- tests/backend.test.mjs
-- tests/jobs-voice.test.mjs
-- docs/STABILISATION-20261013.md
 
 ## Reprise MultipleChat
 
