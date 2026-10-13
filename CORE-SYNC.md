@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T22:11:54.124Z
-Commit source au moment de la génération : `ac9327921e6ceed5739cbb2a4ff69e968e08ec77`
+Généré : 2026-10-13T22:15:19.052Z
+Commit source au moment de la génération : `455846eb6b645dba71824f3d909ed7236863d1d1`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -112,14 +112,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/components/response-player.tsx
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- app/components/browser-response-player.tsx
-- app/lib/browser-reader.ts
-- tests/browser-reader.test.mjs
 
 ## Reprise MultipleChat
 
