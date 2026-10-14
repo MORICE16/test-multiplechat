@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T02:00:54.116Z
-Commit source au moment de la génération : `cb0eb9b7d89608b9bad45fccf6066520c9d5f328`
+Généré : 2026-10-14T02:58:51.192Z
+Commit source au moment de la génération : `4445e8cec3799b732c4a69224c815f39af6ea745`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -37,6 +37,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.
 - 14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.
 - 14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé.
+- 14 octobre : notifications préparées renforcées, clé VAPID stable lors des premières connexions simultanées, destination limitée aux services navigateur pris en charge, redirections refusées et délai borné; abonnement isolé par propriétaire.
 
 ## Tests
 
@@ -69,6 +70,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée.
 - 14 octobre : 108 tests; archivage privé image/PDF sans démarrage IA, idempotence, refus de changement de mode, conservation et isolation propriétaire. TypeScript/lint/build et contrôle runtime consignés après résultat.
 - 14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA.
+- 14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées.
 
 ## En cours
 
@@ -131,8 +133,13 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/api/push/crypto.ts
+- app/api/push/subscribe/route.ts
+- app/api/push/test/route.ts
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- app/lib/push-endpoint.ts
+- tests/push-private.test.mjs
 
 ## Reprise MultipleChat
 

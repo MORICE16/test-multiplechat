@@ -28,7 +28,8 @@
     "14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.",
     "14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.",
     "14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.",
-    "14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé."
+    "14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé.",
+    "14 octobre : notifications préparées renforcées, clé VAPID stable lors des premières connexions simultanées, destination limitée aux services navigateur pris en charge, redirections refusées et délai borné; abonnement isolé par propriétaire."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -59,7 +60,8 @@
     "14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi.",
     "14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée.",
     "14 octobre : 108 tests; archivage privé image/PDF sans démarrage IA, idempotence, refus de changement de mode, conservation et isolation propriétaire. TypeScript/lint/build et contrôle runtime consignés après résultat.",
-    "14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA."
+    "14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA.",
+    "14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

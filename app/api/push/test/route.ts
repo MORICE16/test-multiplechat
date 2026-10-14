@@ -1,8 +1,10 @@
 import { env } from "cloudflare:workers";
 import { userId } from "@/app/lib/runtime";
 import { sendEmptyPush } from "../crypto";
+import { sameOrigin } from "../../../lib/attachment-validation";
 
 export async function POST(request: Request) {
+  if(!sameOrigin(request)) return Response.json({error:'Origine refusée.'},{status:403});
   const rows = await env.DB.prepare("SELECT endpoint FROM morice_push_subscriptions WHERE user_id=?").bind(userId(request)).all();
   const subscriptions = rows.results as Array<{ endpoint: string }>;
   if (!subscriptions.length) return Response.json({ error: "Aucun appareil n’est encore abonné aux notifications Morice." }, { status: 409 });
