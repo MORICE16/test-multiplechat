@@ -64,7 +64,8 @@
     "14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA.",
     "14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées.",
     "14 octobre : 112 tests, liste des fichiers isolée par propriétaire, exclusion des pièces non liées, métadonnées expurgées, recherche littérale et bornes vérifiées. Contrôle runtime après publication consigné séparément.",
-    "14 octobre : Documents publié; liste privée et recherche par nom réellement utilisées, PDF récupéré identique à l’original SHA-256. OneDrive conservé; aucune analyse IA ni permission ajoutée."
+    "14 octobre : Documents publié; liste privée et recherche par nom réellement utilisées, PDF récupéré identique à l’original SHA-256. OneDrive conservé; aucune analyse IA ni permission ajoutée.",
+    "14 octobre : export technique runtime réellement récupéré et contrôlé sans contenu privé; MultipleChat treize fichiers publics Ready après actualisation des fichiers modifiés et ajout de deux composants. Pas de transport IA autonome nouveau."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

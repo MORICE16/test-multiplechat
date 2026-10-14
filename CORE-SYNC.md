@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T04:02:54.864Z
-Commit source au moment de la génération : `e4892698605337d54f5ba8445366b4bcffa99ce3`
+Généré : 2026-10-14T05:01:18.895Z
+Commit source au moment de la génération : `57d276aca5d39ab88a8b8cb074ff60a8d789c01c`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -74,6 +74,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées.
 - 14 octobre : 112 tests, liste des fichiers isolée par propriétaire, exclusion des pièces non liées, métadonnées expurgées, recherche littérale et bornes vérifiées. Contrôle runtime après publication consigné séparément.
 - 14 octobre : Documents publié; liste privée et recherche par nom réellement utilisées, PDF récupéré identique à l’original SHA-256. OneDrive conservé; aucune analyse IA ni permission ajoutée.
+- 14 octobre : export technique runtime réellement récupéré et contrôlé sans contenu privé; MultipleChat treize fichiers publics Ready après actualisation des fichiers modifiés et ajout de deux composants. Pas de transport IA autonome nouveau.
 
 ## En cours
 

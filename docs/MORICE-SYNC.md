@@ -697,3 +697,9 @@ Publication notifications : source 879f629675123ee24ee802105325d9af92ab1fc3, dé
 
 Publication Documents : source e4892698605337d54f5ba8445366b4bcffa99ce3, déploiement privé appgdep_6acefe6f03d081919ad50f46ac62905b succeeded, version appgprj_6a7c6d7e060c819192f3ec42dfea6eaf~appgver_c5b41b440c3c8191b8f81a8cf5672aee, revision 6. 112 tests, TypeScript, lint ciblé zéro erreur et build passent; avertissements d’images préexistants conservés.
 - Runtime authentifié : six pièces listées, cinq visibles initialement, recherche du nom du PDF donnant trois copies synthétiques datées; téléchargement depuis Documents, SHA-256 identique à l’original. OneDrive reste présent séparément. Aucune copie utilisateur demandée, aucun transfert IA ni accès élargi. Capture privée MORICE-DOCUMENTS-PRIVES-20261014.jpg.
+
+### 2026-10-14 — reprise CORE/MultipleChat vérifiée
+- Export technique téléchargé depuis le vrai site : MORICE-SYNC/1, agrégats opération/statut/nombre seulement. Structure vérifiée, aucune demande, réponse, adresse de compte ni nom de pièce. Copie conservée localement en privé, non envoyée à MultipleChat.
+- Project existant : CORE-SYNC et morice-app re-synchronisés depuis main 57d276a; deux composants publics manquants importés via GitHub natif, private-files-panel et idea-composer. Treize fichiers Ready confirmés. Aucun secret, CORE privé ou fichier utilisateur importé; aucune nouvelle question IA envoyée.
+- Sync Pack : préparation de la source complète suivie par Git avec guide de reprise, au lieu de dépendre seulement du lot de fichiers modifiés. Dépendances installées, données privées D1/R2, sauvegarde téléphone et secrets restent exclus. MultipleChat utilise les fichiers GitHub natifs, pas cette archive ZIP.
+- Code applicatif inchangé : source servie e489269, 112 tests précédents conservés, aucun nouveau build ni déploiement. Capture privée MORICE-MULTIPLECHAT-SYNC-20261014.jpg.
