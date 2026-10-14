@@ -54,7 +54,8 @@
     "14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.",
     "14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.",
     "14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.",
-    "14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat."
+    "14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.",
+    "14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

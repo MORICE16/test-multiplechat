@@ -350,6 +350,7 @@ export default function MoriceApp() {
       setMessage("");
       setDictationState("idle");
       await refresh();
+      if (result.action?.jobId) await queue.refresh();
     } catch (error) {
       const errorText = error instanceof Error ? error.message : "Morice n’a pas pu exécuter cette action.";
       setMessages(previous => [...previous, { id: crypto.randomUUID(), role: "error", text: errorText }]);

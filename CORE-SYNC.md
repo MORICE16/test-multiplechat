@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T00:11:12.157Z
-Commit source au moment de la génération : `5f15976dbba6dc1e9a0bdcb50c175b00f419de9e`
+Généré : 2026-10-14T00:24:06.008Z
+Commit source au moment de la génération : `2e733dcfd1712ebafde8e31b1bafd9338c987c8e`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -64,6 +64,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.
 - 14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.
 - 14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.
+- 14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi.
 
 ## En cours
 
@@ -127,12 +128,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 ## Fichiers modifiés lors de la génération
 
 - CORE-SYNC.md
+- app/api/multiplechat/relay/route.ts
 - app/components/jobs-panel.tsx
+- app/components/multiplechat-relay-result.tsx
 - app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- app/api/multiplechat/relay/route.ts
-- app/components/multiplechat-relay-result.tsx
 - tests/multiplechat-relay.test.mjs
 
 ## Reprise MultipleChat

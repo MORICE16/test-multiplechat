@@ -51,3 +51,15 @@ test('an interrupted result import rolls back and pending relay survives normal 
   assert.equal(f.sql.prepare('SELECT status FROM morice_jobs').get().status,'awaiting_relay');assert.equal(f.sent,0);
  }finally{f.close();}
 });
+
+test('only one operator can take a relay and interrupted ownership never causes a resubmission',async()=>{
+ const f=await fixture();try{
+  const id=crypto.randomUUID();await f.route.POST(request({operation:'prepare',id,question:'Test de prise'}));
+  assert.equal((await f.route.POST(request({operation:'take',id},'bob'))).status,404);
+  const results=await Promise.all([f.route.POST(request({operation:'take',id})),f.route.POST(request({operation:'take',id}))]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);
+  assert.equal(f.sql.prepare('SELECT status FROM morice_jobs').get().status,'relay_in_progress');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events').get().n,2);
+  f.sql.prepare("UPDATE morice_jobs SET updated_at='2000-01-01'").run();const jobs=await f.load('app/lib/jobs.ts');await jobs.refreshResearch('alice');assert.equal(f.sql.prepare('SELECT status FROM morice_jobs').get().status,'relay_in_progress');
+  assert.equal((await f.route.POST(request({operation:'take',id}))).status,409);assert.equal(f.sent,0);
+  assert.equal((await f.route.POST(request({operation:'complete',id,answer:'OK',model:'ChatGPT',chatUrl:source}))).status,200);assert.equal(f.sql.prepare('SELECT status FROM morice_jobs').get().status,'done');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_job_events').get().n,3);
+ }finally{f.close();}
+});

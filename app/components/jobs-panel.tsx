@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ResultText } from "./result-text";
 import { ResponsePlayer } from "./response-player";
 import { type Citation } from "../lib/web-result";
@@ -15,10 +15,11 @@ export function useJobs(onCompleted: () => void) {
   const callback = useRef(onCompleted);
   useEffect(() => { callback.current = onCompleted; }, [onCompleted]);
   const working = useRef(false);
+  const refreshAgain = useRef(false);
   const lastDone = useRef("");
   const active = useRef(false);
-  async function refresh() {
-    if (working.current) return;
+  const refresh = useCallback(async function refreshJobs() {
+    if (working.current) { refreshAgain.current = true; return; }
     working.current = true;
     try {
       const response = await fetch("/api/jobs", { method: "POST" });
@@ -29,8 +30,8 @@ export function useJobs(onCompleted: () => void) {
       if (done !== lastDone.current) { lastDone.current = done; callback.current(); }
       setData(next); setError("");
     } catch (e) { setError(e instanceof Error ? e.message : "Suivi indisponible."); }
-    finally { working.current = false; }
-  }
+    finally { working.current = false; if (refreshAgain.current) { refreshAgain.current = false; void refreshJobs(); } }
+  }, []);
   useEffect(() => {
     const timeout = window.setTimeout(() => { void refresh(); }, 0);
     const timer = window.setInterval(() => { if (!document.hidden && navigator.onLine && active.current) void refresh(); }, 15_000);
@@ -38,7 +39,7 @@ export function useJobs(onCompleted: () => void) {
     document.addEventListener("visibilitychange", visible);
     window.addEventListener("online", visible);
     return () => { clearTimeout(timeout); clearInterval(timer); document.removeEventListener("visibilitychange", visible); window.removeEventListener("online", visible); };
-  }, []);
+  }, [refresh]);
   return { data, error, refresh };
 }
 
@@ -47,7 +48,7 @@ export function JobsPanel({ queue, waiting, tasks, onTasks, onApprovals }: { que
     <p>Les recherches acceptées continuent chez le moteur même si vous quittez cette page. Morice récupère et sauvegarde leur résultat à l’ouverture et toutes les 15 secondes pendant la consultation. L’exécution planifiée de nuit et les rappels restent à raccorder.</p>
     <button onClick={() => void queue.refresh()}>Actualiser les travaux</button>{queue.error && <p role="alert">{queue.error}</p>}
     <div className="job-groups">{groups.map(([status, label]) => {
-      const jobs = queue.data.jobs.filter(j => (j.status === "submitting" ? "running" : j.status) === status);
+      const jobs = queue.data.jobs.filter(j => (j.status === "submitting" ? "running" : j.status === "relay_in_progress" ? "awaiting_relay" : j.status) === status);
       const notes = tasks.filter(t => (status === "queued" && t.status === "open") || (status === "done" && t.status === "done"));
       return <section key={status} className="job-group"><h3>{label} · {jobs.length + notes.length + (status === "approval" ? waiting : 0)}</h3>
         {status === "approval" && waiting > 0 && <button onClick={onApprovals}>Examiner {waiting} action(s) à valider</button>}
@@ -61,7 +62,7 @@ export function JobsPanel({ queue, waiting, tasks, onTasks, onApprovals }: { que
           {job.evidence.core && <small>{job.evidence.core}</small>}
           {!!job.evidence.files?.length && <ul aria-label="Pièces jointes conservées">{job.evidence.files.map(file=><li key={file.id}><a href={`/api/files/${file.id}`} target="_blank" rel="noopener noreferrer">{file.name} ↗</a> · {Math.ceil(file.size/1024)} Ko</li>)}</ul>}
           {job.error && <p role="status">{job.error}</p>}
-          {job.operation === 'multiplechat_relay' && job.status === 'awaiting_relay' && <MultipleChatRelayResult id={job.id} question={job.request} onSaved={queue.refresh} />}
+          {job.operation === 'multiplechat_relay' && ['awaiting_relay','relay_in_progress'].includes(job.status) && <MultipleChatRelayResult id={job.id} question={job.request} taken={job.status === "relay_in_progress"} onSaved={queue.refresh} />}
           {job.result && <><ResultText text={job.result} citations={job.evidence.citations} /><ResponsePlayer text={job.result.replace(/[^]*/g, "")} /></>}
           <details><summary>Historique et preuve</summary><p>Référence Morice : {job.id}</p>{job.evidence.responseId && <p>Référence du moteur : {job.evidence.responseId}</p>}{job.evidence.checkedAt && <p>Résultat reçu le {new Date(job.evidence.checkedAt).toLocaleString("fr-FR")}</p>}<ul>{queue.data.events.filter(e => e.job_id === job.id).map((event, n) => <li key={n}>{new Date(event.created_at).toLocaleString("fr-FR")} — {event.detail}</li>)}</ul></details>
         </article>)}

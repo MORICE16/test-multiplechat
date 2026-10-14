@@ -5,7 +5,7 @@ import {sameOrigin} from '../../../lib/attachment-validation';
 const pendingReply = 'Votre question est conservée dans Travaux → Relais MultipleChat. Le transfert et le retour de réponse nécessitent une session opérateur/Codex active. Aucun envoi automatique ni appel API payant.';
 type RelayRow = {id:string;request:string;status:string;result:string;evidence:string};
 function response(row:RelayRow) {
-  return Response.json({ok:true,reply:row.status==='done'?row.result:pendingReply,action:{id:row.id,jobId:row.id,kind:'result',title:'Question pour MultipleChat',content:row.status==='done'?row.result:row.request,status:row.status,label:row.status==='done'?'Réponse MultipleChat importée':'Relais MultipleChat à effectuer',view:'jobs'}},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({ok:true,reply:row.status==='done'?row.result:row.status==='relay_in_progress'?'Le relais est déjà pris. Vérifiez le chat MultipleChat avant toute nouvelle soumission.':pendingReply,action:{id:row.id,jobId:row.id,kind:'result',title:'Question pour MultipleChat',content:row.status==='done'?row.result:row.request,status:row.status,label:row.status==='done'?'Réponse MultipleChat importée':row.status==='relay_in_progress'?'Relais pris · résultat à vérifier':'Relais MultipleChat à effectuer',view:'jobs'}},{headers:{'Cache-Control':'no-store'}});
 }
 export async function POST(request:Request) {
   if (!sameOrigin(request)) return new Response(null,{status:403});
@@ -35,6 +35,17 @@ export async function POST(request:Request) {
     }
     return response((await lookup())!);
   }
+  if(body.operation==='take') {
+    if(!existing) return Response.json({error:'Relais inaccessible.'},{status:404});
+    if(existing.status!=='awaiting_relay') return Response.json({error:'Relais déjà pris ou terminé. Vérifiez le chat source avant toute nouvelle soumission.'},{status:409});
+    const date=now();
+    const results=await env.DB.batch([
+      env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) SELECT id,user_id,'relay_in_progress','Relais pris; vérifier MultipleChat avant toute reprise',? FROM morice_jobs WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status='awaiting_relay'").bind(date,id,uid),
+      env.DB.prepare("UPDATE morice_jobs SET status='relay_in_progress',updated_at=? WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status='awaiting_relay'").bind(date,id,uid),
+    ]);
+    if(!results[1].meta.changes) return Response.json({error:'Relais pris simultanément. Aucun nouvel envoi ne doit être effectué.'},{status:409});
+    return response((await lookup())!);
+  }
   if(body.operation!=='complete') return Response.json({error:'Opération de relais invalide.'},{status:400});
   if(!existing) return Response.json({error:'Relais inaccessible.'},{status:404});
   const answer=typeof body.answer==='string'?body.answer.trim():'';
@@ -47,14 +58,14 @@ export async function POST(request:Request) {
     const evidence=JSON.parse(existing.evidence) as {modelDeclared?:string;chatUrl?:string};
     return existing.result===answer && evidence.modelDeclared===model && evidence.chatUrl===chatUrl.toString()?response(existing):Response.json({error:'Ce relais est déjà terminé. Son résultat ne sera pas écrasé.'},{status:409});
   }
-  if(existing.status!=='awaiting_relay') return Response.json({error:'Ce relais ne peut pas recevoir de résultat dans son état actuel.'},{status:409});
+  if(!['awaiting_relay','relay_in_progress'].includes(existing.status)) return Response.json({error:'Ce relais ne peut pas recevoir de résultat dans son état actuel.'},{status:409});
   const date=now();
   const evidence={tool:'MultipleChat · interface web',modelDeclared:model,chatUrl:chatUrl.toString(),checkedAt:date,trace:`Morice → opérateur/Codex → ${model} dans MultipleChat → réponse importée`,verification:'Texte et provenance importés par un opérateur authentifié; aucune connexion API prouvée'};
   const action={id,jobId:id,kind:'result',title:'Réponse MultipleChat importée',content:answer,status:'done',label:'Réponse MultipleChat importée',view:'jobs',...evidence};
   await env.DB.batch([
-    env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) SELECT id,user_id,'done','Réponse et provenance importées; aucune action externe exécutée',? FROM morice_jobs WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status='awaiting_relay'").bind(date,id,uid),
-    env.DB.prepare("UPDATE morice_messages SET text=?,action=? WHERE user_id=? AND role='assistant' AND json_valid(action) AND json_extract(action,'$.jobId')=? AND EXISTS(SELECT 1 FROM morice_jobs WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status='awaiting_relay')").bind(answer,JSON.stringify(action),uid,id,id,uid),
-    env.DB.prepare("UPDATE morice_jobs SET status='done',result=?,evidence=?,updated_at=? WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status='awaiting_relay'").bind(answer,JSON.stringify(evidence),date,id,uid),
+    env.DB.prepare("INSERT INTO morice_job_events(job_id,user_id,status,detail,created_at) SELECT id,user_id,'done','Réponse et provenance importées; aucune action externe exécutée',? FROM morice_jobs WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status IN ('awaiting_relay','relay_in_progress')").bind(date,id,uid),
+    env.DB.prepare("UPDATE morice_messages SET text=?,action=? WHERE user_id=? AND role='assistant' AND json_valid(action) AND json_extract(action,'$.jobId')=? AND EXISTS(SELECT 1 FROM morice_jobs WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status IN ('awaiting_relay','relay_in_progress'))").bind(answer,JSON.stringify(action),uid,id,id,uid),
+    env.DB.prepare("UPDATE morice_jobs SET status='done',result=?,evidence=?,updated_at=? WHERE id=? AND user_id=? AND operation='multiplechat_relay' AND status IN ('awaiting_relay','relay_in_progress')").bind(answer,JSON.stringify(evidence),date,id,uid),
   ]);
   const completed=await lookup();
   if(completed?.result!==answer) return Response.json({error:'Une autre réponse est déjà enregistrée. Vérifiez Travaux.'},{status:409});
