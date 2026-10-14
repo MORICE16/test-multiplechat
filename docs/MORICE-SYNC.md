@@ -660,3 +660,9 @@ Publication du relais assisté : source 2e733dcfd1712ebafde8e31b1bafd9338c987c8e
 
 - Chaîne réelle réussie : question synthétique créée depuis Conversation mode MultipleChat, transférée par Codex à ChatGPT dans MultipleChat, réponse de contrôle reçue dans son interface, importée dans Morice avec lien source et modèle déclaré. Travaux terminé et conversation mis à jour, résultat retrouvé après rechargement. Capture privée MORICE-RELAIS-MULTIPLECHAT-20261014.jpg. Aucune clé API ni copie demandée à Alan; aucun micro ou téléphone utilisé.
 - Protection de reprise ajoutée : prise de relais atomique avant transfert, un seul opérateur peut prendre la demande; état pris conservé après interruption, vérification du chat exigée avant nouvelle soumission. Pas de reprise ni de renvoi automatique d’une prise ambiguë. 107 tests réussis, dont concurrence de deux prises et conservation de l’état pris.
+
+Publication reprise protégée : source 69b7f7b266ad3a6fe9ebbe0070b8e47029a7bad8, main GitHub relu identique; appgdep_6acecc5ff9508191a459dd3a23bc7976 succeeded, version appgprj_6a7c6d7e060c819192f3ec42dfea6eaf~appgver_a89debf068fc8191b0267eb5f6ba426b, revision 6. 107 tests, TypeScript, lint ciblé zéro erreur et build réussis. Pas de nouvelle migration ni accès élargi.
+
+- Contrôle UI du correctif : nouvelle question de relais visible dans Travaux sans clic Actualiser. Prise de relais effectuée depuis son bouton; état pris et événement apparus avant transmission à MultipleChat. Deuxième contrôle synthétique en cours, sans donnée privée ni clé.
+
+- Deuxième aller-retour réel : prise persistante confirmée, réouverture du site conservant cette prise, réponse retrouvée dans le même chat MultipleChat sans nouvelle soumission; import depuis Travaux effectué. Les deux contrôles utilisent des marqueurs synthétiques distincts. Aucun appel OpenAI API, aucune écriture Microsoft, aucun transfert de fichier privé.
