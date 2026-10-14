@@ -79,3 +79,22 @@ test('private archive persists files without starting AI, retries safely and can
   assert.equal(x.sql.prepare("SELECT COUNT(*) n FROM morice_items WHERE kind='memory'").get().n,1);
  }finally{x.close();}
 });
+
+test('private file listing isolates owners, omits unclaimed files and bounds literal name search',async()=>{
+ const x=await fixture();try{
+  const put=x.sql.prepare('INSERT INTO morice_files(id,user_id,name,mime,size,sha256,object_key,created_at,job_id) VALUES(?,?,?,?,?,?,?,?,?)');
+  for(let i=0;i<55;i++)put.run(crypto.randomUUID(),'alice',`archive-${String(i).padStart(2,'0')}.pdf`,'application/pdf',12,'hash','private/synthetic','2026-10-14T00:00:00Z','claimed');
+  put.run(crypto.randomUUID(),'alice','100%_ready.pdf','application/pdf',12,'hash','private/synthetic','2026-10-14T00:00:00Z','claimed');
+  put.run(crypto.randomUUID(),'alice','unclaimed.pdf','application/pdf',12,'hash','private/synthetic','2026-10-14T00:00:00Z','');
+  put.run(crypto.randomUUID(),'bob','other-owner.pdf','application/pdf',12,'hash','private/synthetic','2026-10-14T00:00:00Z','claimed');
+  const req=query=>new Request('https://morice.test/api/files?query='+encodeURIComponent(query));
+  const response=await x.upload.GET(req(''));assert.equal(response.headers.get('Cache-Control'),'private, no-store');
+  const data=await response.json();assert.equal(data.files.length,50);assert.equal(data.hasMore,true);
+  assert.doesNotMatch(JSON.stringify(data),/object_key|sha256|other-owner|unclaimed/);
+  const exact=await(await x.upload.GET(req('%_'))).json();assert.deepEqual(exact.files.map(f=>f.name),['100%_ready.pdf']);assert.equal(exact.hasMore,false);
+  assert.equal((await x.upload.GET(req('x'.repeat(121)))).status,400);
+  assert.equal((await x.upload.GET(req('bad\u0000name'))).status,400);
+  assert.equal((await(await x.upload.GET(req('missing'))).json()).files.length,0);
+  x.f.uid='bob';const other=await(await x.upload.GET(req(''))).json();assert.deepEqual(other.files.map(f=>f.name),['other-owner.pdf']);
+ }finally{x.close();}
+});

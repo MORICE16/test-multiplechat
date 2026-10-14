@@ -689,3 +689,8 @@ Publication : source cb0eb9b7d89608b9bad45fccf6066520c9d5f328, main GitHub relu 
 - Sources officielles : https://developer.chrome.com/docs/extensions/how-to/integrate/web-push ; https://mozilla-services.github.io/autopush-rs/ ; https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/ ; https://learn.microsoft.com/en-us/windows/apps/develop/notifications/push-notifications/wns-overview .
 
 Publication notifications : source 879f629675123ee24ee802105325d9af92ab1fc3, déploiement privé appgdep_6acef069dc488191a58c0ed80e950da7 succeeded, version appgprj_6a7c6d7e060c819192f3ec42dfea6eaf~appgver_3c9ff91595ac81918a31e34ea193d5fd, revision 6. 111 tests, TypeScript, lint ciblé et build réussis. Aucune permission activée, aucun push réel envoyé; réception réelle et alertes finales restent non prouvées.
+
+### 2026-10-14 — retrouver les fichiers depuis Documents
+- Parcours existant enrichi : Mes fichiers Morice avant la recherche OneDrive, liens authentifiés, nom/type/taille/date, recherche par nom. Cinq entrées visibles, liste extensible; API limitée aux cinquante résultats les plus récents et recherche de 120 caractères. Aucune suppression ni transmission IA.
+- Lecture D1 du propriétaire seulement, pièces liées à une idée seulement, absence de clé objet/hash/compte dans la réponse, pas de migration. Requête annulée au démontage; chargement/erreur distincts d’un résultat vide.
+- 112 tests réussis : isolation, borne de cinquante, caractères génériques traités littéralement, caractères de contrôle et longueur refusés, métadonnées privées omises. TypeScript/lint/build/publication et preuve runtime consignés après contrôle.

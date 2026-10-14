@@ -2,6 +2,15 @@ import { env } from 'cloudflare:workers';
 import { userId, now } from '../../lib/runtime';
 import { detectFile, safeFilename, MAX_FILE_BYTES, sameOrigin } from '../../lib/attachment-validation';
 
+export async function GET(request:Request) {
+  const uid=userId(request);
+  const query=(new URL(request.url).searchParams.get('query') || '').trim();
+  if(query.length>120 || Array.from(query).some(c=>c.charCodeAt(0)<32 || c.charCodeAt(0)===127)) return Response.json({error:'Recherche de 120 caractères maximum.'},{status:400});
+  const pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%';
+  const rows=await env.DB.prepare("SELECT id,name,mime,size,created_at FROM morice_files WHERE user_id=? AND job_id<>'' AND name LIKE ? ESCAPE '\\' ORDER BY created_at DESC,id DESC LIMIT 51").bind(uid,pattern).all();
+  return Response.json({files:rows.results.slice(0,50),hasMore:rows.results.length>50},{headers:{'Cache-Control':'private, no-store'}});
+}
+
 export async function POST(request: Request) {
   const uid = userId(request);
   if (!sameOrigin(request)) return Response.json({error:'Origine refusée.'},{status:403});

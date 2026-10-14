@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T03:01:49.937Z
-Commit source au moment de la génération : `879f629675123ee24ee802105325d9af92ab1fc3`
+Généré : 2026-10-14T03:59:16.317Z
+Commit source au moment de la génération : `d744cde87a7611be5331c038dda6c4ba4da66204`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -38,6 +38,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.
 - 14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé.
 - 14 octobre : notifications préparées renforcées, clé VAPID stable lors des premières connexions simultanées, destination limitée aux services navigateur pris en charge, redirections refusées et délai borné; abonnement isolé par propriétaire.
+- 14 octobre : Documents liste les fichiers privés liés aux idées, recherche littérale par nom, ouverture authentifiée; affichage compact de cinq entrées et limite de cinquante résultats, OneDrive conservé.
 
 ## Tests
 
@@ -71,6 +72,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 108 tests; archivage privé image/PDF sans démarrage IA, idempotence, refus de changement de mode, conservation et isolation propriétaire. TypeScript/lint/build et contrôle runtime consignés après résultat.
 - 14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA.
 - 14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées.
+- 14 octobre : 112 tests, liste des fichiers isolée par propriétaire, exclusion des pièces non liées, métadonnées expurgées, recherche littérale et bornes vérifiées. Contrôle runtime après publication consigné séparément.
 
 ## En cours
 
@@ -133,7 +135,14 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/api/files/route.ts
+- app/components/onedrive-panel.tsx
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
+- docs/core-state.json
+- tests/idea-files.test.mjs
+- app/components/private-files-panel.tsx
 
 ## Reprise MultipleChat
 

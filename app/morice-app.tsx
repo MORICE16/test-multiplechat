@@ -21,6 +21,7 @@ import {MoriceCompanion} from "./components/morice-companion";
 import {GoogleConnections} from "./components/google-connections";
 import {CorePanel} from './components/core-panel';
 import {OneDrivePanel} from './components/onedrive-panel';
+import {PrivateFilesPanel} from './components/private-files-panel';
 import { type Citation } from "./lib/web-result";
 
 type Item = {
@@ -529,7 +530,7 @@ export default function MoriceApp() {
         {view === "mail" && <><MailReviewPanel /><GoogleMailReviewPanel /><MicrosoftReadPanel title="Emails récents" operation="mail_read" /></>}
         {view === "hubspot" && <InfoPanel title="HubSpot indisponible" text="Aucun accès HubSpot supplémentaire n’est disponible. Morice ne simulera jamais une connexion et utilisera Microsoft 365 ou Make pour les actions autorisées." />}
         {view === "calendar" && <MicrosoftReadPanel title="Agenda" operation="calendar_read" />}
-        {view === "documents" && <OneDrivePanel />}
+        {view === "documents" && <div className="single-column"><PrivateFilesPanel /><OneDrivePanel /></div>}
         {view === "core" && <CorePanel />}
         {view === "connections" && <ConnectionsPanel state={connections} refresh={refreshConnections} disconnectMicrosoft={disconnectMicrosoft} />}
         {view === "projects" && <InfoPanel title="Projets" text="L’espace projets est prêt. Il n’affichera que des projets réellement enregistrés ou connectés." />}
