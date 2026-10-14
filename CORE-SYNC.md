@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-13T23:24:37.549Z
-Commit source au moment de la génération : `523a4a9e98cdf3be3ba4996eae6a90ac7b0fb46b`
+Généré : 2026-10-14T00:11:12.157Z
+Commit source au moment de la génération : `5f15976dbba6dc1e9a0bdcb50c175b00f419de9e`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -35,6 +35,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React.
 - 14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.
 - 14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.
+- 14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.
 
 ## Tests
 
@@ -62,6 +63,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : runtime Microsoft principal, Outlook/Calendar/To Do/OneDrive relus avec succès sur la version PC; authentification Microsoft par empreinte PC confirmée.
 - 14 octobre : 103 tests; aperçus runtime de quatre comptes Microsoft supplémentaires, deux boîtes avec 100/91 messages et deux identités à boîte Microsoft vide dans le périmètre examiné.
 - 14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.
+- 14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.
 
 ## En cours
 
@@ -88,6 +90,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 13 octobre : support MultipleChat confirme absence API pour assistant personnel; runtime attend clé d'accès; ADB sans appareil, Desktop Commander hors ligne.
 - Réparation Fold : aucun appareil ADB détecté; sauvegarde téléphone, Authenticator et récupération indépendante à vérifier avant remise à zéro.
 - 14 octobre : les deux lectures Gmail échouent au contrôle réel; anciennes preuves historiques conservées mais non suffisantes. Reconnexion lecture seule ouverte, continuation Google en mode test requise.
+- 14 octobre : MultipleChat Smart et deux avis Compare fonctionnent; aucun accès API exploitable depuis Morice confirmé. Relais assisté nécessitant un opérateur/Codex actif, pas une autonomie permanente.
 
 ## Prochaines actions
 
@@ -124,8 +127,13 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 ## Fichiers modifiés lors de la génération
 
 - CORE-SYNC.md
+- app/components/jobs-panel.tsx
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- app/api/multiplechat/relay/route.ts
+- app/components/multiplechat-relay-result.tsx
+- tests/multiplechat-relay.test.mjs
 
 ## Reprise MultipleChat
 

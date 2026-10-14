@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { ResultText } from "./result-text";
 import { ResponsePlayer } from "./response-player";
 import { type Citation } from "../lib/web-result";
+import { MultipleChatRelayResult } from './multiplechat-relay-result';
 
-type JobView = { id: string; title: string; request: string; operation: string; status: string; result: string; error: string; updated_at: string; evidence: { citations?: Citation[]; checkedAt?: string; tool?: string; responseId?: string; trace?:string; core?:string; files?:{id:string;name:string;size:number}[] } };
+type JobView = { id: string; title: string; request: string; operation: string; status: string; result: string; error: string; updated_at: string; evidence: { citations?: Citation[]; checkedAt?: string; tool?: string; responseId?: string; trace?:string; core?:string; chatUrl?:string; verification?:string; files?:{id:string;name:string;size:number}[] } };
 type QueueData = { jobs: JobView[]; events: { job_id: string; status: string; detail: string; created_at: string }[] };
-const groups = [["queued", "À faire"], ["running", "En cours"], ["approval", "En attente de validation"], ["blocked", "Bloqué"], ["done", "Terminé"]];
+const groups = [["queued", "À faire"], ["awaiting_relay", "Relais MultipleChat"], ["running", "En cours"], ["approval", "En attente de validation"], ["blocked", "Bloqué"], ["done", "Terminé"]];
 
 export function useJobs(onCompleted: () => void) {
   const [data, setData] = useState<QueueData>({ jobs: [], events: [] });
@@ -54,10 +55,13 @@ export function JobsPanel({ queue, waiting, tasks, onTasks, onApprovals }: { que
         {notes.map(task => <article className="job-card" key={task.id}><h4>{task.title}</h4><p>{task.content}</p><small>Tâche de suivi · {task.status === "done" ? "Marquée terminée" : "Exécution manuelle"}</small><button className="secondary" onClick={onTasks}>Ouvrir les tâches</button></article>)}
         {jobs.map(job => <article className="job-card" key={job.id}><h4>{job.title}</h4><p>{job.request}</p>
           <small>{job.evidence.tool || job.operation} · {new Date(job.updated_at).toLocaleString("fr-FR")}</small>
-          {job.evidence.trace && <p className="horizon-caption">{job.evidence.trace} → {job.status === 'done' ? 'résultat enregistré' : job.status === 'blocked' ? 'bloqué' : 'en cours'}</p>}
+          {job.evidence.trace && <p className="horizon-caption">{job.evidence.trace} → {job.status === 'done' ? 'résultat enregistré' : job.status === 'blocked' ? 'bloqué' : job.status === 'awaiting_relay' ? 'attente du relais' : 'en cours'}</p>}
+          {job.evidence.chatUrl?.startsWith("https://multiplechat.ai/") && <a href={job.evidence.chatUrl} target="_blank" rel="noopener noreferrer">Source MultipleChat ↗</a>}
+          {job.evidence.verification && <p className="horizon-caption">{job.evidence.verification}</p>}
           {job.evidence.core && <small>{job.evidence.core}</small>}
           {!!job.evidence.files?.length && <ul aria-label="Pièces jointes conservées">{job.evidence.files.map(file=><li key={file.id}><a href={`/api/files/${file.id}`} target="_blank" rel="noopener noreferrer">{file.name} ↗</a> · {Math.ceil(file.size/1024)} Ko</li>)}</ul>}
           {job.error && <p role="status">{job.error}</p>}
+          {job.operation === 'multiplechat_relay' && job.status === 'awaiting_relay' && <MultipleChatRelayResult id={job.id} question={job.request} onSaved={queue.refresh} />}
           {job.result && <><ResultText text={job.result} citations={job.evidence.citations} /><ResponsePlayer text={job.result.replace(/[^]*/g, "")} /></>}
           <details><summary>Historique et preuve</summary><p>Référence Morice : {job.id}</p>{job.evidence.responseId && <p>Référence du moteur : {job.evidence.responseId}</p>}{job.evidence.checkedAt && <p>Résultat reçu le {new Date(job.evidence.checkedAt).toLocaleString("fr-FR")}</p>}<ul>{queue.data.events.filter(e => e.job_id === job.id).map((event, n) => <li key={n}>{new Date(event.created_at).toLocaleString("fr-FR")} — {event.detail}</li>)}</ul></details>
         </article>)}
