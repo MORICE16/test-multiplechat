@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T02:58:51.192Z
-Commit source au moment de la génération : `4445e8cec3799b732c4a69224c815f39af6ea745`
+Généré : 2026-10-14T03:01:49.937Z
+Commit source au moment de la génération : `879f629675123ee24ee802105325d9af92ab1fc3`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -133,13 +133,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/push/crypto.ts
-- app/api/push/subscribe/route.ts
-- app/api/push/test/route.ts
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- app/lib/push-endpoint.ts
-- tests/push-private.test.mjs
 
 ## Reprise MultipleChat
 
