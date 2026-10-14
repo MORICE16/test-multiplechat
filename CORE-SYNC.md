@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T03:59:16.317Z
-Commit source au moment de la génération : `d744cde87a7611be5331c038dda6c4ba4da66204`
+Généré : 2026-10-14T04:02:54.864Z
+Commit source au moment de la génération : `e4892698605337d54f5ba8445366b4bcffa99ce3`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -73,6 +73,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : archivage sans analyse publié et réellement utilisé; image/PDF récupérés après rechargement avec SHA-256 identiques, résultat de conservation et journal visibles. Aucun appel IA.
 - 14 octobre : 111 tests, dont destinations push, origine et propriété des abonnements, concurrence VAPID et envoi substitué. Aucune notification réelle envoyée pendant le sommeil; réception et alertes finales automatiques non prouvées.
 - 14 octobre : 112 tests, liste des fichiers isolée par propriétaire, exclusion des pièces non liées, métadonnées expurgées, recherche littérale et bornes vérifiées. Contrôle runtime après publication consigné séparément.
+- 14 octobre : Documents publié; liste privée et recherche par nom réellement utilisées, PDF récupéré identique à l’original SHA-256. OneDrive conservé; aucune analyse IA ni permission ajoutée.
 
 ## En cours
 
@@ -135,14 +136,8 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/files/route.ts
-- app/components/onedrive-panel.tsx
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/idea-files.test.mjs
-- app/components/private-files-panel.tsx
 
 ## Reprise MultipleChat
 
