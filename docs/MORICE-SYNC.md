@@ -490,6 +490,36 @@ RADAR filtré : aucune nouveauté officielle du 13/10 ne justifie une nouvelle b
 Transmission 02 : priorité validée à la finalisation du socle existant dès retour du PC, avec preuves avant/après et sans développement dispersé. Commencer par l’inventaire et la sauvegarde, puis traiter `HTTP-SHORTCUTS-001` et un parcours complet minimal ; ne tester Android CLI/ARTEMIS qu’après stabilisation ou si indispensable au diagnostic Android. Aucun code fonctionnel modifié par 04.
 
 
+### 2026-10-14 19:40 Europe/Paris — forte progression du socle et relais MultipleChat assisté prouvé
+Couverture : protocole commun, dernier journal, CORE-SYNC généré le 14/10 à 05:01 UTC et core-state LU sur GitHub main `0676e8e1` ; comparaison `8bc86be0…0676e8e1` LU (23 commits, 43 fichiers touchés) ; preuves DEV/runtime publiques datées du 13–14/10 LU ; état Desktop Commander LU ; RADAR officiel vérifié le 14/10. Git local direct de cette exécution, données privées D1/R2, Fold/ADB, sessions Google et réglages Work/Codex INACCESSIBLES. Les preuves runtime ci-dessous sont celles consignées par DEV, pas des tests rejoués par 04.
+
+Changements matériels :
+- La phase de finalisation validée par Alan a réellement progressé : source applicative servie `e4892698`, déploiement privé réussi, 112 tests, TypeScript, lint ciblé et build réussis. Le dépôt a avancé de 23 commits depuis le bilan précédent.
+- Parcours sans API payante : agenda et mails Microsoft, listes To Do et recherche OneDrive ont été exécutés depuis Conversation avec résultats et historique persistants. La mémoire synthétique a été enregistrée puis retrouvée. Aucune écriture mail ni achat.
+- Voix : lecteur navigateur sans OpenAI publié ; correction bornée du doublon de dictée publiée. Statut `TESTÉ AUTOMATIQUEMENT / À VALIDER SUR FOLD` : qualité sonore, microphone réel et lecture longue sur Fold ne sont pas prouvés.
+- Fichiers : archivage privé image/PDF sans analyse IA publié et vérifié après rechargement ; SHA-256 identiques. Documents liste et recherche les pièces privées du propriétaire et permet leur récupération. D1/R2 et isolation propriétaire sont prouvés dans ce périmètre.
+- Notifications : protections VAPID, origine, propriétaire, redirections et délai renforcées ; 111 tests passaient au lot concerné. Statut `PARTIEL` : aucun push réel ni réception Fold n’est prouvé.
+- Microsoft : compte principal relu avec succès ; quatre identités supplémentaires inspectées dans le périmètre Microsoft. Les deux contrôles Gmail échouent désormais et leur ancien statut vérifié a été dégradé sans effacer les jetons. Reconnexion Google lecture seule requiert une continuation humaine de l’application en test.
+- Continuité : accès Microsoft indépendant du Fold confirmé par empreinte PC. Smart Switch est installé mais aucune sauvegarde téléphone n’est prouvée ; ADB ne détecte aucun appareil. Ne pas réinitialiser le Fold avant sauvegardes et moyens de récupération indépendants.
+- Desktop Commander affiche encore `Alan Offline` au contrôle de 19:40, malgré les travaux locaux exécutés auparavant par une autre session Codex ; ne pas confondre ces accès.
+
+MultipleChat / contradictions :
+- `MC-SYNC-001` n’est plus entièrement « en attente » : Compare avec ChatGPT et Gemini a produit deux avis réels conservés en privé, et deux allers-retours `Morice → opérateur/Codex → MultipleChat → import Morice` ont été exécutés avec référence, provenance, prise atomique, reprise sans renvoi et persistance après rechargement. Le Project affiche treize fichiers GitHub publics Ready après re-synchronisation.
+- Statut courant : `PARTIEL / RELAIS ASSISTÉ OPÉRATIONNEL`. L’autonomie reste `BLOQUÉE` : le support MultipleChat confirme l’absence d’API d’assistant personnel exploitable, et le relais exige un opérateur/Codex actif. Aucun CORE privé, secret ou fichier utilisateur n’a été envoyé.
+- La mention historique « Project Files non fiables » est dépassée pour les treize fichiers publics actuellement affichés Ready ; elle ne prouve toujours ni lecture automatique exhaustive ni transport API.
+
+RADAR filtré :
+- GPT-5.5 est retiré le 14/10 de ChatGPT, Work et Codex ; l’API n’est pas concernée. Aucune référence `gpt-5.5` ou `gpt-4` n’a été trouvée dans le dépôt au contrôle ciblé ; réglages locaux, agents et tâches restent à vérifier quand accessibles.
+- OpenAI annonce aussi le 14/10 la dépréciation de certains modèles API GPT-4 pour retrait le 14/01/2027. Aucun impact immédiat retenu : Morice garde l’API payante désactivée et aucune référence correspondante n’est trouvée dans main.
+- Le bouton Work IQ unifiant le contrôle des données de travail apparaît dans les notes Microsoft 365 Copilot, mais aucune licence/activation Morice n’est prouvée. Graph reste `CONSERVER / OPÉRATIONNEL`.
+- Aucune nouvelle brique, licence, dépense ou migration proposée.
+
+Décisions et transmission 02 :
+- CONSERVER Graph direct, D1/R2, isolation propriétaire, verrous, relais MultipleChat assisté et garde sans API payante.
+- AMÉLIORER uniquement les preuves d’usage restantes : test physique dictée/caméra sur Fold, reconnexion Gmail avec validation humaine, sauvegarde Fold avant réparation et test push réel contrôlé.
+- Maintenir Android CLI/ARTEMIS en attente tant qu’ils ne sont pas indispensables au diagnostic ; aucune nouvelle architecture autorisée. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
