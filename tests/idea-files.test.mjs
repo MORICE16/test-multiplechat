@@ -52,3 +52,30 @@ test('chunked multipart body is capped before decoding',async()=>{
  assert.equal(response.status,413);assert.equal(x.objects.size,0);
  }finally{x.close();}
 });
+
+test('private archive persists files without starting AI, retries safely and cannot switch mode',async()=>{
+ const x=await fixture();try{
+  const ids=[];
+  for(const [name,bytes] of [['image.png',png],['document.pdf',pdf]]){
+   const form=new FormData();form.set('file',new File([bytes],name));
+   const r=await x.upload.POST(new Request('https://morice.test/api/files',{method:'POST',body:form}));ids.push((await r.json()).id);
+  }
+  const id=crypto.randomUUID();const body={id,text:'Conserver ces pièces sans analyse.',files:ids,analyze:false};
+  const req=value=>new Request('https://morice.test/api/ideas',{method:'POST',body:JSON.stringify(value)});
+  assert.equal((await x.idea.POST(req(body))).status,202);
+  assert.equal(x.f.starts,0);
+  const job=x.sql.prepare('SELECT * FROM morice_jobs WHERE id=?').get(id);
+  assert.equal(job.operation,'idea_archive');assert.equal(job.status,'done');assert.equal(job.response_id,'');
+  assert.match(job.result,/Aucune analyse IA/);assert.equal(JSON.parse(job.evidence).tool,'Morice · stockage privé');
+  assert.equal((await x.idea.POST(req(body))).status,200);
+  assert.equal((await x.idea.POST(req({...body,analyze:true}))).status,409);
+  assert.equal((await x.idea.POST(req({...body,id:crypto.randomUUID(),analyze:'false'}))).status,400);
+  assert.equal(x.f.starts,0);assert.equal(x.sql.prepare('SELECT COUNT(*) n FROM morice_job_events WHERE job_id=?').get(id).n,1);
+  for(const fileId of ids){
+   const response=await x.file.GET(new Request('https://morice.test/api/files'),{params:Promise.resolve({id:fileId})});
+   assert.equal(response.status,200);assert.ok((await response.arrayBuffer()).byteLength>0);
+  }
+  x.f.uid='bob';assert.equal((await x.file.GET(new Request('https://morice.test/api/files'),{params:Promise.resolve({id:ids[0]})})).status,404);
+  assert.equal(x.sql.prepare("SELECT COUNT(*) n FROM morice_items WHERE kind='memory'").get().n,1);
+ }finally{x.close();}
+});

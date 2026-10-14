@@ -673,3 +673,8 @@ Publication reprise protégée : source 69b7f7b266ad3a6fe9ebbe0070b8e47029a7bad8
 - Nouvel ajout depuis Journal d’idées → Mes idées : aperçu image et PDF, enregistrement, réouverture de Travaux, téléchargement des deux nouvelles pièces. SHA-256 encore identiques. Entrée de journal conservée; aucune suppression ni migration.
 - Analyse distincte : statut Bloqué, message « OpenAI n’est pas configuré. Aucun renvoi automatique. » La garde des appels payants reste active. Aucun résultat IA produit pour ce nouveau contrôle; cela ne prouve pas le transfert de fichiers vers MultipleChat.
 - Code applicatif inchangé : pas de nouveau build, de nouvelle publication ni de répétition des 107 tests. Preuve visuelle et hachages conservés dans outputs privés; Sync Pack actualisé. Prochain lot : rendre explicite le parcours d’archivage sans analyse payante, puis continuer les raccordements PC indépendants sans élargir les permissions.
+
+### 2026-10-14 — enregistrement privé sans analyse
+- Bouton explicite Enregistrer sans analyse dans les deux usages de Nouvelle idée; texte et pièces liés au même travail, résultat de conservation visible. Le mode analyse existant reste distinct et soumis à la garde API payante.
+- API : choix boolean vérifié, transaction unique fichiers/mémoire/travail/événement, aucune invocation IA en archivage. Reprise identique idempotente; changement de mode sur une référence conservée refusé, sans conversion ni nouvelle analyse. Pas de migration ni permission nouvelle.
+- 108 tests réussis incluant archivage image/PDF, résultat et provenance, isolation propriétaire, relecture, répétition et refus de conversion. TypeScript/lint/build/publication et preuve runtime consignés après contrôle.

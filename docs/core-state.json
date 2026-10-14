@@ -27,7 +27,8 @@
     "14 octobre : stabilisation PC, lectures des comptes annulées au démontage, restauration météo annulable et ambiance pilotée par effet React.",
     "14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.",
     "14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.",
-    "14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée."
+    "14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.",
+    "14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé."
   ],
   "Tests": [
     "83 tests réussis; contrôles de chiffrement, sauvegarde, isolation des comptes et métadonnées Gmail seules inclus.",
@@ -56,7 +57,8 @@
     "14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.",
     "14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.",
     "14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi.",
-    "14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée."
+    "14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée.",
+    "14 octobre : 108 tests; archivage privé image/PDF sans démarrage IA, idempotence, refus de changement de mode, conservation et isolation propriétaire. TypeScript/lint/build et contrôle runtime consignés après résultat."
   ],
   "En cours": [
     "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",

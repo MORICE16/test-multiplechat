@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T00:57:13.020Z
-Commit source au moment de la génération : `d32a39480513259a60c2676b132c9aa5f2954d26`
+Généré : 2026-10-14T01:57:01.898Z
+Commit source au moment de la génération : `5cc18040a63e773035feb46251f2771f704ba129`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -36,6 +36,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : statut Gmail dégradé après lecture échouée, jetons conservés pour nouvel essai; date du dernier succès affichée.
 - 14 octobre : commandes de conversation directes Affiche mes listes To Do et Cherche dans OneDrive mot-clé, sans IA payante; préfixe Morice/Maurice pour lectures précises, exemples repliables.
 - 14 octobre : relais MultipleChat assisté avec référence de question, import de réponse/provenance et journal; aucune connexion API autonome affirmée.
+- 14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé.
 
 ## Tests
 
@@ -66,6 +67,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.
 - 14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi.
 - 14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée.
+- 14 octobre : 108 tests; archivage privé image/PDF sans démarrage IA, idempotence, refus de changement de mode, conservation et isolation propriétaire. TypeScript/lint/build et contrôle runtime consignés après résultat.
 
 ## En cours
 
@@ -128,8 +130,11 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- app/api/ideas/route.ts
+- app/components/idea-composer.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- tests/idea-files.test.mjs
 
 ## Reprise MultipleChat
 
