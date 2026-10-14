@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T00:32:14.632Z
-Commit source au moment de la génération : `69b7f7b266ad3a6fe9ebbe0070b8e47029a7bad8`
+Généré : 2026-10-14T00:57:13.020Z
+Commit source au moment de la génération : `d32a39480513259a60c2676b132c9aa5f2954d26`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -65,6 +65,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : nouvelles commandes To Do et OneDrive réellement exécutées depuis Conversation, résultats et lien Travaux visibles; lecture seule, API IA payante désactivée.
 - 14 octobre : 106 tests; trois tests nouveaux sur le relais, isolation, transaction, reprise et protection du résultat.
 - 14 octobre : aller-retour Morice → Codex/opérateur → ChatGPT dans MultipleChat → réponse importée → journal et conversation, résultat retrouvé après rechargement; 107 tests incluant prise atomique et reprise sans nouvel envoi.
+- 14 octobre, reprise nocturne : anciens et nouveaux fichiers synthétiques image/PDF récupérés depuis le site privé après rechargement, SHA-256 identiques aux originaux; journal conservé. Analyse payante bloquée, aucune analyse IA nouvelle revendiquée.
 
 ## En cours
 
@@ -128,6 +129,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 ## Fichiers modifiés lors de la génération
 
 - docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 

@@ -666,3 +666,10 @@ Publication reprise protégée : source 69b7f7b266ad3a6fe9ebbe0070b8e47029a7bad8
 - Contrôle UI du correctif : nouvelle question de relais visible dans Travaux sans clic Actualiser. Prise de relais effectuée depuis son bouton; état pris et événement apparus avant transmission à MultipleChat. Deuxième contrôle synthétique en cours, sans donnée privée ni clé.
 
 - Deuxième aller-retour réel : prise persistante confirmée, réouverture du site conservant cette prise, réponse retrouvée dans le même chat MultipleChat sans nouvelle soumission; import depuis Travaux effectué. Les deux contrôles utilisent des marqueurs synthétiques distincts. Aucun appel OpenAI API, aucune écriture Microsoft, aucun transfert de fichier privé.
+
+### 2026-10-14 — reprise nocturne, conservation réelle des pièces
+- Checkout main d32a394 relu; aucune demande MultipleChat en attente au contrôle. Aucun nouveau message envoyé à un fournisseur. Project : onze fichiers Ready, route du relais incluse.
+- Depuis le site privé : image et PDF synthétiques du 30 septembre téléchargés depuis leurs liens dans Travaux. SHA-256 identiques aux originaux locaux, conservation R2 réellement prouvée sur deux semaines.
+- Nouvel ajout depuis Journal d’idées → Mes idées : aperçu image et PDF, enregistrement, réouverture de Travaux, téléchargement des deux nouvelles pièces. SHA-256 encore identiques. Entrée de journal conservée; aucune suppression ni migration.
+- Analyse distincte : statut Bloqué, message « OpenAI n’est pas configuré. Aucun renvoi automatique. » La garde des appels payants reste active. Aucun résultat IA produit pour ce nouveau contrôle; cela ne prouve pas le transfert de fichiers vers MultipleChat.
+- Code applicatif inchangé : pas de nouveau build, de nouvelle publication ni de répétition des 107 tests. Preuve visuelle et hachages conservés dans outputs privés; Sync Pack actualisé. Prochain lot : rendre explicite le parcours d’archivage sans analyse payante, puis continuer les raccordements PC indépendants sans élargir les permissions.
