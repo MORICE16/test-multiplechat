@@ -520,6 +520,30 @@ Décisions et transmission 02 :
 - Maintenir Android CLI/ARTEMIS en attente tant qu’ils ne sont pas indispensables au diagnostic ; aucune nouvelle architecture autorisée. Aucun code fonctionnel modifié par 04.
 
 
+### 2026-10-15 20:23 Europe/Paris — nouveau dossier Android sur les destinations cartographiques erronées
+Couverture : protocole commun, dernier journal, CORE-SYNC et core-state LU sur GitHub main `b0af86f4` ; commits récents LU ; demande explicite d’Alan du 15/10 accessible PARTIEL ; état Desktop Commander LU ; documentation officielle Google Maps URLs et RADAR officiel vérifiés le 15/10. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, applications Avison/Casual Now/Avison Terrain V2 et journaux d’intents INACCESSIBLES.
+
+État technique : aucun commit postérieur à `b0af86f4`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié depuis le bilan du 14/10. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 579 h, version 0.2.51).
+
+Nouveau dossier `ANDROID-MAPS-001` — `À DIAGNOSTIQUER / VALIDÉ PAR ALAN le 15/10` :
+- Symptôme rapporté : depuis plusieurs applications, l’ouverture d’une adresse dans Google Maps conduit parfois vers une destination sans rapport. Alan demande une vérification directe sur le téléphone, une correction et de déterminer si Waze peut présenter le même problème.
+- Cette demande autorise un diagnostic Android borné lorsque l’accès au téléphone revient ; elle n’autorise pas une réinitialisation, une installation, une suppression de données, une modification globale des applications par défaut ou une permission permanente sans preuve et retour arrière.
+- Cause non prouvée. Hypothèses à distinguer avec un exemple réel : texte d’adresse mal formé ou tronqué par l’application source ; coordonnées latitude/longitude erronées ; encodage/paramètres d’URL invalides ; ambiguïté de géocodage ; destination correcte transmise mais résolution incorrecte par Maps.
+- Documentation Google : une application peut ouvrir Maps avec une adresse, des coordonnées ou un Place ID ; `api=1` est requis pour appliquer les paramètres et un Place ID est la garantie la plus forte pour cibler un établissement précis. Cela confirme que la donnée transmise par l’application source doit être inspectée avant d’attribuer le défaut à Google Maps.
+- Waze n’est pas un contournement garanti : si l’application source transmet les mêmes coordonnées erronées, Waze peut conduire au même mauvais point ; si elle transmet seulement un texte ambigu, son géocodage peut produire un résultat différent. Conclusion à tester, pas à présumer.
+- Aucune panne générale Google Maps officiellement confirmée n’a été trouvée dans la recherche ciblée du 15/10 ; les résultats publics retrouvés décrivent des cas anciens d’adresses ou repères incorrects, pas l’incident multi-apps précis d’Alan.
+
+Plan transmis à 02 :
+1. dès accès téléphone/ADB/OpenClaw autorisé, reproduire avec une adresse non sensible et conserver : application source, texte visible, lien/intention exact expurgé, coordonnées reçues, destination affichée ;
+2. ouvrir exactement la même donnée dans Google Maps et Waze, puis saisir manuellement l’adresse dans les deux applications ;
+3. classer l’origine `SOURCE / HANDOFF / GÉOCODAGE MAPS / DONNÉE CARTOGRAPHIQUE` avant toute correction ;
+4. corriger uniquement le niveau prouvé, avec sauvegarde et test de retour arrière. Ne pas vider les données de Maps ni réinitialiser les préférences globales à l’aveugle.
+
+RADAR filtré : aucune nouveauté officielle du 15/10 ne remplace ou n’améliore immédiatement une brique Morice. Le retrait GPT-5.5 est effectif depuis le 14/10 à 19:00 UTC pour Codex connecté à ChatGPT ; API et sessions Codex par clé API non concernées. Aucune licence, dépense, installation ou migration proposée.
+
+Blocages existants : Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. `ANDROID-MAPS-001` s’ajoute comme diagnostic utilisateur prioritaire dès accès téléphone. Aucun code fonctionnel modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
