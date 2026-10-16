@@ -544,6 +544,19 @@ RADAR filtré : aucune nouveauté officielle du 15/10 ne remplace ou n’amélio
 Blocages existants : Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. `ANDROID-MAPS-001` s’ajoute comme diagnostic utilisateur prioritaire dès accès téléphone. Aucun code fonctionnel modifié par 04.
 
 
+
+### 2026-10-16 20:26 Europe/Paris — contrôle quotidien et piste Sites Tunnels
+Couverture : protocole commun et dernier journal LU ; CORE-SYNC et core-state LU sur GitHub main `6309b768` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 16/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, applications sources et journaux d’intents INACCESSIBLES.
+
+État technique : aucun commit postérieur à `6309b768`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 603 h, version 0.2.51). `ANDROID-MAPS-001` reste prioritaire mais non reproductible sans accès au téléphone et exemple réel ; aucune action Android exécutée.
+
+RADAR filtré :
+- OpenAI, notes Enterprise/Edu du 15/10 : les Tunnels de ChatGPT Sites sont en déploiement pour des espaces Enterprise éligibles. Ils peuvent connecter un Site à des services du réseau privé sans les rendre publics ; connexion du tunnel et publication publique exigent des permissions séparées. L’aperçu administrateur Sites et la résidence US/UE des nouveaux Sites sont également annoncés, selon éligibilité et réglages du workspace.
+- Dossier `SITES-TUNNEL-001` — `TESTER / À VALIDER` : gain potentiel pour simplifier un accès contrôlé à Morice privé sans exposition Internet. Compatibilité compte, disponibilité régionale, droits administrateur, authentification, coût et capacité à remplacer une brique existante NON PROUVÉS. Option conserver l’architecture actuelle ; aucun tunnel, migration ni publication autorisés.
+- Microsoft annonce un changement commercial des offres Copilot au 01/12, sans changement de capacités ni action pour les abonnements existants ; aucun impact Morice retenu. Aucune autre nouveauté officielle dédupliquée n’améliore immédiatement une brique existante.
+
+Décisions et transmission 02 : CONSERVER l’architecture actuelle. Ne transmettre `SITES-TUNNEL-001` à 02 qu’après validation Alan et preuve d’éligibilité ; exigences minimales : service privé de test, contrôle d’accès, journalisation, retour arrière et absence d’exposition publique. Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
