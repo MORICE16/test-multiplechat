@@ -557,6 +557,19 @@ RADAR filtré :
 
 Décisions et transmission 02 : CONSERVER l’architecture actuelle. Ne transmettre `SITES-TUNNEL-001` à 02 qu’après validation Alan et preuve d’éligibilité ; exigences minimales : service privé de test, contrôle d’accès, journalisation, retour arrière et absence d’exposition publique. Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-17 19:44 Europe/Paris — contrôle quotidien et retrait des connecteurs synchronisés
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `7763d71` ; commits récents LU ; contexte récent accessible PARTIEL ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 17/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat et diagnostics authentifiés INACCESSIBLES.
+
+État technique : aucun commit postérieur à `7763d71`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 626 h, version 0.2.51). `ANDROID-MAPS-001` reste prioritaire et non reproductible sans accès au téléphone ; aucun changement des blocages Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` ou autonomie MultipleChat.
+
+RADAR filtré :
+- OpenAI, notes Enterprise/Edu du 16/10 : les connecteurs à synchronisation administrée sont retirés. Google Drive, SharePoint et Microsoft Teams doivent désormais utiliser les applications en temps réel ; de nouveaux contrôles de contenu existent pour Google Drive, Teams et Outlook Email dans les espaces Enterprise éligibles. Les permissions existantes de chaque utilisateur continuent de s’appliquer.
+- Dossier `APP-SYNC-001` — `À VÉRIFIER / À VALIDER` : contrôler si une connexion Morice ou ChatGPT dépend encore d’une ancienne synchronisation administrée. Le connecteur GitHub direct utilisé par 04 fonctionne aujourd’hui ; aucun impact runtime Morice, aucune perte de données et aucune migration ne sont prouvés.
+- GPT-6 Sol/Luna et GPT-6.1 Sol ont été dédupliqués : disponibilité Work/Codex déjà suivie, aucun achat API ni changement automatique de modèle. Aucune autre nouveauté officielle n’améliore immédiatement une brique existante.
+
+Décisions et transmission 02 : CONSERVER les accès directs actuellement opérationnels. Ne modifier une connexion qu’après identification d’une dépendance réellement retirée, preuve d’éligibilité, contrôle des permissions et retour arrière. `SITES-TUNNEL-001` reste `TESTER / À VALIDER`. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
