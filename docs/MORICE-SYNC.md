@@ -570,6 +570,14 @@ RADAR filtré :
 
 Décisions et transmission 02 : CONSERVER les accès directs actuellement opérationnels. Ne modifier une connexion qu’après identification d’une dépendance réellement retirée, preuve d’éligibilité, contrôle des permissions et retour arrière. `SITES-TUNNEL-001` reste `TESTER / À VALIDER`. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-18 20:22 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `55723d8b` ; commits récents LU ; contexte récent accessible PARTIEL ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 18/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat et diagnostics authentifiés INACCESSIBLES.
+
+Aucun changement matériel. Aucun commit postérieur à `55723d8b`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. GPT-6 Sol/Luna, GPT-6.1 Sol, retrait des connecteurs synchronisés et Sites Tunnels sont déjà suivis. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 651 h, version 0.2.51).
+
+`ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. Aucun travail nouveau transmis à 02 et aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
