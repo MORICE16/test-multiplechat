@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-14T05:01:18.895Z
-Commit source au moment de la génération : `57d276aca5d39ab88a8b8cb074ff60a8d789c01c`
+Généré : 2026-10-19T00:20:15.394Z
+Commit source au moment de la génération : `08d1239dc7f02183546d76e9472f7fe1da1f7bc6`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -39,6 +39,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : enregistrement explicite des idées et fichiers sans analyse IA, journal transactionnel terminé, aucune transmission externe; mode analyse existant conservé.
 - 14 octobre : notifications préparées renforcées, clé VAPID stable lors des premières connexions simultanées, destination limitée aux services navigateur pris en charge, redirections refusées et délai borné; abonnement isolé par propriétaire.
 - 14 octobre : Documents liste les fichiers privés liés aux idées, recherche littérale par nom, ouverture authentifiée; affichage compact de cinq entrées et limite de cinquante résultats, OneDrive conservé.
+- 19 octobre : point quotidien déterministe sur demande explicite : agenda des sept prochains jours, cinq mails récents et listes To Do du compte principal. Lectures seules, sans IA; rubriques indisponibles explicites et résultat journalisé, sans créer de tâches. Publication et preuve runtime consignées séparément.
 
 ## Tests
 
@@ -75,6 +76,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 14 octobre : 112 tests, liste des fichiers isolée par propriétaire, exclusion des pièces non liées, métadonnées expurgées, recherche littérale et bornes vérifiées. Contrôle runtime après publication consigné séparément.
 - 14 octobre : Documents publié; liste privée et recherche par nom réellement utilisées, PDF récupéré identique à l’original SHA-256. OneDrive conservé; aucune analyse IA ni permission ajoutée.
 - 14 octobre : export technique runtime réellement récupéré et contrôlé sans contenu privé; MultipleChat treize fichiers publics Ready après actualisation des fichiers modifiés et ajout de deux composants. Pas de transport IA autonome nouveau.
+- 19 octobre : 116 tests automatisés réussis; nouveau point quotidien : propriétaire conservé, trois lectures permises seulement, absence d'appel IA et d'écriture, résultats partiels, panne complète et provenance/historique; délai partagé et panne de journalisation après revue Claude. Ces tests utilisent des transports substitués, pas les boîtes réelles.
 
 ## En cours
 
@@ -137,8 +139,15 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
+- CORE-SYNC.md
+- app/api/assistant/route.ts
+- app/lib/assistant-context.ts
+- app/lib/microsoft.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- tests/backend.test.mjs
+- app/lib/daily-brief.ts
 
 ## Reprise MultipleChat
 

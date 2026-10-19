@@ -3,7 +3,8 @@ export type HistoryMessage = { role: "user" | "assistant"; text: string };
 export function boundedHistory(value: unknown): HistoryMessage[] {
   if (!Array.isArray(value)) return [];
   return value.slice(-16).filter((item): item is HistoryMessage =>
-    item && (item.role === "user" || item.role === "assistant") && typeof item.text === "string"
+    item && (item.role === "user" || item.role === "assistant") && typeof item.text === "string" &&
+    !(item.role === "assistant" && item.action?.externalData === true)
   ).map(item => ({ role: item.role, text: item.text.slice(0, 4000) }));
 }
 

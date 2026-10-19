@@ -6,10 +6,11 @@ import { boundedHistory, planningError, type HistoryMessage } from "@/app/lib/as
 import { createJob, startResearch, transitionJob } from "@/app/lib/jobs";
 import { isExplicitMailPreview } from "@/app/lib/mail-triage";
 import { fetchOpenClawDiagnostic } from "@/app/lib/openclaw-diagnostic";
+import { buildDailyBrief } from "@/app/lib/daily-brief";
 
 import { routeModel } from "@/app/lib/model-router";
 
-type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "todo_lists" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "answer";
+type Intent = "task" | "memory" | "mail_read" | "mail_triage" | "mail_draft" | "mail_send" | "calendar_read" | "calendar_create" | "todo_create" | "todo_lists" | "onedrive_search" | "make_trigger" | "web_search" | "openclaw_diagnostic" | "daily_brief" | "answer";
 type Plan = {
   model?: string;
   routingReason?: string;
@@ -56,6 +57,7 @@ async function intelligentPlan(message: string, mode: string, history: HistoryMe
   if (mode === "task" || mode === "memory") return localPlan(message, mode);
   const directMessage = message.replace(/^(?:morice|maurice)[,:\s]+/i, "");
   const directText = normalized(directMessage);
+  if (mode === "auto" && /^(?:(?:prepare|affiche|fais)(?:-moi)? )?mon point quotidien[.!?]?$/.test(directText)) return { intent: "daily_brief", title: "Mon point quotidien", reply: "", requiresApproval: false, provider: "microsoft", operation: "daily_brief", payload: emptyPayload() };
   if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes (?:mails|emails|courriels)(?: recents)?[.!?]?$/.test(directText)) return { intent: "mail_read", title: "Lire les mails récents", reply: "", requiresApproval: false, provider: "microsoft", operation: "mail_read", payload: emptyPayload() };
   if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mon (?:agenda|calendrier)[.!?]?$/.test(directText)) return { intent: "calendar_read", title: "Lire mon agenda", reply: "", requiresApproval: false, provider: "microsoft", operation: "calendar_read", payload: emptyPayload() };
   if (mode === "auto" && /^(?:lis|affiche|montre)(?:-moi)? mes listes (?:microsoft )?to do[.!?]?$/.test(directText)) return { intent: "todo_lists", title: "Lire mes listes To Do", reply: "", requiresApproval: false, provider: "microsoft", operation: "todo_lists", payload: emptyPayload() };
@@ -177,6 +179,25 @@ export async function POST(request: Request) {
   if (plan.intent === "task" || plan.intent === "memory") {
     const id = await insertItem(uid, plan.intent, plan.title, message, "open");
     return respond({ ok: true, reply: plan.intent === "task" ? "La tâche est enregistrée dans Morice." : "L’information est enregistrée dans la mémoire de Morice.", action: { id, kind: plan.intent, title: plan.title, content: message, status: "open", label: plan.intent === "task" ? "Tâche créée" : "Information mémorisée", view: plan.intent === "task" ? "tasks" : "memory" } });
+  }
+
+  if (plan.intent === "daily_brief") {
+    let jobId: string;
+    try {
+      jobId = await createJob(uid, plan.title, message, plan.intent);
+      await transitionJob(uid, jobId, "running", "Trois lectures Microsoft demandées, sans appel IA");
+    } catch { return Response.json({ error: "Le journal est indisponible. Aucune lecture Microsoft n’a été lancée." }, { status: 503 }); }
+    const result = await buildDailyBrief((operation, signal) => runMicrosoftAction(uid, operation, {}, undefined, signal));
+    const status = result.available ? "done" : "blocked";
+    const label = result.complete ? "Point quotidien" : "Point quotidien incomplet";
+    const evidence = { tool: "Microsoft Graph", operation: plan.intent, checkedAt: now(), complete: result.complete, sources: result.sources, externalData: true, verification: `${result.available}/${result.sources.length} rubriques reçues; lecture seule, sans appel IA` };
+    try { await transitionJob(uid, jobId, status, label, result.text, evidence); }
+    catch {
+      const warning = "Lectures terminées, mais journalisation interrompue. Le résultat ci-dessous n’est pas confirmé dans Travaux.";
+      try { await transitionJob(uid, jobId, "blocked", warning, result.text, { ...evidence, journalSaved: false }); } catch { /* Storage is unavailable; never claim the job was saved. */ }
+      return respond({ ok: true, reply: `${warning}\n\n${result.text}`, action: { id: jobId, jobId, kind: "result", title: plan.title, content: result.text, status: "blocked", label: "Journalisation à vérifier", view: "jobs", ...evidence, journalSaved: false } });
+    }
+    return respond({ ok: true, reply: result.text, action: { id: jobId, jobId, kind: "result", title: plan.title, content: result.text, status, label, view: "jobs", ...evidence } });
   }
 
   if (["mail_read", "mail_triage", "calendar_read", "todo_lists", "onedrive_search"].includes(plan.intent)) {

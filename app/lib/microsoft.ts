@@ -23,7 +23,7 @@ export type ActionPayload = {
 
 import { microsoftConnection as connection } from "./microsoft-accounts";
 
-async function accessToken(uid: string, accountId = "") {
+async function accessToken(uid: string, accountId = "", signal?: AbortSignal) {
   const stored = await connection(uid, accountId);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
 
@@ -38,6 +38,7 @@ async function accessToken(uid: string, accountId = "") {
 
   const response = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(tenant)}/oauth2/v2.0/token`, {
     method: "POST",
+    signal: signal || AbortSignal.timeout(30_000),
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       client_id: clientId,
@@ -60,13 +61,13 @@ async function accessToken(uid: string, accountId = "") {
   return token.access_token;
 }
 
-async function graph(uid: string, path: string, init?: RequestInit, accountId = "") {
+async function graph(uid: string, path: string, init?: RequestInit, accountId = "", signal?: AbortSignal) {
   let token: string;
-  try { token = await accessToken(uid, accountId); }
+  try { signal?.throwIfAborted(); token = await accessToken(uid, accountId, signal); }
   catch { throw new ActionError("Microsoft 365 doit être reconnecté dans Connexions. Aucune action n’a été envoyée.", true); }
   const response = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     ...init,
-    signal: AbortSignal.timeout(30_000),
+    signal: signal || AbortSignal.timeout(30_000),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -111,7 +112,8 @@ export async function readMicrosoftDay(uid: string, start: string, end: string) 
   return dayEvents(data, start, end);
 }
 
-export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload, progress: (text: string) => Promise<void> = async () => {}) {
+export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload, progress: (text: string) => Promise<void> = async () => {}, readSignal?: AbortSignal) {
+  if (readSignal && !["mail_read", "calendar_read", "todo_lists"].includes(operation)) throw new Error("Délai partagé réservé aux lectures du point quotidien.");
   const accountId = payload.accountId || "";
   if (accountId && !["mail_categorize", "mail_triage", "mail_read"].includes(operation)) throw new ActionError("Cette action utilise encore le compte principal.", true);
   if (operation === "mail_categorize") {
@@ -123,19 +125,21 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
   }
   if (operation === "mail_triage") return mailReviewText(await reviewMicrosoftMailbox(uid, accountId));
   if (operation === "mail_read") {
-    const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead", undefined, accountId) as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };
+    const data = await graph(uid, "/me/messages?$top=5&$orderby=receivedDateTime%20desc&$select=subject,from,receivedDateTime,isRead", undefined, accountId, readSignal) as { value?: Array<{ subject?: string; from?: { emailAddress?: { name?: string } }; isRead?: boolean }> };
+    if (!Array.isArray(data?.value)) throw new ActionError("Microsoft n’a pas confirmé la lecture des mails.", true);
     const rows = data?.value || [];
     return rows.length ? rows.map(message => `${message.isRead ? "Lu" : "Non lu"} — ${message.from?.emailAddress?.name || "Expéditeur inconnu"} : ${message.subject || "Sans objet"}`).join("\n") : "Aucun mail récent.";
   }
   if (operation === "calendar_read") {
     const start = encodeURIComponent(new Date().toISOString());
     const end = encodeURIComponent(new Date(Date.now() + 7 * 86_400_000).toISOString());
-    const data = await graph(uid, `/me/calendarView?startDateTime=${start}&endDateTime=${end}&$top=10&$orderby=start/dateTime&$select=subject,start,end,location`) as { value?: Array<{ subject?: string; start?: { dateTime?: string }; location?: { displayName?: string } }> };
+    const data = await graph(uid, `/me/calendarView?startDateTime=${start}&endDateTime=${end}&$top=10&$orderby=start/dateTime&$select=subject,start,end,location`, undefined, accountId, readSignal) as { value?: Array<{ subject?: string; start?: { dateTime?: string }; location?: { displayName?: string } }> };
+    if (!Array.isArray(data?.value)) throw new ActionError("Microsoft n’a pas confirmé la lecture du calendrier.", true);
     const rows = data?.value || [];
     return rows.length ? rows.map(event => `${event.start?.dateTime || "Date inconnue"} — ${event.subject || "Sans titre"}${event.location?.displayName ? ` (${event.location.displayName})` : ""}`).join("\n") : "Aucun rendez-vous dans les sept prochains jours.";
   }
   if (operation === "todo_lists") {
-    const data = await graph(uid, "/me/todo/lists") as { value?: Array<{ displayName?: string }>; "@odata.nextLink"?: string };
+    const data = await graph(uid, "/me/todo/lists", undefined, accountId, readSignal) as { value?: Array<{ displayName?: string }>; "@odata.nextLink"?: string };
     if (!Array.isArray(data?.value)) throw new ActionError("Microsoft n’a pas confirmé les listes To Do.", true);
     const names = data.value.slice(0, 100).map(list => list.displayName || "Liste sans nom");
     const more = data["@odata.nextLink"] || data.value.length > 100 ? "\nD’autres listes restent à lire. Ouvrez Microsoft To Do pour poursuivre." : "";

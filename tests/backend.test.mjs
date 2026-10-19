@@ -7,6 +7,7 @@ import { ActionError, actionFailure } from '../app/lib/action-error.ts';
 import { boundedHistory, planningError } from '../app/lib/assistant-context.ts';
 import { inspectMailbox, mailReviewText, isExplicitMailPreview } from '../app/lib/mail-triage.ts';
 import { CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan } from '../app/lib/mail-categories.ts';
+import { buildDailyBrief } from '../app/lib/daily-brief.ts';
 
 // Run the real route SQL against SQLite; only the Cloudflare transport and
 // external providers are substituted. No real email/webhook is sent.
@@ -14,7 +15,7 @@ async function fixture() {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history', '0004_ancient_micromax']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
-  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan };
+  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, buildDailyBrief };
   f.env = { DB: {
     prepare(query) {
       return { query, bind(...values) {
@@ -37,7 +38,7 @@ async function fixture() {
   f.route = async path => {
     let source = await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
     source = source.replace(/^import .*;\r?\n/gm, '');
-    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan} = f;
+    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan,buildDailyBrief} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const connection=(...a)=>f.microsoftConnection(...a);
@@ -45,7 +46,7 @@ async function fixture() {
       const routeModel=async()=>({model:'gpt-5-mini',reason:'Test de transport isolé'});
       ${path.endsWith('/microsoft.ts') ? '' : 'const readMicrosoftTodo=(...a)=>f.readMicrosoftTodo(...a);'}
       const coreContext=(...a)=>f.coreContext?.(...a) || Promise.resolve(null);
-      const createJob=async(...a)=>{f.jobRequest=a;return 'job-test';}, transitionJob=async(...a)=>{f.jobTransitions=(f.jobTransitions||[]).concat([a]);};
+      const createJob=async(...a)=>{if(f.failJobStart)throw Error('PRIVATE storage error');f.jobRequest=a;return 'job-test';}, transitionJob=async(...a)=>{f.jobTransitions=(f.jobTransitions||[]).concat([a]);if(f.failJobCompletion&&a[2]==='done')throw Error('PRIVATE storage error');};
       const decryptSecret=async v=>v, encryptSecret=async v=>v;
       ` + source;
     const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
@@ -268,13 +269,75 @@ test('mixed or write requests never match the direct read shortcut without AI', 
   const f=await fixture();try {
     f.vars.OPENAI_API_KEY='';
     const route=await f.route('app/api/assistant/route.ts');
-    for(const message of ['Lis mes mails et supprime-les','Affiche mon agenda et ajoute un rendez-vous','Affiche mes listes To Do et supprime-les','Ne cherche pas dans OneDrive facture','Cherche dans OneDrive '+ 'x'.repeat(201)]) {
+    for(const message of ['Lis mes mails et supprime-les','Affiche mon agenda et ajoute un rendez-vous','Affiche mes listes To Do et supprime-les','Prépare mon point quotidien et envoie-le','Ne prépare pas mon point quotidien','Ne cherche pas dans OneDrive facture','Cherche dans OneDrive '+ 'x'.repeat(201)]) {
       const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message,mode:'auto'})}));
       assert.equal(response.status,502);
     }
     assert.equal(f.sent,0);assert.equal(f.jobRequest,undefined);
     assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
   }finally{f.close();}
+});
+
+test('daily brief reads exactly three principal-account sources without AI or writes and persists provenance', async()=>{
+  const f=await fixture();try{
+    f.vars.OPENAI_API_KEY='';const calls=[];
+    f.fetch=async()=>{throw Error('No AI transport allowed');};
+    f.runMicrosoftAction=async(uid,operation,payload)=>{assert.equal(uid,'alice');assert.deepEqual(payload,{});calls.push(operation);return `Résultat ${operation}`;};
+    const route=await f.route('app/api/assistant/route.ts');
+    const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message:'Morice, prépare mon point quotidien.',mode:'auto'})}));
+    assert.equal(response.status,200);const result=await response.json();
+    assert.deepEqual(calls,['calendar_read','mail_read','todo_lists']);assert.equal(result.action.complete,true);assert.equal(result.action.operation,'daily_brief');
+    assert.equal(f.jobTransitions.at(-1)[2],'done');assert.equal(f.jobRequest[0],'alice');
+    assert.match(result.reply,/sept prochains jours/);assert.match(result.reply,/cinq plus récents/);
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_items').get().n,0);
+    const restored=await route.GET(new Request('https://morice.test/api/assistant'));
+    const history=await restored.json();assert.equal(history.messages.length,2);assert.equal(history.messages[1].action.sources.length,3);
+    assert.equal(history.messages[1].action.externalData,true);assert.deepEqual(boundedHistory(history.messages),[{role:'user',text:'Morice, prépare mon point quotidien.'}]);
+  }finally{f.close();}
+});
+
+test('daily brief preserves successful sections and never turns failure into an empty mailbox or success', async()=>{
+  const partial=await buildDailyBrief(async operation=>{if(operation==='mail_read')throw Error('PRIVATE-TOKEN-not-for-output');return `Résultat ${operation}`;});
+  assert.equal(partial.complete,false);assert.equal(partial.available,2);assert.match(partial.text,/2\/3/);assert.doesNotMatch(partial.text,/PRIVATE-TOKEN|Aucun mail/);
+  const f=await fixture();try{
+    f.vars.OPENAI_API_KEY='';f.runMicrosoftAction=async()=>{throw Error('PRIVATE-secret');};
+    const route=await f.route('app/api/assistant/route.ts');
+    const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message:'Mon point quotidien',mode:'auto'})}));
+    const result=await response.json();assert.equal(result.action.status,'blocked');assert.equal(result.action.complete,false);
+    assert.equal(f.jobTransitions.at(-1)[2],'blocked');assert.match(result.reply,/0\/3/);assert.doesNotMatch(result.reply,/PRIVATE-secret/);
+    assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_messages').get().n,2);
+  }finally{f.close();}
+});
+
+test('daily brief shares an abort deadline and stops remaining reads without refresh concurrency',async()=>{
+  const controller=new AbortController();let calls=0,active=0,peak=0;
+  const result=await buildDailyBrief(async(_operation,signal)=>{
+    assert.equal(signal,controller.signal);calls++;peak=Math.max(peak,++active);await Promise.resolve();active--;controller.abort();return 'Résultat vérifié';
+  },controller.signal);
+  assert.equal(calls,1);assert.equal(peak,1);assert.equal(result.available,1);assert.equal(result.complete,false);
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');const live=new AbortController();let malformed=false,reads=0;
+    f.fetch=async(_url,init)=>{reads++;assert.equal(init.signal,live.signal);return Response.json(malformed?{error:{message:'not confirmed'}}:{value:[]});};
+    assert.match(await ms.runMicrosoftAction('alice','mail_read',{},undefined,live.signal),/Aucun mail/);
+    malformed=true;
+    for(const operation of ['mail_read','calendar_read'])await assert.rejects(ms.runMicrosoftAction('alice',operation,{},undefined,live.signal),/pas confirmé/);
+    live.abort();const previousReads=reads;await assert.rejects(ms.runMicrosoftAction('alice','todo_lists',{},undefined,live.signal));assert.equal(reads,previousReads);
+  }finally{f.close();}
+});
+
+test('daily brief refuses reads before a failed journal start and exposes an interrupted final save',async()=>{
+  for(const failStart of [true,false]){
+    const f=await fixture();try{
+      f.vars.OPENAI_API_KEY='';f.failJobStart=failStart;f.failJobCompletion=!failStart;let reads=0;
+      f.runMicrosoftAction=async()=>{reads++;return 'Donnée reçue';};
+      const route=await f.route('app/api/assistant/route.ts');
+      const response=await route.POST(new Request('https://morice.test/api/assistant',{method:'POST',body:JSON.stringify({message:'Mon point quotidien',mode:'auto'})}));
+      const result=await response.json();assert.doesNotMatch(JSON.stringify(result),/PRIVATE storage/);
+      if(failStart){assert.equal(response.status,503);assert.equal(reads,0);}
+      else {assert.equal(reads,3);assert.equal(result.action.journalSaved,false);assert.equal(result.action.status,'blocked');assert.equal(f.jobTransitions.at(-1)[2],'blocked');assert.match(result.reply,/journalisation interrompue/);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM morice_messages').get().n,2);}
+    }finally{f.close();}
+  }
 });
 
 test('To Do list summary is an owner-scoped Graph GET and exposes pagination limits',async()=>{
