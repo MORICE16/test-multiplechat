@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T00:20:15.394Z
-Commit source au moment de la génération : `08d1239dc7f02183546d76e9472f7fe1da1f7bc6`
+Généré : 2026-10-19T00:28:53.515Z
+Commit source au moment de la génération : `0505870db0ef52e3e36dedaf5b78babb40d8a08f`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -137,17 +137,17 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - MC-SYNC-001 demeure EN ATTENTE MULTIPLECHAT ; ne bloque que les changements architecturaux qui exigent cette confrontation.
 - Commande locale de lecture échouée : sandbox provisioning failed. Git local, navigateur et runtime non contrôlés dans cette session ; aucun branchement applicatif revendiqué.
 
+## Livraison verifiee 2026-10-19
+
+- Source applicative 0505870 sur GitHub main ; publication privee succeeded, variables revision 6 conservees.
+- 116 tests, TypeScript, lint cible et build reussis.
+- Point quotidien runtime : agenda sept jours, cinq mails recents, listes To Do ; 3/3 recus et journal conserve apres rechargement, sans appel IA ni ecriture Microsoft.
+- Claude relu dans MultipleChat ; aucune souscription nouvelle. Relais assiste distinct API autonome.
+
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/assistant/route.ts
-- app/lib/assistant-context.ts
-- app/lib/microsoft.ts
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/backend.test.mjs
-- app/lib/daily-brief.ts
 
 ## Reprise MultipleChat
 
