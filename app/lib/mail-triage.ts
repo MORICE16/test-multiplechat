@@ -22,7 +22,7 @@ export function isExplicitMailPreview(message: string) {
 
 const rules: [string, RegExp][] = [
   ["Assurances", /\b(assurance|assurances|assureur|sinistre|mutuelle|attestation d assurance)\b/],
-  ["Informations / Newsletters", /\b(newsletter|lettre d information|digest|bulletin hebdomadaire)\b/],
+  ["Informations / Newsletters", /\b(newsletter|newsbailleur|lettre d information|digest|bulletin hebdomadaire)\b/],
   ["Juridique / Notaire", /\b(notaire|notaires|notarial|notariale|notariaux)\b/],
   ["Juridique / Avocat", /\b(avocat|avocats|cabinet d avocat|cabinet d avocats|barreau)\b/],
   ["Juridique / Huissier", /\b(huissier|huissiers|commissaire de justice|commissaires de justice)\b/],
@@ -40,6 +40,14 @@ export function suggestMail(message: MailSummary): MailSuggestion {
   const text = `${subject} ${sender}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const matches = rules.flatMap(([category, pattern]) => {
     const match = text.match(pattern);
+    if(category==='Juridique / Avocat') {
+      const normalizedSender=sender.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const professionalSender=/\b(avocats?|barreau)\b/.test(normalizedSender)||/@[^\s>]*(?:avocat|barreau)/.test(normalizedSender);
+      const legalContext=/\b(honoraires|cabinet|juridique|tribunal|assignation|affaire|convention)\b/.test(text);
+      // A film title or recipe mentioning "avocat" is not evidence of a legal correspondent.
+      if(professionalSender)return [{category,reason:'Indice juridique repéré dans le nom ou l’adresse de l’expéditeur, à vérifier.'}];
+      if(!legalContext)return [];
+    }
     return match ? [{ category, reason: `Mot repéré dans l’objet ou l’expéditeur : « ${match[0]} ».` }] : [];
   });
   return { id: message.id || "", subject, sender, receivedAt: message.receivedDateTime || "", categories: message.categories || [],

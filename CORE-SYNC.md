@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T00:57:48.363Z
-Commit source au moment de la génération : `bdd5e3030766d5a11e294acc1cdf08146b185e95`
+Généré : 2026-10-19T01:14:24.504Z
+Commit source au moment de la génération : `f7bba03c4d0437ada5f0be299fb46b1f852b0e20`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -152,13 +152,17 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Revue Claude sur le descriptif effectivement recue, controles appropries implementes.
 - Dreame Matrix10 Ultra : firmware Matter et passerelle privee non verifies, aucun appairage ou commande.
 - 123 tests passes ; publication/runtime du nouveau lot encore a confirmer.
+- Production privee source f7bba03 verifiee ; 13 categories relues dans trois boites, 37 creations ; premiers classements reels relus : 101 notaires, 3 avocats, 14 newsletters.
+- 125 tests, TypeScript, lint cible et build passent apres correction des faux positifs avocats/Netflix.
+- OpenClaw distant non confirme dans Morice ; aucune commande telephone.
 
 ## Fichiers modifiés lors de la génération
 
 - CORE-SYNC.md
-- app/lib/mail-categories.ts
+- app/lib/mail-triage.ts
 - docs/MORICE-SYNC.md
-- tests/mail-catalog.test.mjs
+- docs/core-state.json
+- tests/mail-triage.test.mjs
 
 ## Reprise MultipleChat
 

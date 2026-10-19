@@ -45,3 +45,10 @@ test('fixed Microsoft searches cover older subjects and sender addresses without
  assert.equal(calls.length,1);assert.equal(review.scope,'notaire');assert.deepEqual(review.messages[0].suggestions,['Juridique / Notaire']);assert.match(mailReviewText(review),/Recherche Microsoft/);assert.doesNotMatch(mailReviewText(review),/depuis le 1er janvier 2025/);
  for(const scope of ['__proto__','https://evil.example','notaire OR secret','constructor'])await assert.rejects(()=>inspectMailbox('test',async()=>{throw Error('must not read');},scope),/Périmètre/);
 });
+
+test('lawyer proposals require professional sender or legal context, not film titles or food',()=>{
+ for(const subject of ['Suits : avocats sur mesure','Salade poulet avocat'])assert.deepEqual(suggestMail({subject,from:{emailAddress:{name:'Magazine'}}}).suggestions,[]);
+ assert.ok(suggestMail({subject:'Dossier',from:{emailAddress:{name:'Cabinet Exemple',address:'contact@avocats-exemple.invalid'}}}).suggestions.includes('Juridique / Avocat'));
+ assert.ok(suggestMail({subject:'Convention honoraires avocat',from:{emailAddress:{name:'Test'}}}).suggestions.includes('Juridique / Avocat'));
+ assert.ok(suggestMail({subject:'Nos conseils',from:{emailAddress:{name:'Newsbailleur'}}}).suggestions.includes('Informations / Newsletters'));
+});
