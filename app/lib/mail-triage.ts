@@ -1,6 +1,6 @@
 export type MailSummary = { id?: string; subject?: string; receivedDateTime?: string; importance?: string; isRead?: boolean; categories?: string[]; from?: { emailAddress?: { name?: string; address?: string } } };
 export type MailSuggestion = { id: string; subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
-export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[]; scope?:string };
+export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[]; scope?:string; cursor?:string; nextCursor?:string; previousCursor?:string|null; batch?:number };
 const categoryKey=(value:string)=>value.normalize('NFC').toLocaleLowerCase('fr');
 export function remainingMailSuggestions(message:MailSuggestion){
  const existing=new Set(message.categories.map(categoryKey));
@@ -13,6 +13,7 @@ export function selectUniqueMailProposals(messages:MailSuggestion[]){
 }
 export const MAIL_REVIEW_SCOPES:Record<string,{label:string;terms?:string[]}>={
  recent:{label:'Réception · 100 messages récents depuis janvier 2025'},
+ all:{label:'Tous les dossiers · lots de 100 · sans date de début'},
  notaire:{label:'Recherche Microsoft · notaires',terms:['notaire','notaires','notarial']},
  avocat:{label:'Recherche Microsoft · avocats',terms:['avocat','avocats','barreau']},
  immobilier:{label:'Recherche Microsoft · immobilier',terms:['immobilier','syndic','copropriete','notaire']},
@@ -66,21 +67,40 @@ export function suggestMail(message: MailSummary): MailSuggestion {
     unread: message.isRead === false };
 }
 
-export async function inspectMailbox(account: string, read: (path: string) => Promise<unknown>,scope='recent'): Promise<MailReview> {
+export function initialMailPage(scope:string){
   if(!Object.hasOwn(MAIL_REVIEW_SCOPES,scope))throw Error('Périmètre de recherche invalide.');
   const terms=MAIL_REVIEW_SCOPES[scope].terms;
   const query = new URLSearchParams({ "$top": "100", "$select": "id,subject,from,receivedDateTime,importance,isRead,categories" });
   if(terms)query.set('$search',`"${terms.flatMap(term=>[`subject:${term}`,`from:${term}`]).join(' OR ')}"`);
-  else{query.set('$orderby','receivedDateTime desc');query.set('$filter','receivedDateTime ge 2025-01-01T00:00:00Z');}
-  const data = await read(`${terms?'/me/messages':'/me/mailFolders/inbox/messages'}?${query}`) as { value?: MailSummary[]; "@odata.nextLink"?: string };
-  if (!data || !Array.isArray(data.value)) throw new Error("La lecture de la boîte est incomplète.");
-  return { account, checkedAt: new Date().toISOString(), hasMore: Boolean(data["@odata.nextLink"])||data.value.length>=100, messages: data.value.slice(0, 100).map(suggestMail),scope };
+  else{query.set('$orderby','receivedDateTime desc');if(scope==='recent')query.set('$filter','receivedDateTime ge 2025-01-01T00:00:00Z');}
+  return `${terms||scope==='all'?'/me/messages':'/me/mailFolders/inbox/messages'}?${query}`;
+}
+/** Follow a provider continuation intact, only after validating its destination and complete projection/scope. */
+export function validatedMailPage(url:string,scope:string){
+ const base=new URL('https://graph.microsoft.com/v1.0'+initialMailPage(scope));
+ if(typeof url!=='string'||!url.startsWith('https://graph.microsoft.com/v1.0/')||url.length>8192||Array.from(url).some(c=>c.charCodeAt(0)<=32||c==='\\'))throw Error('Suite Microsoft non valide.');
+ let next:URL;try{next=new URL(url);}catch{throw Error('Suite Microsoft non valide.');}
+ if(next.protocol!=='https:'||next.hostname!=='graph.microsoft.com'||next.port||next.username||next.password||next.hash||next.pathname!==base.pathname)throw Error('Suite Microsoft non valide.');
+ const rawPath=url.slice(url.indexOf('://')+3).split('?')[0];if(/%|\/\.|\/\//.test(rawPath))throw Error('Suite Microsoft non valide.');
+ const keys=[...next.searchParams.keys()];if(new Set(keys).size!==keys.length)throw Error('Suite Microsoft non valide.');
+ const allowed=new Set([...base.searchParams.keys(),'$skip','$skiptoken']);if(keys.some(k=>!allowed.has(k)))throw Error('Suite Microsoft non valide.');
+ for(const [key,value] of base.searchParams){const candidate=next.searchParams.get(key);if(key==='$select'){if(candidate?.split(',').sort().join(',')!==value.split(',').sort().join(','))throw Error('Projection Microsoft non valide.');}else if(candidate!==value)throw Error('Périmètre Microsoft non valide.');}
+ const skip=next.searchParams.get('$skip'),token=next.searchParams.get('$skiptoken');
+ if((skip===null)===(token===null)||(skip!==null&&!/^\d{1,9}$/.test(skip))||(token!==null&&(!token||token.length>6000)))throw Error('Suite Microsoft non valide.');
+ // Retain the complete provider query; never construct a new token or a guessed offset.
+ return next.pathname.slice('/v1.0'.length)+next.search;
+}
+export async function inspectMailbox(account: string, read: (path: string) => Promise<unknown>,scope='recent',pageUrl=''): Promise<MailReview & {nextLink?:string}> {
+  const path=pageUrl?validatedMailPage(pageUrl,scope):initialMailPage(scope);
+  const data = await read(path) as { value?: MailSummary[]; "@odata.nextLink"?: string };
+  if (!data || !Array.isArray(data.value)||data.value.length>100) throw new Error("La lecture de la boîte est incomplète.");
+  return { account, checkedAt: new Date().toISOString(), hasMore: Boolean(data["@odata.nextLink"])||data.value.length>=100, messages: data.value.map(suggestMail),scope,...(typeof data['@odata.nextLink']==='string'?{nextLink:data['@odata.nextLink']}:{}) };
 }
 
 export function mailReviewText(review: MailReview) {
   const counts = new Map<string, number>();
   for (const message of review.messages) for (const category of message.suggestions.length ? message.suggestions : ["À examiner"]) counts.set(category, (counts.get(category) || 0) + 1);
-  const perimeter=review.scope&&review.scope!=='recent'?`${MAIL_REVIEW_SCOPES[review.scope]?.label||'Recherche Microsoft'} : ${review.messages.length} résultat(s) examiné(s), 100 maximum.`:`${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.`;
+  const perimeter=review.scope&&review.scope!=='recent'?`${MAIL_REVIEW_SCOPES[review.scope]?.label||'Recherche Microsoft'} : ${review.messages.length} résultat(s) examiné(s) dans ce lot, 100 maximum.`:`${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.`;
   return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${perimeter}${review.hasMore ? " Il reste potentiellement d’autres messages : cet aperçu n’est pas exhaustif." : " Ce résultat ne constitue pas le tri complet de la boîte."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes restent à raccorder. Pour appliquer les catégories, ouvrez Emails, sélectionnez jusqu’à 10 messages et confirmez le lot.`;
 }
 

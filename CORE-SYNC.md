@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T02:08:15.433Z
-Commit source au moment de la génération : `c89cbc115a1506771bc25f23e4fd7747df4f9164`
+Généré : 2026-10-19T02:54:27.006Z
+Commit source au moment de la génération : `bda2d28916672cffe8db84bb3c59f7352a0c73d2`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -171,10 +171,26 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Source c89cbc1 et déploiement appgdep_6ad57ab874248191a22330affff1a1ad succeeded, privé révision 6 ; 135 tests/TypeScript/lint ciblé/build réussis.
 - Masque Outlook production : 92 lus, 91 déjà appliqués, un restant ; retour 92/1 et sélection 1/0 vérifiés sans écriture mail. Test Chrome personnel différé au réveil.
 
+## Navigation Outlook 2026-10-19
+
+- Lecture de cent métadonnées par lot, continuation Microsoft entière et privée, navigation suivant/précédent/premier.
+- Périmètre tous dossiers sans date de début ; pas de scan automatique ni cumul exhaustif.
+- Curseurs privés isolés, trente minutes et plafond atomique cent ; réglages réservés non lisibles/modifiables côté client.
+- Préparation d action relisant le bon lot ; pas de nouvelle permission ni modification mail pendant les contrôles.
+- 139 tests, TypeScript, lint ciblé réussis ; publication et pagination réseau encore à vérifier.
+
 ## Fichiers modifiés lors de la génération
 
+- app/api/microsoft/triage/route.ts
+- app/api/state/route.ts
+- app/components/mail-review.tsx
+- app/lib/mail-triage.ts
+- app/lib/microsoft.ts
 - docs/MORICE-SYNC.md
 - docs/core-state.json
+- app/lib/mail-pages.ts
+- docs/MAIL-LOTS.md
+- tests/mail-pages.test.mjs
 
 ## Reprise MultipleChat
 

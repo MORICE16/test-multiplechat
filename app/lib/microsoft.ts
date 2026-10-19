@@ -68,6 +68,7 @@ async function graph(uid: string, path: string, init?: RequestInit, accountId = 
   catch { throw new ActionError("Microsoft 365 doit être reconnecté dans Connexions. Aucune action n’a été envoyée.", true); }
   const response = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     ...init,
+    redirect: 'error',
     signal: signal || AbortSignal.timeout(30_000),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -80,10 +81,11 @@ async function graph(uid: string, path: string, init?: RequestInit, accountId = 
   return payload as Record<string, unknown> | null;
 }
 
-export async function reviewMicrosoftMailbox(uid: string, accountId = "",scope='recent') {
+export async function reviewMicrosoftMailbox(uid: string, accountId = "",scope='recent',pageUrl='') {
   const stored = await connection(uid, accountId);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
-  return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId),scope);
+  const deadline=AbortSignal.timeout(25_000);
+  return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId,deadline),scope,pageUrl);
 }
 
 export async function probeMicrosoft(uid:string,path:string) {

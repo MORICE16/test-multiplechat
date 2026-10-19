@@ -3,16 +3,20 @@ import { reviewMicrosoftMailbox } from "@/app/lib/microsoft";
 import { userId } from "@/app/lib/runtime";
 import { env } from "cloudflare:workers";
 import { categoryPermissions, validateCategoryPlan, type CategoryEntry } from "@/app/lib/mail-categories";
+import {readMailPage,mailPageStore} from '@/app/lib/mail-pages';
 
 export async function GET(request: Request) {
   const uid = userId(request);
   try {
     const accountId = new URL(request.url).searchParams.get("accountId") || "";
     const connection = await microsoftConnection(uid, accountId);
+    if(!connection)throw Error();
     const scope=new URL(request.url).searchParams.get('scope')||'recent';
-    return Response.json({ ...await reviewMicrosoftMailbox(uid, accountId,scope), accountId, permissions: categoryPermissions(connection?.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
+    const cursor=new URL(request.url).searchParams.get('cursor')||'';
+    const review=await readMailPage(mailPageStore(env.DB,uid),url=>reviewMicrosoftMailbox(uid,accountId,scope,url),accountId,connection.account_email,scope,cursor);
+    return Response.json({ ...review, accountId, permissions: categoryPermissions(connection.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
   } catch {
-    return Response.json({ error: "La lecture des mails n’a pas abouti. Vérifiez Microsoft dans Connexions puis réessayez." }, { status: 502, headers: { "Cache-Control": "no-store" } });
+    return Response.json({ error: "Ce lot n’est plus accessible ou la lecture Microsoft a été interrompue. Réessayez ou recommencez au premier lot. Aucun mail modifié." }, { status: 502, headers: { "Cache-Control": "no-store" } });
   }
 }
 
@@ -20,13 +24,15 @@ export async function POST(request: Request) {
   const uid = userId(request);
   if (request.headers.get("Origin") !== new URL(request.url).origin) return Response.json({ error: "Origine non autorisée." }, { status: 403 });
   try {
-    const body = await request.json() as { entries?: CategoryEntry[]; account?: string; accountId?: string;scope?:string };
+    const body = await request.json() as { entries?: CategoryEntry[]; account?: string; accountId?: string;scope?:string;cursor?:string };
     const createdAt = new Date().toISOString();
     const accountId = typeof body.accountId === "string" ? body.accountId : "";
-    const review = await reviewMicrosoftMailbox(uid, accountId,typeof body.scope==='string'?body.scope:'recent');
+    const scope=typeof body.scope==='string'?body.scope:'recent';
+    const connection=await microsoftConnection(uid,accountId);if(!connection)throw Error('Microsoft doit être reconnecté.');
+    const review = await readMailPage(mailPageStore(env.DB,uid),url=>reviewMicrosoftMailbox(uid,accountId,scope,url),accountId,connection.account_email,scope,typeof body.cursor==='string'?body.cursor:'',false);
     const plan = { account: body.account || "", createdAt, entries: body.entries || [] };
     validateCategoryPlan(plan, review.account);
-    // Only messages returned again by the same fixed search scope may be selected.
+    // Revalidate membership in the exact owner/account/scope/page before preparing any write.
     plan.entries = plan.entries.map(entry => {
       const message = review.messages.find(message => message.id === entry.id);
       if (!message) throw new Error("La sélection a changé. Actualisez les propositions.");
