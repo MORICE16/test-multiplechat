@@ -578,6 +578,31 @@ Aucun changement matériel. Aucun commit postérieur à `55723d8b`, aucune nouve
 
 `ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. Aucun travail nouveau transmis à 02 et aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-19 19:51 Europe/Paris — forte progression Microsoft, portail et liaison PC locale
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state actualisés LU sur GitHub main `f42ea3e` ; 26 commits depuis le contrôle du 18/10 LU ; preuves runtime et tests consignés par 02 LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 19/10 ; Desktop Commander LU. Git local direct, téléphone/Fold, ADB, OpenClaw Android, Google et navigateur Chrome personnel INACCESSIBLES dans cette exécution.
+
+Changements matériels :
+- La source applicative privée servie a avancé jusqu’à `0276d84`. Les lots successifs ont été publiés en révision privée 6 ; le dernier état conserve 147 tests réussis avec TypeScript, lint ciblé et builds réussis aux étapes consignées.
+- Le point quotidien déterministe a été vérifié sur le vrai site : agenda sept jours, cinq mails récents et listes To Do, 3/3 reçus et journal conservé après rechargement, sans appel IA ni écriture Microsoft.
+- Portail desktop et catalogue Applications/appareils ajoutés. Le plan de connexion ne marque qu’une demande, sans secret ni connexion présumée.
+- Outlook : treize catégories relues dans trois boîtes ; 176 classements réels relus au total, par lots bornés. Navigation de cent métadonnées par lot et retour au lot précédent vérifiés ; aucune analyse exhaustive revendiquée. Le transport Workers a été corrigé pour refuser explicitement les redirections 3xx.
+- To Do : neuf listes et vingt tâches affichées sur le vrai site ; navigation locale des cent tâches déjà chargées vérifiée par groupes de vingt, sans nouvelle écriture.
+- OneDrive : recherche `pdf` vérifiée sur le runtime, dix métadonnées et limite partielle affichées ; aucun document ouvert ou modifié.
+- Agenda : lecture hebdomadaire en fuseau Paris publiée et vérifiée ; aucun rendez-vous actif reçu lors du contrôle et aucun événement modifié.
+- Liaison PC locale : service borné à santé/calculatrice, écoute `127.0.0.1`, confirmation Windows obligatoire, aucune commande libre, tunnel ou API payante. La santé du programme est reçue par la boucle locale ; le navigateur intégré refuse l’accès. Le test Chrome personnel convenu reste en attente, sans le redemander automatiquement.
+- Suivi Travaux borné à 35 s, regroupement des lectures concurrentes et conservation de l’ancien résultat après panne. Les scénarios timeout/503/collection absente/annulation ont été vérifiés sur un banc local synthétique sans toucher la production. Le suivi nocturne séparé a ensuite été mis en pause ; site et données préservés.
+- MultipleChat : le guide public MAIL-LOTS et calendar-day ont été importés ; dix-neuf fichiers Ready. Aucun mail, curseur, secret ou donnée privée transmis. Le relais reste assisté, sans API autonome.
+
+Contradictions et limites :
+- Desktop Commander affiche toujours `Alan Offline` (dernière présence indiquée il y a 675 h), alors que les preuves locales/runtime ont été produites par une autre session ; ne pas confondre ces accès.
+- Dreame/Matter, OpenClaw distant, téléphone, Google et Chrome personnel ne sont pas vérifiés. Les preuves runtime Microsoft n’autorisent ni tri massif automatique ni nouvelle permission.
+- `ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents.
+
+RADAR filtré : aucune nouveauté officielle dédupliquée du 19/10 ne remplace ou améliore immédiatement une brique existante. GPT-6 Sol/Luna, GPT-6.1 Sol, Sites Tunnels et retrait des connecteurs synchronisés sont déjà suivis.
+
+Décisions et transmission 02 : CONSERVER Graph direct, les limites par lots, les confirmations humaines et le refus des API payantes. Reprendre seulement après le test Chrome personnel et la continuation Google déjà convenus ; ne pas relancer le suivi nocturne sans progrès vérifiable. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
