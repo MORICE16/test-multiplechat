@@ -210,6 +210,7 @@
   "Suspension suivi nocturne 2026-10-19": [
     "Source servie0276d84 et déploiement privé réussi conservés ; aucun changement applicatif ni nouveau test ou déploiement à cette reprise.",
     "Stabilisation indépendante vérifiée ; prochaines preuves prioritaires PC/Google/téléphone attendent une intervention déjà convenue. Backlog d extensions non déclaré livré.",
-    "Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé."
+    "Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé.",
+    "Pause confirmée par l outil natif : morice-widget-et-finition-de-nuit PAUSED ; le site et les données restent disponibles."
   ]
 }

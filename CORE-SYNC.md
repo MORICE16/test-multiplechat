@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T09:49:40.293Z
-Commit source au moment de la génération : `ea6ef4d4f9881613a5c6711006091f22c69da2e7`
+Généré : 2026-10-19T09:51:06.200Z
+Commit source au moment de la génération : `d6ca0fd2993b7eaafefccbaf06af6159fb27ae7e`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -238,6 +238,7 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Source servie0276d84 et déploiement privé réussi conservés ; aucun changement applicatif ni nouveau test ou déploiement à cette reprise.
 - Stabilisation indépendante vérifiée ; prochaines preuves prioritaires PC/Google/téléphone attendent une intervention déjà convenue. Backlog d extensions non déclaré livré.
 - Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé.
+- Pause confirmée par l outil natif : morice-widget-et-finition-de-nuit PAUSED ; le site et les données restent disponibles.
 
 ## Fichiers modifiés lors de la génération
 
