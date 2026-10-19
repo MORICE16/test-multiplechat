@@ -158,6 +158,9 @@
     "Curseurs privés isolés, trente minutes et plafond atomique cent ; réglages réservés non lisibles/modifiables côté client.",
     "Préparation d action relisant le bon lot ; pas de nouvelle permission ni modification mail pendant les contrôles.",
     "139 tests, TypeScript, lint ciblé réussis ; publication et pagination réseau encore à vérifier.",
-    "Incompatibilité redirect:error détectée en production, retour privé c89cbc1 succeeded puis correction Worker redirect:manual avec refus 3xx. Un test Node ne prouve pas le runtime Workers."
+    "Incompatibilité redirect:error détectée en production, retour privé c89cbc1 succeeded puis correction Worker redirect:manual avec refus 3xx. Un test Node ne prouve pas le runtime Workers.",
+    "Correctif e6a5dcf, déploiement appgdep_6ad587ceb0408191836f3af227c4eb9c succeeded, privé révision 6 ; 140 tests, TypeScript/lint ciblé/build réussis.",
+    "Runtime : cent métadonnées lot 1, cent lot 2, retour cent lot 1 ; échantillons affichés distincts. Aucune modification de mail et aucun total exhaustif revendiqué.",
+    "Guide MAIL-LOTS.md importé dans MultipleChat Ready, dix-huit fichiers ; aucune donnée mail ou curseur transmis. Test Chrome PC toujours reporté au réveil."
   ]
 }
