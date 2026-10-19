@@ -4,7 +4,7 @@ import { now, runtimeValue } from "./runtime";
 import { ActionError } from "./action-error";
 import { inspectMailbox, mailReviewText } from "./mail-triage";
 import { dayEvents, validateDayRange } from "./calendar-day";
-import { applyCategoryPlan, categoryPermissions, validateCategoryPlan, type CategoryPlan } from "./mail-categories";
+import { applyCategoryPlan, categoryPermissions, validateCategoryPlan, ensureCategoryCatalog, type CategoryPlan } from "./mail-categories";
 
 export type ActionPayload = {
   to?: string | null;
@@ -18,6 +18,7 @@ export type ActionPayload = {
   notes?: string | null;
   webhookEvent?: string | null;
   categoryPlan?: CategoryPlan;
+  categorySetup?: {account:string;createdAt:string};
   accountId?: string;
 };
 
@@ -79,10 +80,10 @@ async function graph(uid: string, path: string, init?: RequestInit, accountId = 
   return payload as Record<string, unknown> | null;
 }
 
-export async function reviewMicrosoftMailbox(uid: string, accountId = "") {
+export async function reviewMicrosoftMailbox(uid: string, accountId = "",scope='recent') {
   const stored = await connection(uid, accountId);
   if (!stored) throw new Error("Connecte d’abord Microsoft 365 dans Connexions.");
-  return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId));
+  return inspectMailbox(stored.account_email, path => graph(uid, path, undefined, accountId),scope);
 }
 
 export async function probeMicrosoft(uid:string,path:string) {
@@ -115,7 +116,13 @@ export async function readMicrosoftDay(uid: string, start: string, end: string) 
 export async function runMicrosoftAction(uid: string, operation: string, payload: ActionPayload, progress: (text: string) => Promise<void> = async () => {}, readSignal?: AbortSignal) {
   if (readSignal && !["mail_read", "calendar_read", "todo_lists"].includes(operation)) throw new Error("Délai partagé réservé aux lectures du point quotidien.");
   const accountId = payload.accountId || "";
-  if (accountId && !["mail_categorize", "mail_triage", "mail_read"].includes(operation)) throw new ActionError("Cette action utilise encore le compte principal.", true);
+  if (accountId && !["mail_categorize", "mail_category_setup", "mail_triage", "mail_read"].includes(operation)) throw new ActionError("Cette action utilise encore le compte principal.", true);
+  if (operation === 'mail_category_setup') {
+    const stored=await connection(uid,accountId);const setup=payload.categorySetup;const age=Date.now()-Date.parse(setup?.createdAt||'');
+    if(!stored||!categoryPermissions(stored.scopes||'').manageCategories)throw new ActionError('Autorisez la gestion des catégories Microsoft avant de valider.',true);
+    if(!setup||typeof setup.account!=='string'||setup.account.toLowerCase()!==stored.account_email.toLowerCase()||!Number.isFinite(age)||age<0||age>30*60_000)throw new ActionError('Cette préparation a expiré ou la boîte a changé. Préparez une nouvelle action.',true);
+    return ensureCategoryCatalog((path,init)=>graph(uid,path,init,accountId),progress);
+  }
   if (operation === "mail_categorize") {
     const stored = await connection(uid, accountId);
     const permissions = categoryPermissions(stored?.scopes || "");

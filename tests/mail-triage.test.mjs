@@ -35,3 +35,13 @@ test('mailbox review reads only bounded inbox metadata, never follows foreign ne
   assert.match(mailReviewText(review),/Aucun message déplacé/);
   await assert.rejects(()=>inspectMailbox('test',async()=>({error:'bad'})),/incomplète/);
 });
+
+test('fixed Microsoft searches cover older subjects and sender addresses without arbitrary queries or mail bodies',async()=>{
+ const calls=[];
+ const review=await inspectMailbox('test@example.invalid',async path=>{
+  calls.push(path);const url=new URL(path,'https://graph.microsoft.com');assert.equal(url.pathname,'/me/messages');assert.match(url.searchParams.get('$search'),/subject:notaire OR from:notaire/);assert.equal(url.searchParams.get('$filter'),null);assert.equal(url.searchParams.get('$orderby'),null);assert.doesNotMatch(url.searchParams.get('$select'),/body|attachment/);
+  return{value:[{id:'one',subject:'Dossier',from:{emailAddress:{name:'Étude Test',address:'test@notaires.example.invalid'}},receivedDateTime:'2020-01-01'}]};
+ },'notaire');
+ assert.equal(calls.length,1);assert.equal(review.scope,'notaire');assert.deepEqual(review.messages[0].suggestions,['Juridique / Notaire']);assert.match(mailReviewText(review),/Recherche Microsoft/);assert.doesNotMatch(mailReviewText(review),/depuis le 1er janvier 2025/);
+ for(const scope of ['__proto__','https://evil.example','notaire OR secret','constructor'])await assert.rejects(()=>inspectMailbox('test',async()=>{throw Error('must not read');},scope),/Périmètre/);
+});

@@ -1,8 +1,20 @@
-export const MAIL_CATEGORIES = ["Assurances", "Juridique / Notaire", "Juridique / Huissier", "Comptabilité / Comptable", "Comptabilité / Factures", "Immobilier / Location", "Énergie / Travaux", "Informations / Newsletters", "Personnel", "À examiner"] as const;
+export const MAIL_CATEGORIES = ["Assurances", "Juridique / Notaire", "Juridique / Avocat", "Juridique / Huissier", "Comptabilité / Comptable", "Comptabilité / Factures", "Immobilier / Location", "Immobilier / Locataires", "Immobilier / Gestion", "Énergie / Travaux", "Informations / Newsletters", "Personnel", "À examiner"] as const;
 export type CategoryEntry = { id: string; subject: string; category: string };
 export type CategoryPlan = { account: string; createdAt: string; entries: CategoryEntry[] };
 export type CategoryGraph = (path: string, init?: RequestInit) => Promise<unknown>;
 export class CategoryExecutionError extends Error {}
+
+// Fixed names only. No message is modified while preparing the category library.
+export async function ensureCategoryCatalog(graph:CategoryGraph,progress:(text:string)=>Promise<void>){
+ let created=0;
+ try {
+  const read=async()=>{const data=await graph('/me/outlook/masterCategories?$top=100') as {value?:{displayName:string}[];'@odata.nextLink'?:string};if(!Array.isArray(data?.value)||data['@odata.nextLink'])throw Error();return new Set(data.value.map(c=>c.displayName));};
+  const existing=await read();
+  for(const name of MAIL_CATEGORIES){if(existing.has(name))continue;await progress(`Préparation de la catégorie « ${name} ». ${created} création(s) confirmée(s).`);const result=await graph('/me/outlook/masterCategories',{method:'POST',body:JSON.stringify({displayName:name,color:'preset7'})}) as {displayName?:string};if(result?.displayName!==name)throw Error();created++;}
+  const checked=await read();if(!MAIL_CATEGORIES.every(name=>checked.has(name)))throw Error();
+  return `${MAIL_CATEGORIES.length} catégories Outlook disponibles et relues, dont ${created} créée(s). Catégories existantes conservées. Aucun message modifié, déplacé, envoyé ou supprimé.`;
+ }catch{throw new CategoryExecutionError(`Préparation interrompue après ${created} création(s) confirmée(s). Une création supplémentaire peut avoir abouti. Vérifiez les catégories Outlook avant toute nouvelle tentative. Aucun message modifié.`);}
+}
 
 export function categoryPermissions(scopes: string) {
   const granted = new Set(scopes.toLowerCase().split(/\s+/).map(scope => scope.replace(/^https:\/\/graph.microsoft.com\//, "")));

@@ -9,7 +9,8 @@ export async function GET(request: Request) {
   try {
     const accountId = new URL(request.url).searchParams.get("accountId") || "";
     const connection = await microsoftConnection(uid, accountId);
-    return Response.json({ ...await reviewMicrosoftMailbox(uid, accountId), accountId, permissions: categoryPermissions(connection?.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
+    const scope=new URL(request.url).searchParams.get('scope')||'recent';
+    return Response.json({ ...await reviewMicrosoftMailbox(uid, accountId,scope), accountId, permissions: categoryPermissions(connection?.scopes || "") }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ error: "La lecture des mails n’a pas abouti. Vérifiez Microsoft dans Connexions puis réessayez." }, { status: 502, headers: { "Cache-Control": "no-store" } });
   }
@@ -19,13 +20,13 @@ export async function POST(request: Request) {
   const uid = userId(request);
   if (request.headers.get("Origin") !== new URL(request.url).origin) return Response.json({ error: "Origine non autorisée." }, { status: 403 });
   try {
-    const body = await request.json() as { entries?: CategoryEntry[]; account?: string; accountId?: string };
+    const body = await request.json() as { entries?: CategoryEntry[]; account?: string; accountId?: string;scope?:string };
     const createdAt = new Date().toISOString();
     const accountId = typeof body.accountId === "string" ? body.accountId : "";
-    const review = await reviewMicrosoftMailbox(uid, accountId);
+    const review = await reviewMicrosoftMailbox(uid, accountId,typeof body.scope==='string'?body.scope:'recent');
     const plan = { account: body.account || "", createdAt, entries: body.entries || [] };
     validateCategoryPlan(plan, review.account);
-    // Only current Inbox messages from the reviewed perimeter may be selected.
+    // Only messages returned again by the same fixed search scope may be selected.
     plan.entries = plan.entries.map(entry => {
       const message = review.messages.find(message => message.id === entry.id);
       if (!message) throw new Error("La sélection a changé. Actualisez les propositions.");

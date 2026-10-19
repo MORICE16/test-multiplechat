@@ -126,5 +126,13 @@
     "116 tests, TypeScript, lint cible et build reussis.",
     "Point quotidien runtime : agenda sept jours, cinq mails recents, listes To Do ; 3/3 recus et journal conserve apres rechargement, sans appel IA ni ecriture Microsoft.",
     "Claude relu dans MultipleChat ; aucune souscription nouvelle. Relais assiste distinct API autonome."
+  ],
+  "Portail et classement 2026-10-19": [
+    "Centre de commande desktop et catalogue Applications/appareils implementes ; ancien accueil mobile conserve.",
+    "Plan de connexion prive et idempotent : requested seulement, aucun secret, aucune connexion deduite.",
+    "Outlook : preparation des 13 categories fixes et recherches ciblees sans date de debut ; limites 100 resultats et 10 modifications par lot, pas tri exhaustif.",
+    "Revue Claude sur le descriptif effectivement recue, controles appropries implementes.",
+    "Dreame Matrix10 Ultra : firmware Matter et passerelle privee non verifies, aucun appairage ou commande.",
+    "123 tests passes ; publication/runtime du nouveau lot encore a confirmer."
   ]
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { MailReview } from "../lib/mail-triage";
+import {MAIL_REVIEW_SCOPES} from '../lib/mail-triage';
 import { MAIL_CATEGORIES } from "../lib/mail-categories";
 
 export function MailReviewPanel() {
@@ -10,6 +11,7 @@ export function MailReviewPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("Tous");
+  const [scope,setScope]=useState('recent');
   const [page, setPage] = useState(0);
   const [permissions, setPermissions] = useState({ writeMail: false, manageCategories: false });
   const [selection, setSelection] = useState<Record<string, string>>({});
@@ -26,7 +28,7 @@ export function MailReviewPanel() {
   async function load() {
     setLoading(true); setError("");
     try {
-      const response = await fetch(`/api/microsoft/triage?accountId=${encodeURIComponent(accountId)}`, { cache: "no-store" });
+      const response = await fetch(`/api/microsoft/triage?accountId=${encodeURIComponent(accountId)}&scope=${encodeURIComponent(scope)}`, { cache: "no-store" });
       const data = await response.json() as MailReview & { error?: string; permissions: typeof permissions };
       if (!response.ok) throw new Error(data.error || "Lecture indisponible.");
       setReview(data); setPermissions(data.permissions); setFilter("Tous"); setPage(0); setSelection({}); setApproval(null);
@@ -37,12 +39,22 @@ export function MailReviewPanel() {
     if (!review) return;
     setLoading(true); setError(""); setResult("");
     try {
-      const response = await fetch("/api/microsoft/triage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountId, account: review.account, entries: Object.entries(selection).map(([id, category]) => ({ id, category })) }) });
+      const response = await fetch("/api/microsoft/triage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountId, account: review.account, scope:review.scope||'recent', entries: Object.entries(selection).map(([id, category]) => ({ id, category })) }) });
       const data = await response.json() as { id: string; summary: string; error?: string };
       if (!response.ok) throw new Error(data.error || "Préparation impossible.");
       setApproval(data);
     } catch (e) { setError(e instanceof Error ? e.message : "Préparation impossible."); }
     finally { setLoading(false); }
+  }
+  async function prepareCatalog() {
+    if (loading || approval) return;
+    setLoading(true);setError('');setResult('');
+    try {
+      const response=await fetch('/api/microsoft/category-catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accountId})});
+      const data=await response.json() as {id:string;summary:string;error?:string};
+      if(!response.ok)throw Error(data.error||'Préparation des catégories impossible.');
+      setApproval(data);
+    }catch(e){setError(e instanceof Error?e.message:'Préparation non confirmée.');}finally{setLoading(false);}
   }
   async function apply() {
     if (!approval) return;
@@ -62,16 +74,20 @@ export function MailReviewPanel() {
   return <section className="panel" aria-label="Préparer le classement des mails">
     <p className="eyebrow">CLASSEMENT À PRÉPARER</p><h2>Organiser ma boîte mail</h2>
     <label>Boîte Microsoft <select value={accountId} disabled={loading} onChange={event => { setAccountId(event.target.value); setReview(null); setSelection({}); setApproval(null); setResult(""); setError(""); }}><option value="">Compte principal</option>{accounts.filter(a => a.id).map(a => <option value={a.id} key={a.id}>{a.email}</option>)}</select></label>
-    <p>Examiner jusqu’à 100 messages récents de la boîte choisie, depuis janvier 2025. Les autres dossiers ne sont pas encore inclus.</p>
+    <label>Périmètre de lecture<select value={scope} disabled={loading} onChange={e=>{setScope(e.target.value);setReview(null);setSelection({});setApproval(null);setResult('');setError('');}}>{Object.entries(MAIL_REVIEW_SCOPES).map(([id,item])=><option key={id} value={id}>{item.label}</option>)}</select></label>
+    <p>{scope==='recent'?'Jusqu’à 100 messages récents de la réception, depuis janvier 2025.':'Recherche Microsoft dans les objets et expéditeurs, sans date de début imposée : jusqu’à 100 résultats. Les corps et pièces jointes ne sont pas lus.'} Ce lot ne représente pas le tri complet de la boîte.</p>
     <p>Propositions par mots-clés dans l’objet et l’expéditeur. Choisissez les catégories, puis validez leur ajout dans Outlook. Aucun déplacement, envoi ou suppression.</p>
     <button disabled={loading} onClick={load}>{loading ? "Lecture Microsoft en cours…" : review ? "Actualiser les propositions" : "Préparer le classement"}</button>
     {error && <p role="alert">{error}{review ? " Le résultat ci-dessous provient de la lecture précédente." : ""}</p>}
     {result && <p role="status">{result}</p>}
     {review && <>
       <p role="status"><strong>{review.account || "Compte Microsoft connecté"}</strong> · {review.messages.length} messages examinés · {new Date(review.checkedAt).toLocaleString("fr-FR")}</p>
-      {review.hasMore && <p>Il reste des messages plus anciens. Cet aperçu ne couvre pas toute la boîte.</p>}
+      {review.hasMore && <p>La limite du lot est atteinte ou Microsoft signale d’autres résultats. Cet aperçu ne couvre pas toute la boîte.</p>}
       {(!permissions.writeMail || !permissions.manageCategories) && <p>Microsoft doit autoriser la création des catégories et le classement. <a href="/api/microsoft/start?categories=1">Autoriser le classement Outlook</a> — choisissez le même compte : {review.account}.</p>}
       <p>Lot de 10 messages maximum. Les catégories existantes sont conservées. Les noms avec « / » organisent les étiquettes ; Outlook ne crée pas de sous-dossiers.</p>
+      <button disabled={loading||Boolean(approval)||!permissions.manageCategories} onClick={prepareCatalog}>Préparer mes catégories Outlook</button>
+      <p>Notaire, avocat, immobilier, locataires, assurances… Crée les étiquettes manquantes après confirmation ; ne classe pas encore les messages.</p>
+      <button disabled={loading||Boolean(approval)||!permissions.writeMail||!permissions.manageCategories} onClick={()=>{const next:Record<string,string>={};for(const message of shown){if(Object.keys(next).length>=10)break;if(message.id&&message.suggestions.length===1&&!message.categories.includes(message.suggestions[0]))next[message.id]=message.suggestions[0];}setSelection(next);setError(Object.keys(next).length?'':'Aucune proposition unique dans ce périmètre. Choisissez une catégorie manuellement ou examinez une autre boîte.');}}>Sélectionner jusqu’à 10 propositions uniques</button>
       <button disabled={loading || !Object.keys(selection).length || !permissions.writeMail || !permissions.manageCategories} onClick={prepare}>Vérifier mon classement ({Object.keys(selection).length}/10)</button>
       {approval && <div role="region" aria-label="Classement à confirmer"><p style={{ whiteSpace: "pre-wrap" }}>{approval.summary}</p><button disabled={loading} onClick={apply}>Confirmer et appliquer dans Outlook</button><button disabled={loading} onClick={() => setApproval(null)}>Revenir à la sélection</button></div>}
       <label>Catégorie proposée <select value={filter} onChange={event => { setFilter(event.target.value); setPage(0); }}><option>Tous</option>{groups.map(group => <option key={group}>{group}</option>)}</select></label>

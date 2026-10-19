@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import "./horizon.css";
+import "./control-center.css";
 
 export const viewport = {
   themeColor: "#08172e",

@@ -6,7 +6,7 @@ import ts from 'typescript';
 import { ActionError, actionFailure } from '../app/lib/action-error.ts';
 import { boundedHistory, planningError } from '../app/lib/assistant-context.ts';
 import { inspectMailbox, mailReviewText, isExplicitMailPreview } from '../app/lib/mail-triage.ts';
-import { CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan } from '../app/lib/mail-categories.ts';
+import { CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, ensureCategoryCatalog, MAIL_CATEGORIES } from '../app/lib/mail-categories.ts';
 import { buildDailyBrief } from '../app/lib/daily-brief.ts';
 
 // Run the real route SQL against SQLite; only the Cloudflare transport and
@@ -15,7 +15,7 @@ async function fixture() {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history', '0004_ancient_micromax']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
-  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, buildDailyBrief };
+  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, ensureCategoryCatalog, MAIL_CATEGORIES, buildDailyBrief, sameOrigin:r=>r.headers.get('Origin')===new URL(r.url).origin };
   f.env = { DB: {
     prepare(query) {
       return { query, bind(...values) {
@@ -38,7 +38,7 @@ async function fixture() {
   f.route = async path => {
     let source = await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
     source = source.replace(/^import .*;\r?\n/gm, '');
-    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan,buildDailyBrief} = f;
+    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan,ensureCategoryCatalog,MAIL_CATEGORIES,buildDailyBrief,sameOrigin} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const connection=(...a)=>f.microsoftConnection(...a);
@@ -350,4 +350,23 @@ test('To Do list summary is an owner-scoped Graph GET and exposes pagination lim
     malformed=true;await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{}),/pas confirmé/);
     await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{accountId:'second'}),/compte principal/);
   }finally{f.close();}
+});
+
+test('fixed category setup requires same owner permission and records an approval before any write',async()=>{
+ const f=await fixture();try{
+  const expiry=new Date(Date.now()+3600000).toISOString();
+  f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','primary','refresh',?,'primary@example.invalid','MailboxSettings.ReadWrite','connected','now')").run(expiry);
+  const route=await f.route('app/api/microsoft/category-catalog/route.ts');
+  const request=(body={},user='alice',origin='https://morice.example')=>new Request('https://morice.example/api/microsoft/category-catalog',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','test-user':user},body:JSON.stringify(body)});
+  assert.equal((await route.POST(request({},'bob'))).status,403);
+  assert.equal((await route.POST(request({},'alice','https://evil.example'))).status,403);
+  assert.equal((await route.POST(request({accountId:'missing'}))).status,403);
+  assert.equal((await route.POST(request({accountId:'',names:['Injected']}))).status,400);
+  const r=await route.POST(request());assert.equal(r.status,200);const d=await r.json();assert.ok(d.id);assert.equal(f.sent,0);
+  const stored=f.sql.prepare('SELECT operation,payload FROM morice_action_payloads WHERE item_id=?').get(d.id);assert.equal(stored.operation,'mail_category_setup');assert.equal(JSON.parse(stored.payload).categorySetup.account,'primary@example.invalid');
+  const labels=new Set();f.fetch=async(path,init)=>{assert.ok(String(path).includes('/me/outlook/masterCategories'));if(init?.method==='POST'){const body=JSON.parse(init.body);labels.add(body.displayName);return Response.json(body);}return Response.json({value:[...labels].map(displayName=>({displayName}))});};
+  const ms=await f.route('app/lib/microsoft.ts');assert.match(await ms.runMicrosoftAction('alice',stored.operation,JSON.parse(stored.payload)),/13 catégories/);assert.equal(labels.size,13);
+  await assert.rejects(ms.runMicrosoftAction('bob',stored.operation,JSON.parse(stored.payload)),/Autorisez/);
+  await assert.rejects(ms.runMicrosoftAction('alice',stored.operation,{categorySetup:{account:'primary@example.invalid',createdAt:'2020-01-01'}}),/expiré/);
+ }finally{f.close();}
 });

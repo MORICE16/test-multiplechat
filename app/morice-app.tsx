@@ -22,6 +22,8 @@ import {GoogleConnections} from "./components/google-connections";
 import {CorePanel} from './components/core-panel';
 import {OneDrivePanel} from './components/onedrive-panel';
 import {PrivateFilesPanel} from './components/private-files-panel';
+import {ControlCenter} from './components/control-center';
+import {IntegrationCatalog} from './components/integration-catalog';
 import { type Citation } from "./lib/web-result";
 
 type Item = {
@@ -77,6 +79,8 @@ type ConnectionState = {
 const MORICE_LOGO_SRC = "/morice-3d.png?v=morice-logo-44fce869-20260823";
 
 const navigation = [
+  ["control", "Centre de commande", "◈"],
+  ["integrations", "Applications & appareils", "⬡"],
   ["home", "Aujourd’hui", "⌂"],
   ["journal", "Journal d’idées", "✧"],
   ["core", "CORE Morice", "◉"],
@@ -210,6 +214,7 @@ export default function MoriceApp() {
       void refreshConnections();
       void loadConversation();
       const params = new URLSearchParams(window.location.search);
+      if (!params.get('microsoft') && !params.get('google') && !params.get('view') && !window.location.hash && window.matchMedia('(min-width: 1100px)').matches) setView('control');
       if (params.get("microsoft") === "connected") {
         setView("connections");
         setNotice("Microsoft 365 est connecté à Morice.");
@@ -231,7 +236,7 @@ export default function MoriceApp() {
         setDictationState(widgetDraft ? "ready" : "idle");
         history.replaceState({}, "", window.location.pathname + window.location.search);
         if (widgetDraft) setNotice("Votre dictée est prête. Relisez-la, puis touchez Envoyer.");
-      } else if (["chat", "jobs", "improvements"].includes(params.get("view") || "")) {
+      } else if (["chat", "jobs", "improvements", "control", "integrations", "connections", "mail"].includes(params.get("view") || "")) {
         setView(params.get("view")!);
       }
       setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
@@ -472,16 +477,16 @@ export default function MoriceApp() {
   const dateText = clock ? new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(clock) : "Aujourd’hui";
 
   return (
-    <main className="morice-shell">
+    <main className={`morice-shell ${['control','integrations'].includes(view)?'portal-shell':''}`}>
       <aside className="morice-sidebar">
         <button className="brand" onClick={() => setView("home")}>
           <img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" />
           <span><b>MORICE</b><small>Assistant privé</small></span>
         </button>
         <nav className="side-navigation" aria-label="Navigation principale">
-          {navigation.filter(([id]) => ["home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
+          {navigation.filter(([id]) => ["control", "integrations", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
         </nav>
-        <details className="other-spaces"><summary>Mes autres espaces</summary><nav className="side-navigation" aria-label="Autres espaces">{navigation.filter(([id]) => !["home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span></button>)}</nav></details>
+        <details className="other-spaces"><summary>Mes autres espaces</summary><nav className="side-navigation" aria-label="Autres espaces">{navigation.filter(([id]) => !["control", "integrations", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span></button>)}</nav></details>
         <div className="sidebar-footer">
           {installState !== "installed" && <button className="outline-action" onClick={installMorice}>Installer l’application</button>}
           <button className="outline-action" onClick={enableNotifications}>Activer les notifications</button>
@@ -493,6 +498,9 @@ export default function MoriceApp() {
         <header className={`topbar ${view === "home" ? "dashboard-topbar" : ""}`}><div><p className="eyebrow">VOTRE ASSISTANT</p><h1>{view === "home" ? "Aujourd’hui" : currentView?.[1] || "Morice"}</h1></div><div className="topbar-actions"><button onClick={() => setView("approvals")} aria-label="Ouvrir les validations"><span>◆</span>{approvals.length > 0 && <b>{approvals.length}</b>}</button><img src={MORICE_LOGO_SRC} alt="Logo officiel de Morice" /></div></header>
         <label className="mobile-sections">Ouvrir un espace<select aria-label="Choisir un espace" value={view} onChange={event => setView(event.target.value)}>{navigation.map(([id, title]) => <option key={id} value={id}>{title}</option>)}<option value="hubspot">HubSpot</option></select></label>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
+
+        {view === 'control' && <ControlCenter onOpen={setView} onPrepare={(text,mode='auto')=>{setMessage(text);setAssistantMode(mode);setView('chat');}} storage={storageStatus} microsoftAuthorized={Boolean(connections?.microsoft.connected)} taskCount={tasks.filter(t=>t.status!=='done').length} waiting={approvals.length} active={assistantBusy||queue.data.jobs.some(j=>['running','submitting'].includes(j.status))} date={dateText} jobs={queue.data.jobs}/>}
+        {view === 'integrations' && <IntegrationCatalog onOpen={setView} microsoftAuthorized={Boolean(connections?.microsoft.connected)}/>}
 
         {view === "home" && <div className="horizon-home">
           <div className="horizon-heading"><div><p className="eyebrow">{dateText}</p><p>Vos idées. Votre journée. Morice à vos côtés.</p></div><HorizonWeather /></div>

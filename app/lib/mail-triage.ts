@@ -1,6 +1,15 @@
 export type MailSummary = { id?: string; subject?: string; receivedDateTime?: string; importance?: string; isRead?: boolean; categories?: string[]; from?: { emailAddress?: { name?: string; address?: string } } };
 export type MailSuggestion = { id: string; subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
-export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[] };
+export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[]; scope?:string };
+export const MAIL_REVIEW_SCOPES:Record<string,{label:string;terms?:string[]}>={
+ recent:{label:'Réception · 100 messages récents depuis janvier 2025'},
+ notaire:{label:'Recherche Microsoft · notaires',terms:['notaire','notaires','notarial']},
+ avocat:{label:'Recherche Microsoft · avocats',terms:['avocat','avocats','barreau']},
+ immobilier:{label:'Recherche Microsoft · immobilier',terms:['immobilier','syndic','copropriete','notaire']},
+ locataire:{label:'Recherche Microsoft · locataires et loyers',terms:['locataire','locataires','loyer','quittance','bail']},
+ assurances:{label:'Recherche Microsoft · assurances',terms:['assurance','assurances','assureur','sinistre']},
+ comptable:{label:'Recherche Microsoft · comptabilité',terms:['comptable','facture','factures','invoice']},
+};
 
 export function isExplicitMailPreview(message: string) {
   const text = message.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -15,6 +24,7 @@ const rules: [string, RegExp][] = [
   ["Assurances", /\b(assurance|assurances|assureur|sinistre|mutuelle|attestation d assurance)\b/],
   ["Informations / Newsletters", /\b(newsletter|lettre d information|digest|bulletin hebdomadaire)\b/],
   ["Juridique / Notaire", /\b(notaire|notaires|notarial|notariale|notariaux)\b/],
+  ["Juridique / Avocat", /\b(avocat|avocats|cabinet d avocat|cabinet d avocats|barreau)\b/],
   ["Juridique / Huissier", /\b(huissier|huissiers|commissaire de justice|commissaires de justice)\b/],
   ["Comptabilité / Comptable", /\b(comptable|comptables|expertise comptable|bilan comptable)\b/],
   ["Comptabilité / Factures", /\b(facture|factures|invoice|invoices|avoir comptable)\b/],
@@ -24,7 +34,8 @@ const rules: [string, RegExp][] = [
 
 export function suggestMail(message: MailSummary): MailSuggestion {
   const subject = (message.subject || "Sans objet").slice(0, 500);
-  const sender = (message.from?.emailAddress?.name || message.from?.emailAddress?.address || "Expéditeur inconnu").slice(0, 320);
+  const person=message.from?.emailAddress;
+  const sender = (person?.name&&person.address&&person.name!==person.address?`${person.name} <${person.address}>`:person?.name||person?.address||"Expéditeur inconnu").slice(0, 320);
   // Mail text is data only. Rules run locally; no message body or attachment is requested.
   const text = `${subject} ${sender}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const matches = rules.flatMap(([category, pattern]) => {
@@ -37,17 +48,22 @@ export function suggestMail(message: MailSummary): MailSuggestion {
     unread: message.isRead === false };
 }
 
-export async function inspectMailbox(account: string, read: (path: string) => Promise<unknown>): Promise<MailReview> {
-  const query = new URLSearchParams({ "$top": "100", "$orderby": "receivedDateTime desc", "$filter": "receivedDateTime ge 2025-01-01T00:00:00Z", "$select": "id,subject,from,receivedDateTime,importance,isRead,categories" });
-  const data = await read(`/me/mailFolders/inbox/messages?${query}`) as { value?: MailSummary[]; "@odata.nextLink"?: string };
+export async function inspectMailbox(account: string, read: (path: string) => Promise<unknown>,scope='recent'): Promise<MailReview> {
+  if(!Object.hasOwn(MAIL_REVIEW_SCOPES,scope))throw Error('Périmètre de recherche invalide.');
+  const terms=MAIL_REVIEW_SCOPES[scope].terms;
+  const query = new URLSearchParams({ "$top": "100", "$select": "id,subject,from,receivedDateTime,importance,isRead,categories" });
+  if(terms)query.set('$search',`"${terms.flatMap(term=>[`subject:${term}`,`from:${term}`]).join(' OR ')}"`);
+  else{query.set('$orderby','receivedDateTime desc');query.set('$filter','receivedDateTime ge 2025-01-01T00:00:00Z');}
+  const data = await read(`${terms?'/me/messages':'/me/mailFolders/inbox/messages'}?${query}`) as { value?: MailSummary[]; "@odata.nextLink"?: string };
   if (!data || !Array.isArray(data.value)) throw new Error("La lecture de la boîte est incomplète.");
-  return { account, checkedAt: new Date().toISOString(), hasMore: Boolean(data["@odata.nextLink"]), messages: data.value.slice(0, 100).map(suggestMail) };
+  return { account, checkedAt: new Date().toISOString(), hasMore: Boolean(data["@odata.nextLink"])||data.value.length>=100, messages: data.value.slice(0, 100).map(suggestMail),scope };
 }
 
 export function mailReviewText(review: MailReview) {
   const counts = new Map<string, number>();
   for (const message of review.messages) for (const category of message.suggestions.length ? message.suggestions : ["À examiner"]) counts.set(category, (counts.get(category) || 0) + 1);
-  return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.${review.hasMore ? " Il reste d’autres messages : cet aperçu n’est pas exhaustif." : " Les autres dossiers ne sont pas inclus."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes restent à raccorder. Pour appliquer les catégories, ouvrez Emails, sélectionnez jusqu’à 10 messages et confirmez le lot.`;
+  const perimeter=review.scope&&review.scope!=='recent'?`${MAIL_REVIEW_SCOPES[review.scope]?.label||'Recherche Microsoft'} : ${review.messages.length} résultat(s) examiné(s), 100 maximum.`:`${review.messages.length} messages récents examinés dans la boîte de réception depuis le 1er janvier 2025.`;
+  return `Préparation du classement — ${review.account || "boîte Microsoft connectée"}\n${perimeter}${review.hasMore ? " Il reste potentiellement d’autres messages : cet aperçu n’est pas exhaustif." : " Ce résultat ne constitue pas le tri complet de la boîte."}\n${Array.from(counts, ([name, count]) => `${name} : ${count}`).join("\n")}\nPropositions par mots-clés dans les objets et expéditeurs, à vérifier dans Emails. Aucun message déplacé, modifié ni envoyé. Une seule boîte connectée est couverte; les autres comptes restent à raccorder. Pour appliquer les catégories, ouvrez Emails, sélectionnez jusqu’à 10 messages et confirmez le lot.`;
 }
 
 export async function inspectGmailInbox(account:string,read:(path:string)=>Promise<unknown>):Promise<MailReview>{
