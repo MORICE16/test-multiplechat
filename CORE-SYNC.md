@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T06:45:47.321Z
-Commit source au moment de la génération : `4d99399f044b9d50317fff8b5d0025965fb19b36`
+Généré : 2026-10-19T06:50:41.907Z
+Commit source au moment de la génération : `703eec9238f8e0c44d8ac9f0b5b92b460f2f63dc`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -208,9 +208,19 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Publication privée appgdep_6ad5ad8fc1b88191bcdf115c6cee1ff7 succeeded, source 9ab7b22, révision 6. Runtime : lecture hebdomadaire confirmée, fuseau Paris affiché, aucun rendez-vous actif reçu ; conversion d événement réel non observée, couverte par tests substitués.
 - calendar-day.ts importé dans MultipleChat, dix-neuf fichiers. Aucune donnée privée transmise et aucun événement modifié.
 
+## Navigation To Do locale 2026-10-19
+
+- Navigation précédent/suivant par vingt parmi les cent tâches maximum déjà chargées, compteur explicite, sans nouveau transport Graph.
+- Recherche et changement de liste reviennent au début ; page bornée quand le nombre de résultats diminue.
+- Liste cible nommée et sélecteur bloqué pendant préparation/exécution/validation en attente ; aucune écriture de tâche pour tester.
+- TypeScript, lint ciblé, build officiel réussis ; suite serveur 147 tests inchangée, non rejouée. Source 703eec9 ; publication et navigation runtime à vérifier.
+- Publication privée appgdep_6ad5bcf0f4f081918ae91067a6ef9674 succeeded, source 703eec9, révision 6. Runtime : cinq groupes de vingt parcourus jusqu à 81–100, limite suivante bloquée, précédent/recherche vide/effacement vérifiés sans erreur.
+- Cent tâches déjà chargées, pas de pagination Microsoft supplémentaire. Aucune préparation ou écriture de tâche pour tester ; gel de liste contrôlé dans le code seulement.
+
 ## Fichiers modifiés lors de la génération
 
-- app/components/todo-panel.tsx
+- docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 
