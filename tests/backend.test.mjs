@@ -8,6 +8,7 @@ import { boundedHistory, planningError } from '../app/lib/assistant-context.ts';
 import { inspectMailbox, mailReviewText, isExplicitMailPreview } from '../app/lib/mail-triage.ts';
 import { CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, ensureCategoryCatalog, MAIL_CATEGORIES } from '../app/lib/mail-categories.ts';
 import { buildDailyBrief } from '../app/lib/daily-brief.ts';
+import { calendarReadText } from '../app/lib/calendar-day.ts';
 
 // Run the real route SQL against SQLite; only the Cloudflare transport and
 // external providers are substituted. No real email/webhook is sent.
@@ -15,7 +16,7 @@ async function fixture() {
   const sql = new DatabaseSync(':memory:');
   for (const file of ['0000_morice', '0001_connections_actions', '0002_conversation_history', '0004_ancient_micromax']) sql.exec(await readFile(new URL(`../drizzle/${file}.sql`, import.meta.url), 'utf8'));
   const key = crypto.randomUUID();
-  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, ensureCategoryCatalog, MAIL_CATEGORIES, buildDailyBrief, sameOrigin:r=>r.headers.get('Origin')===new URL(r.url).origin };
+  const f = { sql, sent: 0, failConfirmation: false, vars: { OPENAI_API_KEY: 'test-only' }, ActionError, actionFailure, boundedHistory, planningError, inspectMailbox, mailReviewText, isExplicitMailPreview, CategoryExecutionError, categoryPermissions, validateCategoryPlan, applyCategoryPlan, ensureCategoryCatalog, MAIL_CATEGORIES, buildDailyBrief, calendarReadText, sameOrigin:r=>r.headers.get('Origin')===new URL(r.url).origin };
   f.env = { DB: {
     prepare(query) {
       return { query, bind(...values) {
@@ -38,7 +39,7 @@ async function fixture() {
   f.route = async path => {
     let source = await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
     source = source.replace(/^import .*;\r?\n/gm, '');
-    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan,ensureCategoryCatalog,MAIL_CATEGORIES,buildDailyBrief,sameOrigin} = f;
+    source = `const f = globalThis[${JSON.stringify(key)}]; const {env,ActionError,actionFailure,boundedHistory,planningError,inspectMailbox,mailReviewText,isExplicitMailPreview,CategoryExecutionError,categoryPermissions,validateCategoryPlan,applyCategoryPlan,ensureCategoryCatalog,MAIL_CATEGORIES,buildDailyBrief,calendarReadText,sameOrigin} = f;
       const now=()=>new Date().toISOString(), userId=r=>r.headers.get('test-user') || 'alice', runtimeValue=n=>f.vars[n] || '';
       ${path.endsWith('/microsoft.ts') ? '' : 'const runMicrosoftAction=(...a)=>f.runMicrosoftAction(...a), runMakeAction=(...a)=>f.runMakeAction(...a);'}
       const connection=(...a)=>f.microsoftConnection(...a);
@@ -360,6 +361,16 @@ test('To Do list summary is an owner-scoped Graph GET and exposes pagination lim
     malformed=true;await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{}),/pas confirmé/);
     await assert.rejects(()=>ms.runMicrosoftAction('alice','todo_lists',{accountId:'second'}),/compte principal/);
   }finally{f.close();}
+});
+
+test('weekly calendar Graph read requests UTC metadata with a shared deadline and no write',async()=>{
+ const f=await fixture();try{
+  f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+  const ms=await f.route('app/lib/microsoft.ts');let reads=0;const shared=AbortSignal.timeout(5000);
+  f.fetch=async(url,init)=>{reads++;assert.equal(init.method,undefined);assert.equal(init.signal,shared);assert.equal(init.headers.Prefer,'outlook.timezone="UTC"');const parsed=new URL(url);assert.equal(parsed.pathname,'/v1.0/me/calendarView');assert.equal(parsed.searchParams.get('$top'),'10');assert.ok(parsed.searchParams.get('$select').includes('isAllDay'));const from=Date.parse(parsed.searchParams.get('startDateTime'));const to=Date.parse(parsed.searchParams.get('endDateTime'));assert.ok(Math.abs(to-from-7*86400000)<100);return Response.json({value:[]});};
+  await assert.rejects(()=>ms.runMicrosoftAction('bob','calendar_read',{},undefined,shared));assert.equal(reads,0);
+  assert.match(await ms.runMicrosoftAction('alice','calendar_read',{},undefined,shared),/Europe\/Paris/);assert.equal(reads,1);
+ }finally{f.close();}
 });
 
 test('OneDrive distinguishes malformed reads from a confirmed empty page and requires the owner',async()=>{

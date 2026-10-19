@@ -19,6 +19,28 @@ function utcDate(value: unknown) {
   return Number.isFinite(stamp) ? new Date(stamp).toISOString() : null;
 }
 
+// Graph is explicitly requested in UTC. Label the display zone rather than
+// interpreting its timezone-less dateTime in the server's local timezone.
+export function calendarReadText(data: Record<string, unknown> | null) {
+  if(!Array.isArray(data?.value))throw new Error("Microsoft n’a pas confirmé la lecture du calendrier.");
+  const format=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'medium',timeStyle:'short'});
+  const dateOnly=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'medium'});
+  const rows:string[]=[];
+  for(const item of data.value.slice(0,10)){
+    if(!item||typeof item!=='object'||Array.isArray(item))throw new Error('Réponse calendrier incomplète.');
+    const event=item as {isCancelled?:unknown;isAllDay?:unknown;subject?:unknown;start?:{dateTime?:unknown;timeZone?:unknown};location?:{displayName?:unknown}};
+    if(event.isCancelled===true)continue;
+    const start=utcDate(event.start?.dateTime);
+    if(!start||(event.start?.timeZone!=null&&event.start.timeZone!=='UTC'&&event.start.timeZone!=='Etc/UTC'))throw new Error('Heure du calendrier non confirmée.');
+    const title=typeof event.subject==='string'?event.subject:'Sans titre';
+    const place=typeof event.location?.displayName==='string'&&event.location.displayName?` (${event.location.displayName})`:'';
+    rows.push(`${event.isAllDay===true?dateOnly.format(new Date(start))+' · Toute la journée':format.format(new Date(start))} — ${title}${place}`);
+  }
+  const more=Boolean(data['@odata.nextLink'])||data.value.length>10;
+  const empty=more?'Aucun rendez-vous actif dans cette page.':'Aucun rendez-vous actif dans les sept prochains jours.';
+  return 'Calendrier principal · sept prochains jours · heures de Paris (Europe/Paris)\n'+(rows.length?rows.join('\n'):empty)+(more?'\nLecture partielle : d’autres rendez-vous restent à lire dans Outlook.':'');
+}
+
 export function dayEvents(data: Record<string, unknown> | null, start: string, end: string): MicrosoftDay {
   if (!Array.isArray(data?.value)) throw new Error("Réponse calendrier incomplète.");
   const events: DayEvent[] = [];

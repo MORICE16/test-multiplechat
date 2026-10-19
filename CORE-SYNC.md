@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T04:45:16.281Z
-Commit source au moment de la génération : `b633c5168ff4613e6c75093c56117af017abf2a1`
+Généré : 2026-10-19T05:40:28.471Z
+Commit source au moment de la génération : `b71a8456430b620dbe0fed150619bd8240c4cbc4`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -201,8 +201,10 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Fichiers modifiés lors de la génération
 
-- docs/MORICE-SYNC.md
-- docs/core-state.json
+- app/lib/calendar-day.ts
+- app/lib/microsoft.ts
+- tests/backend.test.mjs
+- tests/calendar-day.test.mjs
 
 ## Reprise MultipleChat
 

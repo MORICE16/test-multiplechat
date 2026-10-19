@@ -3,7 +3,7 @@ import { decryptSecret, encryptSecret } from "./secret-crypto";
 import { now, runtimeValue } from "./runtime";
 import { ActionError } from "./action-error";
 import { inspectMailbox, mailReviewText } from "./mail-triage";
-import { dayEvents, validateDayRange } from "./calendar-day";
+import { dayEvents, validateDayRange, calendarReadText } from "./calendar-day";
 import { applyCategoryPlan, categoryPermissions, validateCategoryPlan, ensureCategoryCatalog, type CategoryPlan } from "./mail-categories";
 
 export type ActionPayload = {
@@ -151,10 +151,8 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
   if (operation === "calendar_read") {
     const start = encodeURIComponent(new Date().toISOString());
     const end = encodeURIComponent(new Date(Date.now() + 7 * 86_400_000).toISOString());
-    const data = await graph(uid, `/me/calendarView?startDateTime=${start}&endDateTime=${end}&$top=10&$orderby=start/dateTime&$select=subject,start,end,location`, undefined, accountId, readSignal) as { value?: Array<{ subject?: string; start?: { dateTime?: string }; location?: { displayName?: string } }> };
-    if (!Array.isArray(data?.value)) throw new ActionError("Microsoft n’a pas confirmé la lecture du calendrier.", true);
-    const rows = data?.value || [];
-    return rows.length ? rows.map(event => `${event.start?.dateTime || "Date inconnue"} — ${event.subject || "Sans titre"}${event.location?.displayName ? ` (${event.location.displayName})` : ""}`).join("\n") : "Aucun rendez-vous dans les sept prochains jours.";
+    const data = await graph(uid, `/me/calendarView?startDateTime=${start}&endDateTime=${end}&$top=10&$orderby=start/dateTime&$select=subject,start,end,location,isAllDay,isCancelled`, {headers:{Prefer:'outlook.timezone="UTC"'}}, accountId, readSignal||AbortSignal.timeout(25_000));
+    return calendarReadText(data);
   }
   if (operation === "todo_lists") {
     const data = await graph(uid, "/me/todo/lists", undefined, accountId, readSignal) as { value?: Array<{ displayName?: string }>; "@odata.nextLink"?: string };
