@@ -5,6 +5,7 @@ export function TodoPanel() {
   const [lists,setLists]=useState<{id:string;displayName:string}[]>([]),[list,setList]=useState(''),[tasks,setTasks]=useState<Task[]>([]);
   const [account,setAccount]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[refresh,setRefresh]=useState(0),[hasMore,setHasMore]=useState(false),[search,setSearch]=useState('');
   const [title,setTitle]=useState(''),[prepared,setPrepared]=useState(''),[writing,setWriting]=useState(false),[result,setResult]=useState('');
+  const [page,setPage]=useState(0);
   async function prepare() {
     setWriting(true);setError('');setResult('');
     try {
@@ -33,20 +34,22 @@ export function TodoPanel() {
     return()=>{active=false;clearTimeout(timeout);controller.abort();};
   },[list,refresh]);
   const shown=tasks.filter(t=>!search || t.title.toLocaleLowerCase('fr').includes(search.toLocaleLowerCase('fr')));
+  const currentPage=Math.min(page,Math.max(0,Math.ceil(shown.length/20)-1));
+  const first=currentPage*20,last=Math.min(first+20,shown.length);
   const repeats=new Map<string,number>();for(const task of tasks){const key=task.title.trim().toLocaleLowerCase('fr');repeats.set(key,(repeats.get(key)||0)+1);}
   return <section className="panel"><h2>Microsoft To Do</h2><p>{account || 'Votre compte Microsoft connecté'} · Listes et tâches réelles</p>
-    <label>Liste <select value={list} onChange={e=>setList(e.target.value)}>{lists.map(l=><option key={l.id} value={l.id}>{l.displayName}</option>)}</select></label>
-    <button disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Actualiser</button>
+    <label>Liste <select value={list} disabled={writing||Boolean(prepared)} onChange={e=>{setList(e.target.value);setPage(0);}}>{lists.map(l=><option key={l.id} value={l.id}>{l.displayName}</option>)}</select></label>
+    <button disabled={busy} onClick={()=>{setPage(0);setRefresh(v=>v+1);}}>Actualiser</button>
     <div><h3>Ajouter une tâche sans Make ni IA</h3><label>Titre de la tâche <input maxLength={300} value={title} disabled={writing||Boolean(prepared)} onChange={e=>setTitle(e.target.value)}/></label>
-      {!prepared?<button disabled={writing||busy||!list||!title.trim()} onClick={prepare}>{writing?'Préparation…':'Préparer la tâche'}</button>:<p>La demande est enregistrée dans Validations. <button disabled={writing} onClick={confirm}>Valider et créer dans Microsoft To Do</button></p>}
+      {!prepared?<button disabled={writing||busy||!list||!title.trim()} onClick={prepare}>{writing?'Préparation…':'Préparer la tâche'}</button>:<p>La demande est enregistrée dans Validations pour la liste « {lists.find(item=>item.id===list)?.displayName||'sélectionnée'} ». <button disabled={writing} onClick={confirm}>Valider et créer dans Microsoft To Do</button></p>}
       {result&&<p role="status">{result}</p>}
     </div>
-    <label>Rechercher dans les tâches chargées <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Ex. relance client" /></label>
+    <label>Rechercher dans les tâches chargées <input value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}} placeholder="Ex. relance client" /></label>
     {busy&&<p role="status">Lecture de Microsoft To Do…</p>}{error&&<p role="alert">{error}</p>}
     {hasMore&&<p>Lecture partielle : d’autres éléments existent dans Microsoft To Do. La recherche porte uniquement sur les éléments chargés.</p>}
-    {shown.slice(0,20).map(t=><article className="row" key={t.id}><div><b>{t.title}</b><p>{t.status==='completed'?'Terminée':'À faire'}{t.dueDateTime?' · Échéance : '+t.dueDateTime.dateTime.slice(0,10):''}{t.isReminderOn?' · Rappel activé':''}</p>{(repeats.get(t.title.trim().toLocaleLowerCase('fr'))||0)>1&&<small>Plusieurs tâches portent ce titre : à vérifier avant de supprimer un doublon.</small>}</div></article>)}
+    {!busy&&!error&&shown.length>0&&<nav aria-label="Tâches chargées"><p role="status">{first+1}–{last} sur {shown.length} tâches chargées{search?' correspondant à la recherche':''}.</p><button disabled={currentPage===0} onClick={()=>setPage(currentPage-1)}>Tâches précédentes</button><button disabled={last>=shown.length} onClick={()=>setPage(currentPage+1)}>Tâches suivantes</button></nav>}
+    {shown.slice(first,last).map(t=><article className="row" key={t.id}><div><b>{t.title}</b><p>{t.status==='completed'?'Terminée':'À faire'}{t.dueDateTime?' · Échéance : '+t.dueDateTime.dateTime.slice(0,10):''}{t.isReminderOn?' · Rappel activé':''}</p>{(repeats.get(t.title.trim().toLocaleLowerCase('fr'))||0)>1&&<small>Plusieurs tâches portent ce titre : à vérifier avant de supprimer un doublon.</small>}</div></article>)}
     {!busy&&!error&&!shown.length&&<p>Aucune tâche dans cette sélection.</p>}
-    {shown.length>20&&<p>{shown.length} résultats : affinez la recherche pour voir les autres tâches.</p>}
     <a href="https://to-do.live.com/tasks/" target="_blank" rel="noopener noreferrer">Ouvrir Microsoft To Do pour modifier les rappels ↗</a>
     <p>La lecture de cette page ne crée aucune tâche et ne déclenche aucune relance.</p>
   </section>;
