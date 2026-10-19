@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T04:40:30.080Z
-Commit source au moment de la génération : `da72cfdc9cbb5c262e5f379e7944366241844bba`
+Généré : 2026-10-19T04:45:16.281Z
+Commit source au moment de la génération : `b633c5168ff4613e6c75093c56117af017abf2a1`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -191,11 +191,18 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 142 tests, TypeScript, lint ciblé et build officiels réussis. Source 9662121, publication et lecture runtime à confirmer séparément.
 - Publication privée appgdep_6ad591e92cbc8191911ae2cf2572e1bc succeeded, source 9662121, révision 6 ; neuf listes et vingt tâches affichées sur le vrai site sans erreur. Aucune tâche modifiée.
 
+## Recherche OneDrive fiable 2026-10-19
+
+- Collection et types requis contrôlés : réponse malformée distincte d une page vide, dix résultats maximum, suite signalée partielle.
+- Requête limitée à deux cents caractères, délai partagé OAuth 25 s, réponse métadonnées seules sans continuation.
+- Panneau annulable, délai 35 s, ancien résultat effacé, mot-clé de réponse conservé et réponse périmée ignorée.
+- 144 tests, TypeScript, lint ciblé et build officiels réussis. Source b633c51 ; publication et preuve runtime à consigner.
+- Publication privée appgdep_6ad59f7d4dc88191b0dfb2388675b8eb succeeded, source b633c51, révision 6. Recherche runtime pdf : dix métadonnées reçues, limite partielle et lecture confirmée affichées ; aucun document ouvert ou modifié.
+
 ## Fichiers modifiés lors de la génération
 
-- app/components/onedrive-panel.tsx
-- app/lib/microsoft.ts
-- tests/backend.test.mjs
+- docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 

@@ -169,5 +169,12 @@
     "Délais lecture 25 s serveur / 35 s panneau, annulation et résultat périmé ignoré ; aucune relance ou création automatique.",
     "142 tests, TypeScript, lint ciblé et build officiels réussis. Source 9662121, publication et lecture runtime à confirmer séparément.",
     "Publication privée appgdep_6ad591e92cbc8191911ae2cf2572e1bc succeeded, source 9662121, révision 6 ; neuf listes et vingt tâches affichées sur le vrai site sans erreur. Aucune tâche modifiée."
+  ],
+  "Recherche OneDrive fiable 2026-10-19": [
+    "Collection et types requis contrôlés : réponse malformée distincte d une page vide, dix résultats maximum, suite signalée partielle.",
+    "Requête limitée à deux cents caractères, délai partagé OAuth 25 s, réponse métadonnées seules sans continuation.",
+    "Panneau annulable, délai 35 s, ancien résultat effacé, mot-clé de réponse conservé et réponse périmée ignorée.",
+    "144 tests, TypeScript, lint ciblé et build officiels réussis. Source b633c51 ; publication et preuve runtime à consigner.",
+    "Publication privée appgdep_6ad59f7d4dc88191b0dfb2388675b8eb succeeded, source b633c51, révision 6. Recherche runtime pdf : dix métadonnées reçues, limite partielle et lecture confirmée affichées ; aucun document ouvert ou modifié."
   ]
 }
