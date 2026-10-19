@@ -70,8 +70,8 @@
     "19 octobre : 116 tests automatisés réussis; nouveau point quotidien : propriétaire conservé, trois lectures permises seulement, absence d'appel IA et d'écriture, résultats partiels, panne complète et provenance/historique; délai partagé et panne de journalisation après revue Claude. Ces tests utilisent des transports substitués, pas les boîtes réelles."
   ],
   "En cours": [
-    "Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.",
-    "4 octobre : routage commun publié et affichage confirmé ; génération IA refusée par limitation OpenAI, benchmark réel non réussi."
+    "Liaison PC locale préparée ; test Chrome personnel choisi par Alan au réveil, non confirmé depuis le navigateur.",
+    "Google attend une continuation humaine déjà demandée ; ne pas franchir l avertissement sans réponse."
   ],
   "À faire": [
     "Routage global de tous les modules selon capacités, difficulté et échecs; le routeur actuel concerne les analyses et vérifie le catalogue du compte.",
@@ -94,9 +94,9 @@
     "14 octobre : MultipleChat Smart et deux avis Compare fonctionnent; aucun accès API exploitable depuis Morice confirmé. Relais assisté nécessitant un opérateur/Codex actif, pas une autonomie permanente."
   ],
   "Prochaines actions": [
-    "Tester caméra et dictée sur le Fold avec le parcours livré.",
-    "Connecter les autres boîtes et vérifier leurs droits avant un classement limité et réversible.",
-    "Compléter le CORE privé et les notifications, puis évaluer l’upgrade OpenClaw sans remplacer la chaîne validée."
+    "Reprendre après le test Chrome personnel déjà convenu avec Alan, sans répéter les essais bloqués du navigateur intégré.",
+    "Terminer la continuation Google quand Alan sera disponible ; permissions et comptes à vérifier alors, sans supposer leur accès.",
+    "Après reprise, choisir un lot fonctionnel vérifiable du backlog ; classement progressif avec validation, pas de tri massif nocturne."
   ],
   "Synchronisation — consolidation 2026-09-30": [
     "Décision Alan : 04 MORICE SYNC réunit sync et RADAR ; 02 MORICE DEV reste séparé ; code applicatif inchangé.",
@@ -206,5 +206,10 @@
     "Timeout mesuré35015 ms, maximum une lecture active, clics regroupés, ancien résultat conservé et pas de relance immédiate après échec.",
     "Reprise normale, HTTP503, collections absentes, annulation au démontage avec lecture différée et remontage vérifiés ; sept requêtes fictives, deux annulations, cinq réponses achevées dont deux erreurs contrôlées.",
     "Aucune panne provoquée en production, aucune donnée utilisateur, aucun nouveau déploiement ou test serveur répété ; source servie0276d84 conservée, banc local arrêté."
+  ],
+  "Suspension suivi nocturne 2026-10-19": [
+    "Source servie0276d84 et déploiement privé réussi conservés ; aucun changement applicatif ni nouveau test ou déploiement à cette reprise.",
+    "Stabilisation indépendante vérifiée ; prochaines preuves prioritaires PC/Google/téléphone attendent une intervention déjà convenue. Backlog d extensions non déclaré livré.",
+    "Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé."
   ]
 }

@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T08:46:46.169Z
-Commit source au moment de la génération : `9171958abba230ed52cb2888c452daa0f1cf0cd9`
+Généré : 2026-10-19T09:49:40.293Z
+Commit source au moment de la génération : `ea6ef4d4f9881613a5c6711006091f22c69da2e7`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -80,8 +80,8 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## En cours
 
-- Raccordement des autres boîtes et vérification réelle de l’aperçu Gmail après publication.
-- 4 octobre : routage commun publié et affichage confirmé ; génération IA refusée par limitation OpenAI, benchmark réel non réussi.
+- Liaison PC locale préparée ; test Chrome personnel choisi par Alan au réveil, non confirmé depuis le navigateur.
+- Google attend une continuation humaine déjà demandée ; ne pas franchir l avertissement sans réponse.
 
 ## À faire
 
@@ -107,9 +107,9 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 
 ## Prochaines actions
 
-- Tester caméra et dictée sur le Fold avec le parcours livré.
-- Connecter les autres boîtes et vérifier leurs droits avant un classement limité et réversible.
-- Compléter le CORE privé et les notifications, puis évaluer l’upgrade OpenClaw sans remplacer la chaîne validée.
+- Reprendre après le test Chrome personnel déjà convenu avec Alan, sans répéter les essais bloqués du navigateur intégré.
+- Terminer la continuation Google quand Alan sera disponible ; permissions et comptes à vérifier alors, sans supposer leur accès.
+- Après reprise, choisir un lot fonctionnel vérifiable du backlog ; classement progressif avec validation, pas de tri massif nocturne.
 
 ## Synchronisation — consolidation 2026-09-30
 
@@ -232,6 +232,12 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Timeout mesuré35015 ms, maximum une lecture active, clics regroupés, ancien résultat conservé et pas de relance immédiate après échec.
 - Reprise normale, HTTP503, collections absentes, annulation au démontage avec lecture différée et remontage vérifiés ; sept requêtes fictives, deux annulations, cinq réponses achevées dont deux erreurs contrôlées.
 - Aucune panne provoquée en production, aucune donnée utilisateur, aucun nouveau déploiement ou test serveur répété ; source servie0276d84 conservée, banc local arrêté.
+
+## Suspension suivi nocturne 2026-10-19
+
+- Source servie0276d84 et déploiement privé réussi conservés ; aucun changement applicatif ni nouveau test ou déploiement à cette reprise.
+- Stabilisation indépendante vérifiée ; prochaines preuves prioritaires PC/Google/téléphone attendent une intervention déjà convenue. Backlog d extensions non déclaré livré.
+- Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé.
 
 ## Fichiers modifiés lors de la génération
 
