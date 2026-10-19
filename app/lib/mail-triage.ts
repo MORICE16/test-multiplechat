@@ -1,6 +1,16 @@
 export type MailSummary = { id?: string; subject?: string; receivedDateTime?: string; importance?: string; isRead?: boolean; categories?: string[]; from?: { emailAddress?: { name?: string; address?: string } } };
 export type MailSuggestion = { id: string; subject: string; sender: string; receivedAt: string; categories: string[]; suggestions: string[]; reasons: string[]; priority: string; unread: boolean };
 export type MailReview = { account: string; checkedAt: string; hasMore: boolean; messages: MailSuggestion[]; scope?:string };
+const categoryKey=(value:string)=>value.normalize('NFC').toLocaleLowerCase('fr');
+export function remainingMailSuggestions(message:MailSuggestion){
+ const existing=new Set(message.categories.map(categoryKey));
+ return message.suggestions.filter(category=>!existing.has(categoryKey(category)));
+}
+export function selectUniqueMailProposals(messages:MailSuggestion[]){
+ const entries:Record<string,string>={};
+ for(const message of messages){if(Object.keys(entries).length>=10)break;const remaining=remainingMailSuggestions(message);if(message.id&&remaining.length===1)entries[message.id]=remaining[0];}
+ return entries;
+}
 export const MAIL_REVIEW_SCOPES:Record<string,{label:string;terms?:string[]}>={
  recent:{label:'Réception · 100 messages récents depuis janvier 2025'},
  notaire:{label:'Recherche Microsoft · notaires',terms:['notaire','notaires','notarial']},

@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T01:48:17.041Z
-Commit source au moment de la génération : `a164ad48ddbfc1849562d13eb47353ac3f23a278`
+Généré : 2026-10-19T01:58:36.915Z
+Commit source au moment de la génération : `b99cba4a6871e83ffb401108b8155722f05a9020`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -165,22 +165,19 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Service local limité à santé et calculatrice, confirmation Windows obligatoire pour lancement, écoute 127.0.0.1 seulement, aucun tunnel ni API payante.
 - Journal privé : reçu du navigateur explicitement non attesté serveur, refus des commandes libres, déduplication et reprise de journal sans renvoi action.
 - 132 tests passent ; TypeScript et lint ciblé sans erreur. Publication et vrai passage navigateur à vérifier séparément.
+- Publication b99cba4 succeeded : appgdep_6ad5772c9870819181061909687dac9b, privé révision 6. Santé du programme réellement reçue par boucle locale ; navigateur intégré refuse explicitement cet accès. Test Chrome personnel reporté au réveil par Alan ; ne pas le redemander pendant la nuit.
+- 135 tests passent après journal explicite des liaisons interrompues et filtre Outlook masquant les propositions déjà appliquées ; aucun nouveau mail modifié.
 
 ## Fichiers modifiés lors de la génération
 
-- app/components/control-center.tsx
-- app/control-center.css
-- app/morice-app.tsx
+- app/api/pc/journal/route.ts
+- app/components/mail-review.tsx
+- app/components/pc-local-panel.tsx
+- app/lib/mail-triage.ts
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- app/api/pc/journal/route.ts
-- app/components/pc-local-panel.tsx
-- app/lib/pc-contract.ts
-- docs/PC-LOCAL.md
-- scripts/pc-local.mjs
-- scripts/start-pc-local.cmd
 - tests/pc-journal.test.mjs
-- tests/pc-local.test.mjs
+- tests/mail-remaining.test.mjs
 
 ## Reprise MultipleChat
 

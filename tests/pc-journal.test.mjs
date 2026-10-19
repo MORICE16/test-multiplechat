@@ -29,3 +29,10 @@ test('PC journal rejects another owner, CSRF, arbitrary commands, oversized and 
  assert.equal((await f.route.POST(request({phase:'begin',id:crypto.randomUUID(),action:'x'.repeat(1200)}))).status,413);
  assert.equal(f.sql.prepare('SELECT status FROM morice_jobs').get().status,'queued');
  }finally{f.close();}});
+test('PC transport failure becomes an explicit unresolved terminal journal, never overwrites a received result',async()=>{const f=await fixture();try{
+ const id=crypto.randomUUID();await f.route.POST(request({phase:'begin',id,action:'health'}));
+ assert.equal((await f.route.POST(request({phase:'unconfirmed',id},'bob'))).status,400);
+ await f.route.POST(request({phase:'unconfirmed',id}));await f.route.POST(request({phase:'unconfirmed',id}));
+ const row=f.sql.prepare('SELECT * FROM morice_jobs').get();assert.equal(row.status,'blocked');assert.equal(row.result,'');assert.match(JSON.parse(row.evidence).verification,/Aucun reçu/);assert.equal(f.sql.prepare('SELECT count(*) n FROM morice_job_events').get().n,2);
+ const second=crypto.randomUUID();await f.route.POST(request({phase:'begin',id:second,action:'health'}));await f.route.POST(request({phase:'finish',id:second,receipt:receipt(second)}));await f.route.POST(request({phase:'unconfirmed',id:second}));assert.equal(f.sql.prepare('SELECT status FROM morice_jobs WHERE id=?').get(second).status,'done');
+ }finally{f.close();}});

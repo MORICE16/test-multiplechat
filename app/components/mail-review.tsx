@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { MailReview } from "../lib/mail-triage";
-import {MAIL_REVIEW_SCOPES} from '../lib/mail-triage';
+import {MAIL_REVIEW_SCOPES,remainingMailSuggestions,selectUniqueMailProposals} from '../lib/mail-triage';
 import { MAIL_CATEGORIES } from "../lib/mail-categories";
 
 export function MailReviewPanel() {
@@ -11,6 +11,7 @@ export function MailReviewPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("Tous");
+  const [hideApplied,setHideApplied]=useState(true);
   const [scope,setScope]=useState('recent');
   const [page, setPage] = useState(0);
   const [permissions, setPermissions] = useState({ writeMail: false, manageCategories: false });
@@ -70,7 +71,8 @@ export function MailReviewPanel() {
     finally { setLoading(false); }
   }
   const groups = review ? [...new Set(review.messages.flatMap(message => message.suggestions.length ? message.suggestions : ["À examiner"]))].sort() : [];
-  const shown = review?.messages.filter(message => filter === "Tous" || (message.suggestions.length ? message.suggestions : ["À examiner"]).includes(filter)) || [];
+  const alreadyApplied=review?.messages.filter(message=>message.suggestions.length>0&&!remainingMailSuggestions(message).length).length||0;
+  const shown = review?.messages.filter(message => (!hideApplied||!message.suggestions.length||remainingMailSuggestions(message).length>0)&&(filter === "Tous" || (message.suggestions.length ? message.suggestions : ["À examiner"]).includes(filter))) || [];
   return <section className="panel" aria-label="Préparer le classement des mails">
     <p className="eyebrow">CLASSEMENT À PRÉPARER</p><h2>Organiser ma boîte mail</h2>
     <label>Boîte Microsoft <select value={accountId} disabled={loading} onChange={event => { setAccountId(event.target.value); setReview(null); setSelection({}); setApproval(null); setResult(""); setError(""); }}><option value="">Compte principal</option>{accounts.filter(a => a.id).map(a => <option value={a.id} key={a.id}>{a.email}</option>)}</select></label>
@@ -87,11 +89,13 @@ export function MailReviewPanel() {
       <p>Lot de 10 messages maximum. Les catégories existantes sont conservées. Les noms avec « / » organisent les étiquettes ; Outlook ne crée pas de sous-dossiers.</p>
       <button disabled={loading||Boolean(approval)||!permissions.manageCategories} onClick={prepareCatalog}>Préparer mes catégories Outlook</button>
       <p>Notaire, avocat, immobilier, locataires, assurances… Crée les étiquettes manquantes après confirmation ; ne classe pas encore les messages.</p>
-      <button disabled={loading||Boolean(approval)||!permissions.writeMail||!permissions.manageCategories} onClick={()=>{const next:Record<string,string>={};for(const message of shown){if(Object.keys(next).length>=10)break;if(message.id&&message.suggestions.length===1&&!message.categories.includes(message.suggestions[0]))next[message.id]=message.suggestions[0];}setSelection(next);setError(Object.keys(next).length?'':'Aucune proposition unique dans ce périmètre. Choisissez une catégorie manuellement ou examinez une autre boîte.');}}>Sélectionner jusqu’à 10 propositions uniques</button>
+      <button disabled={loading||Boolean(approval)||!permissions.writeMail||!permissions.manageCategories} onClick={()=>{const next=selectUniqueMailProposals(shown);setSelection(next);setError(Object.keys(next).length?'':'Aucune proposition unique dans ce périmètre. Choisissez une catégorie manuellement ou examinez une autre boîte.');}}>Sélectionner jusqu’à 10 propositions uniques</button>
       <button disabled={loading || !Object.keys(selection).length || !permissions.writeMail || !permissions.manageCategories} onClick={prepare}>Vérifier mon classement ({Object.keys(selection).length}/10)</button>
       {approval && <div role="region" aria-label="Classement à confirmer"><p style={{ whiteSpace: "pre-wrap" }}>{approval.summary}</p><button disabled={loading} onClick={apply}>Confirmer et appliquer dans Outlook</button><button disabled={loading} onClick={() => setApproval(null)}>Revenir à la sélection</button></div>}
-      <label>Catégorie proposée <select value={filter} onChange={event => { setFilter(event.target.value); setPage(0); }}><option>Tous</option>{groups.map(group => <option key={group}>{group}</option>)}</select></label>
-      <p>{shown.length} message(s) · Page {page + 1} sur {Math.max(1, Math.ceil(shown.length / 10))}. Votre sélection est conservée entre les pages.</p>
+      <label><input type="checkbox" checked={hideApplied} disabled={loading||Boolean(approval)} onChange={event=>{setHideApplied(event.target.checked);setPage(0);setSelection({});}}/> Masquer les propositions déjà appliquées</label>
+      <p>{alreadyApplied} message(s) de ce lot ont déjà toutes les catégories proposées. Les autres propositions restent à vérifier ; ce compteur ne mesure pas le classement complet de la boîte.</p>
+      <label>Catégorie proposée <select value={filter} disabled={loading||Boolean(approval)} onChange={event => { setFilter(event.target.value); setPage(0); setSelection({}); }}><option>Tous</option>{groups.map(group => <option key={group}>{group}</option>)}</select></label>
+      <p>{shown.length} message(s) · Page {page + 1} sur {Math.max(1, Math.ceil(shown.length / 10))}. Votre sélection est conservée entre les pages et effacée lors d’un changement de filtre.</p>
       <nav aria-label="Pages des mails"><button disabled={loading || page === 0} onClick={() => setPage(value => value - 1)}>Précédente</button><button disabled={loading || (page + 1) * 10 >= shown.length} onClick={() => setPage(value => value + 1)}>Suivante</button></nav>
       {shown.slice(page * 10, page * 10 + 10).map((message, index) => <article key={message.id || index} style={{ padding: "1rem 0", borderTop: "1px solid var(--border, #d6e0ed)", overflowWrap: "anywhere" }}>
         <h3>{message.subject}</h3><p>{message.sender} · {message.receivedAt ? new Date(message.receivedAt).toLocaleDateString("fr-FR") : "Date inconnue"} · {message.unread ? "Non lu" : "Lu"}</p>
@@ -106,6 +110,7 @@ export function MailReviewPanel() {
         {message.categories.length > 0 && <p>Catégories Outlook existantes : {message.categories.join(", ")}</p>}
       </article>)}
       {!review.messages.length && <p>Aucun message dans ce périmètre.</p>}
+      {review.messages.length>0&&!shown.length&&<p>Aucun message à afficher avec ces filtres. Décochez le masque pour retrouver les propositions déjà appliquées.</p>}
     </>}
   </section>;
 }

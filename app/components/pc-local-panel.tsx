@@ -20,6 +20,7 @@ export function PcLocalPanel(){
    received=true;setReceipt(p);setPending(p);if(action==='health')setSession(p.session);
    await save(p);
   }catch{
+   if(prepared&&!received){try{await journal({phase:'unconfirmed',id});}catch{/* Keep the prepared job for later reconciliation; never repeat the local action. */}}
    if(!received){setSession('');setError(prepared?'Liaison locale inaccessible ou résultat non confirmé. Aucun renvoi automatique. Le service doit être actif sur ce PC ; le navigateur peut demander l’accès au réseau local. Vérifiez le journal avant un nouvel essai.':'Journal indisponible : aucune demande envoyée au PC.');}
    else setError('Résultat reçu sur le PC, mais journal non confirmé. Enregistrez ce résultat sans relancer l’action.');
   }finally{setBusy(false);locked.current=false;}
