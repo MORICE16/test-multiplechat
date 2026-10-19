@@ -101,12 +101,20 @@ export async function readMicrosoftTodo(uid: string, listId: string) {
   const stored = await connection(uid);
   if (!stored) throw new Error("Connectez Microsoft dans Connexions.");
   if (listId.length>2048) throw new Error("Liste invalide.");
-  if (!listId) {
-    const data=await graph(uid,"/me/todo/lists") as {value?:unknown[];"@odata.nextLink"?:string};
-    return {account:stored.account_email,lists:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
-  }
-  const data=await graph(uid,`/me/todo/lists/${encodeURIComponent(listId)}/tasks?$top=100`) as {value?:unknown[];"@odata.nextLink"?:string};
-  return {account:stored.account_email,tasks:data?.value||[],hasMore:Boolean(data?.["@odata.nextLink"]),checkedAt:now()};
+  const deadline=AbortSignal.timeout(25_000);
+  const path=listId?`/me/todo/lists/${encodeURIComponent(listId)}/tasks?$top=100`:"/me/todo/lists";
+  const data=await graph(uid,path,undefined,"",deadline);
+  // A missing collection is a failed read, never proof of an empty list.
+  if(!Array.isArray(data?.value))throw new ActionError('Microsoft n’a pas confirmé la lecture To Do. Actualisez pour réessayer.',true);
+  const rows=data.value.slice(0,100).map((item:unknown)=>{
+    if(!item||typeof item!=='object'||Array.isArray(item))throw new ActionError('Microsoft a renvoyé un élément To Do incomplet.',true);
+    const row=item as Record<string,unknown>;
+    if(typeof row.id!=='string'||!row.id||typeof row[listId?'title':'displayName']!=='string'||(listId&&typeof row.status!=='string'))throw new ActionError('Microsoft a renvoyé un élément To Do incomplet.',true);
+    if(!listId)return {id:row.id,displayName:row.displayName};
+    const date=(value:unknown)=>value&&typeof value==='object'&&typeof (value as {dateTime?:unknown}).dateTime==='string'?{dateTime:(value as {dateTime:string}).dateTime}:undefined;
+    return {id:row.id,title:row.title,status:row.status,isReminderOn:row.isReminderOn===true,dueDateTime:date(row.dueDateTime),reminderDateTime:date(row.reminderDateTime)};
+  });
+  return {account:stored.account_email,...(listId?{tasks:rows}:{lists:rows}),hasMore:Boolean(data['@odata.nextLink'])||data.value.length>100,checkedAt:now()};
 }
 
 export async function readMicrosoftDay(uid: string, start: string, end: string) {

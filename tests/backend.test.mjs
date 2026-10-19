@@ -362,6 +362,34 @@ test('To Do list summary is an owner-scoped Graph GET and exposes pagination lim
   }finally{f.close();}
 });
 
+test('To Do panel refuses malformed collections instead of confirming an empty list',async()=>{
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');let reads=0;
+    f.fetch=async()=>{reads++;return Response.json({value:[]});};
+    await assert.rejects(()=>ms.readMicrosoftTodo('bob',''));assert.equal(reads,0);
+    for(const list of ['', 'list-one']){
+      for(const value of [{},null,{value:{}},{value:[null]},{value:[{}]}]){
+        f.fetch=async()=>Response.json(value);
+        await assert.rejects(()=>ms.readMicrosoftTodo('alice',list),/pas confirmé|incomplet/);
+      }
+      f.fetch=async(_url,init)=>{assert.equal(init.method,undefined);assert.ok(init.signal);assert.equal(init.redirect,'manual');return Response.json({value:[]});};
+      const result=await ms.readMicrosoftTodo('alice',list);assert.deepEqual(result[list?'tasks':'lists'],[]);assert.equal(result.hasMore,false);
+    }
+  }finally{f.close();}
+});
+
+test('To Do panel returns bounded metadata and a partial flag without bodies or provider links',async()=>{
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');const calls=[];
+    f.fetch=async(url,init)=>{calls.push(url);assert.equal(init.method,undefined);return Response.json({value:Array.from({length:101},(_,i)=>({id:String(i),displayName:'Liste',body:{content:'PRIVATE BODY'}}))});};
+    const lists=await ms.readMicrosoftTodo('alice','');assert.equal(lists.lists.length,100);assert.equal(lists.hasMore,true);assert.doesNotMatch(JSON.stringify(lists),/PRIVATE BODY/);
+    f.fetch=async(url,init)=>{calls.push(url);assert.equal(init.method,undefined);return Response.json({value:[{id:'one',title:'Test',status:'notStarted',isReminderOn:true,dueDateTime:{dateTime:'2026-10-19T10:00:00',timeZone:'UTC'},body:{content:'PRIVATE BODY'},linkedResources:[{webUrl:'PRIVATE URL'}]}],'@odata.nextLink':'PRIVATE CONTINUATION'});};
+    const tasks=await ms.readMicrosoftTodo('alice','list/one');assert.equal(tasks.tasks.length,1);assert.equal(tasks.hasMore,true);assert.equal(tasks.tasks[0].isReminderOn,true);assert.equal(tasks.tasks[0].dueDateTime.dateTime,'2026-10-19T10:00:00');assert.doesNotMatch(JSON.stringify(tasks),/PRIVATE|linkedResources|timeZone/);assert.match(calls[1],/list%2Fone\/tasks\?\$top=100$/);assert.equal(calls.length,2);
+  }finally{f.close();}
+});
+
 test('fixed category setup requires same owner permission and records an approval before any write',async()=>{
  const f=await fixture();try{
   const expiry=new Date(Date.now()+3600000).toISOString();

@@ -21,15 +21,16 @@ export function TodoPanel() {
       setResult(data.result);setTitle('');setRefresh(v=>v+1);
     }catch(e){setError(e instanceof Error?e.message:'Résultat inconnu. Vérifiez Validations et To Do avant de recommencer.');}finally{setWriting(false);}
   }
-  useEffect(()=>{ const controller=new AbortController();
+  useEffect(()=>{ const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(new Error('Lecture trop longue. Actualisez pour réessayer.')),35_000);let active=true;
     void (async()=>{await Promise.resolve();if(controller.signal.aborted)return;setBusy(true);setError('');setTasks([]);try{
       const response=await fetch('/api/microsoft/todo'+(list?'?list='+encodeURIComponent(list):''),{signal:controller.signal,cache:'no-store'});
       const data=await response.json() as {lists?:typeof lists;tasks?:Task[];account:string;error?:string;hasMore:boolean};
+      if(!active||controller.signal.aborted)return;
       if(!response.ok)throw new Error(data.error||'Lecture impossible.');
       setAccount(data.account);setHasMore(data.hasMore);
       if(data.lists){setLists(data.lists);if(data.lists.length)setList(data.lists[0].id);} else setTasks(data.tasks||[]);
-    }catch(e){if(!controller.signal.aborted)setError(e instanceof Error?e.message:'Lecture impossible.');}finally{if(!controller.signal.aborted)setBusy(false);}})();
-    return()=>controller.abort();
+    }catch(e){if(active)setError(controller.signal.aborted?'Lecture trop longue. Actualisez pour réessayer.':e instanceof Error?e.message:'Lecture impossible.');}finally{clearTimeout(timeout);if(active)setBusy(false);}})();
+    return()=>{active=false;clearTimeout(timeout);controller.abort();};
   },[list,refresh]);
   const shown=tasks.filter(t=>!search || t.title.toLocaleLowerCase('fr').includes(search.toLocaleLowerCase('fr')));
   const repeats=new Map<string,number>();for(const task of tasks){const key=task.title.trim().toLocaleLowerCase('fr');repeats.set(key,(repeats.get(key)||0)+1);}
@@ -42,7 +43,7 @@ export function TodoPanel() {
     </div>
     <label>Rechercher dans les tâches chargées <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Ex. relance client" /></label>
     {busy&&<p role="status">Lecture de Microsoft To Do…</p>}{error&&<p role="alert">{error}</p>}
-    {hasMore&&<p>Les 100 premiers éléments sont chargés. D’autres éléments existent dans Microsoft To Do.</p>}
+    {hasMore&&<p>Lecture partielle : d’autres éléments existent dans Microsoft To Do. La recherche porte uniquement sur les éléments chargés.</p>}
     {shown.slice(0,20).map(t=><article className="row" key={t.id}><div><b>{t.title}</b><p>{t.status==='completed'?'Terminée':'À faire'}{t.dueDateTime?' · Échéance : '+t.dueDateTime.dateTime.slice(0,10):''}{t.isReminderOn?' · Rappel activé':''}</p>{(repeats.get(t.title.trim().toLocaleLowerCase('fr'))||0)>1&&<small>Plusieurs tâches portent ce titre : à vérifier avant de supprimer un doublon.</small>}</div></article>)}
     {!busy&&!error&&!shown.length&&<p>Aucune tâche dans cette sélection.</p>}
     {shown.length>20&&<p>{shown.length} résultats : affinez la recherche pour voir les autres tâches.</p>}
