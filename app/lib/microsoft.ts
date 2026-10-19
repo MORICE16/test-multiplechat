@@ -164,11 +164,19 @@ export async function runMicrosoftAction(uid: string, operation: string, payload
     return (names.length ? `Listes Microsoft To Do du compte principal :\n${names.join("\n")}` : "Aucune liste Microsoft To Do.") + more;
   }
   if (operation === "onedrive_search") {
-    const safeQuery = (payload.query || payload.subject || "").replace(/'/g, "''");
-    if (!safeQuery) throw new Error("Indique ce que Morice doit chercher dans OneDrive.");
-    const data = await graph(uid, `/me/drive/root/search(q='${encodeURIComponent(safeQuery)}')?$top=10&$select=name,webUrl,lastModifiedDateTime`) as { value?: Array<{ name?: string; webUrl?: string }> };
-    const rows = data?.value || [];
-    return rows.length ? rows.map(file => `${file.name || "Document"}${file.webUrl ? ` — ${file.webUrl}` : ""}`).join("\n") : "Aucun document correspondant dans OneDrive.";
+    const query = (payload.query || payload.subject || "").trim();
+    if (!query || query.length>200) throw new ActionError("Indique ce que Morice doit chercher dans OneDrive (200 caractères maximum).",true);
+    const safeQuery = query.replace(/'/g, "''");
+    const data = await graph(uid, `/me/drive/root/search(q='${encodeURIComponent(safeQuery)}')?$top=10&$select=name,webUrl,lastModifiedDateTime`,undefined,"",AbortSignal.timeout(25_000));
+    if(!Array.isArray(data?.value))throw new ActionError('Microsoft n’a pas confirmé la recherche OneDrive.',true);
+    const rows=data.value.slice(0,10).map((file:unknown)=>{
+      if(!file||typeof file!=='object'||Array.isArray(file))throw new ActionError('Microsoft a renvoyé un résultat OneDrive incomplet.',true);
+      const item=file as {name?:unknown;webUrl?:unknown};
+      if(typeof item.name!=='string'||(item.webUrl!=null&&typeof item.webUrl!=='string'))throw new ActionError('Microsoft a renvoyé un résultat OneDrive incomplet.',true);
+      return `${item.name || "Document"}${item.webUrl ? ` — ${item.webUrl}` : ""}`;
+    });
+    const more=Boolean(data['@odata.nextLink'])||data.value.length>10?'\nLecture partielle : d’autres résultats existent dans OneDrive.':'';
+    return (rows.length?rows.join('\n'):'Aucun document correspondant dans cette page OneDrive.')+more;
   }
   if (operation === "mail_draft") {
     const created = await graph(uid, "/me/messages", { method: "POST", body: JSON.stringify({

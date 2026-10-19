@@ -362,6 +362,39 @@ test('To Do list summary is an owner-scoped Graph GET and exposes pagination lim
   }finally{f.close();}
 });
 
+test('OneDrive distinguishes malformed reads from a confirmed empty page and requires the owner',async()=>{
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+    const ms=await f.route('app/lib/microsoft.ts');let reads=0;
+    f.fetch=async()=>{reads++;return Response.json({value:[]});};
+    await assert.rejects(()=>ms.runMicrosoftAction('bob','onedrive_search',{query:'test'}));assert.equal(reads,0);
+    for(const value of [{},null,{value:{}},{value:[null]},{value:[{}]},{value:[{name:42}]},{value:[{name:'Test',webUrl:{private:'value'}}]}]){
+      f.fetch=async()=>Response.json(value);
+      await assert.rejects(()=>ms.runMicrosoftAction('alice','onedrive_search',{query:'test'}),/pas confirmé|incomplet/);
+    }
+    f.fetch=async()=>Response.json({value:[]});
+    assert.match(await ms.runMicrosoftAction('alice','onedrive_search',{query:'test'}),/Aucun document correspondant dans cette page/);
+    await assert.rejects(()=>ms.runMicrosoftAction('alice','onedrive_search',{query:' '.repeat(5)}),/200 caractères/);
+    await assert.rejects(()=>ms.runMicrosoftAction('alice','onedrive_search',{query:'x'.repeat(201)}),/200 caractères/);
+  }finally{f.close();}
+});
+
+test('OneDrive keeps its query in a fixed metadata GET, caps results and shares the refresh deadline',async()=>{
+  const f=await fixture();try{
+    f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','expired','test-refresh','2000-01-01','alice@example.invalid','','connected','now')").run();
+    f.vars.MICROSOFT_CLIENT_ID='test-client';f.vars.MICROSOFT_CLIENT_SECRET='test-secret';
+    const ms=await f.route('app/lib/microsoft.ts');let refreshSignal;let graphReads=0;
+    const query="rapport '2026' & #/?";
+    f.fetch=async(url,init)=>{
+      if(url.startsWith('https://login.microsoftonline.com/')){refreshSignal=init.signal;assert.equal(init.method,'POST');return Response.json({access_token:'fresh-test',expires_in:3600});}
+      graphReads++;assert.equal(init.signal,refreshSignal);assert.equal(init.method,undefined);assert.equal(init.redirect,'manual');assert.equal(init.headers.Authorization,'Bearer fresh-test');
+      assert.equal(url,`https://graph.microsoft.com/v1.0/me/drive/root/search(q='${encodeURIComponent(query.replace(/'/g,"''"))}')?$top=10&$select=name,webUrl,lastModifiedDateTime`);
+      return Response.json({value:Array.from({length:11},(_,i)=>({name:`Document-${i}`,webUrl:'https://example.invalid/document',content:'PRIVATE BODY'})),'@odata.nextLink':'PRIVATE CONTINUATION'});
+    };
+    const result=await ms.runMicrosoftAction('alice','onedrive_search',{query});assert.equal(graphReads,1);assert.ok(refreshSignal);assert.equal((result.match(/Document-/g)||[]).length,10);assert.match(result,/Lecture partielle/);assert.doesNotMatch(result,/PRIVATE|Document-10/);
+  }finally{f.close();}
+});
+
 test('To Do panel refuses malformed collections instead of confirming an empty list',async()=>{
   const f=await fixture();try{
     f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
