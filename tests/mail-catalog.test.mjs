@@ -12,3 +12,14 @@ test('ambiguous category creation stops without retry and never reports success'
  let creates=0;await assert.rejects(()=>ensureCategoryCatalog(async(_path,init)=>{if(init?.method==='POST'){creates++;throw Error('SECRET provider detail');}return{value:[]};},async()=>{}),error=>error instanceof CategoryExecutionError&&!error.message.includes('SECRET')&&error.message.includes('peut avoir abouti'));assert.equal(creates,1);
  let reads=0;await assert.rejects(()=>ensureCategoryCatalog(async()=>{reads++;return{value:[],'@odata.nextLink':'untrusted'};},async()=>{}),CategoryExecutionError);assert.equal(reads,1);
 });
+
+test('category setup and assignment reuse case and Unicode equivalents instead of creating duplicates',async()=>{
+ const {applyCategoryPlan}=await import('../app/lib/mail-categories.ts');let writes=0;
+ const names=MAIL_CATEGORIES.map(n=>n.normalize('NFD').toLocaleLowerCase('fr'));
+ const read=async()=>({value:names.map(displayName=>({displayName}))});
+ await ensureCategoryCatalog(async(path,init)=>{assert.ok(!init?.method);return read();},async()=>{});
+ const result=await applyCategoryPlan({account:'test@example.invalid',createdAt:new Date().toISOString(),entries:[{id:'one',subject:'Test',category:'Juridique / Notaire'}]},async(path,init)=>{
+  if(init?.method){writes++;throw Error('Must not write');}if(path.includes('masterCategories'))return read();return{categories:['juridique / notaire']};
+ },async()=>{});
+ assert.equal(writes,0);assert.match(result,/1 message/);
+});

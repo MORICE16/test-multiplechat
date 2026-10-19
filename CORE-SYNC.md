@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T00:53:09.286Z
-Commit source au moment de la génération : `d866938209c6489561e07d05db056cb2045cc685`
+Généré : 2026-10-19T00:57:48.363Z
+Commit source au moment de la génération : `bdd5e3030766d5a11e294acc1cdf08146b185e95`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -156,25 +156,8 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 ## Fichiers modifiés lors de la génération
 
 - CORE-SYNC.md
-- app/api/assistant/route.ts
-- app/api/microsoft/triage/route.ts
-- app/components/mail-review.tsx
-- app/layout.tsx
 - app/lib/mail-categories.ts
-- app/lib/mail-triage.ts
-- app/lib/microsoft.ts
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
-- docs/core-state.json
-- tests/backend.test.mjs
-- tests/mail-triage.test.mjs
-- app/api/integrations/route.ts
-- app/api/microsoft/category-catalog/route.ts
-- app/components/control-center.tsx
-- app/components/integration-catalog.tsx
-- app/control-center.css
-- app/lib/integration-catalog.ts
-- tests/integrations.test.mjs
 - tests/mail-catalog.test.mjs
 
 ## Reprise MultipleChat

@@ -3,17 +3,18 @@ export type CategoryEntry = { id: string; subject: string; category: string };
 export type CategoryPlan = { account: string; createdAt: string; entries: CategoryEntry[] };
 export type CategoryGraph = (path: string, init?: RequestInit) => Promise<unknown>;
 export class CategoryExecutionError extends Error {}
+const categoryKey=(name:string)=>name.normalize('NFC').toLocaleLowerCase('fr');
 
 // Fixed names only. No message is modified while preparing the category library.
 export async function ensureCategoryCatalog(graph:CategoryGraph,progress:(text:string)=>Promise<void>){
- let created=0;
+ let created=0;let attemptedWrite=false;let stage='lecture initiale';
  try {
-  const read=async()=>{const data=await graph('/me/outlook/masterCategories?$top=100') as {value?:{displayName:string}[];'@odata.nextLink'?:string};if(!Array.isArray(data?.value)||data['@odata.nextLink'])throw Error();return new Set(data.value.map(c=>c.displayName));};
+  const read=async()=>{const data=await graph('/me/outlook/masterCategories?$top=100') as {value?:{displayName:string}[];'@odata.nextLink'?:string};if(!Array.isArray(data?.value)||data['@odata.nextLink']||data.value.some(c=>typeof c?.displayName!=='string'))throw Error();return new Set(data.value.map(c=>categoryKey(c.displayName)));};
   const existing=await read();
-  for(const name of MAIL_CATEGORIES){if(existing.has(name))continue;await progress(`Préparation de la catégorie « ${name} ». ${created} création(s) confirmée(s).`);const result=await graph('/me/outlook/masterCategories',{method:'POST',body:JSON.stringify({displayName:name,color:'preset7'})}) as {displayName?:string};if(result?.displayName!==name)throw Error();created++;}
-  const checked=await read();if(!MAIL_CATEGORIES.every(name=>checked.has(name)))throw Error();
+  for(const name of MAIL_CATEGORIES){if(existing.has(categoryKey(name)))continue;stage=`création de ${name}`;await progress(`Préparation de la catégorie « ${name} ». ${created} création(s) confirmée(s).`);attemptedWrite=true;const result=await graph('/me/outlook/masterCategories',{method:'POST',body:JSON.stringify({displayName:name,color:'preset7'})}) as {displayName?:string};if(typeof result?.displayName!=='string'||categoryKey(result.displayName)!==categoryKey(name))throw Error();created++;}
+  stage='relecture finale';const checked=await read();if(!MAIL_CATEGORIES.every(name=>checked.has(categoryKey(name))))throw Error();
   return `${MAIL_CATEGORIES.length} catégories Outlook disponibles et relues, dont ${created} créée(s). Catégories existantes conservées. Aucun message modifié, déplacé, envoyé ou supprimé.`;
- }catch{throw new CategoryExecutionError(`Préparation interrompue après ${created} création(s) confirmée(s). Une création supplémentaire peut avoir abouti. Vérifiez les catégories Outlook avant toute nouvelle tentative. Aucun message modifié.`);}
+ }catch{throw new CategoryExecutionError(`Préparation interrompue (${stage}) après ${created} création(s) confirmée(s). ${attemptedWrite?'Une création supplémentaire peut avoir abouti. Vérifiez les catégories Outlook avant toute nouvelle tentative.':'Aucune création envoyée.'} Aucun message modifié.`);}
 }
 
 export function categoryPermissions(scopes: string) {
@@ -36,25 +37,26 @@ export async function applyCategoryPlan(plan: CategoryPlan, graph: CategoryGraph
   try {
     const catalog = await graph("/me/outlook/masterCategories?$top=100") as { value?: { displayName: string }[]; "@odata.nextLink"?: string };
     if (!Array.isArray(catalog?.value) || catalog["@odata.nextLink"]) throw new Error("Catalogue de catégories incomplet.");
-    const known = new Set(catalog.value.map(category => category.displayName));
+    const known = new Map(catalog.value.map(category => [categoryKey(category.displayName),category.displayName]));
     for (const name of new Set(plan.entries.map(entry => entry.category))) {
-      if (!known.has(name)) {
+      if (!known.has(categoryKey(name))) {
         await progress(`Création de la catégorie « ${name} » en cours. ${verified} message(s) vérifié(s).`);
         await graph("/me/outlook/masterCategories", { method: "POST", body: JSON.stringify({ displayName: name, color: "preset7" }) });
-        known.add(name);
+        known.set(categoryKey(name),name);
       }
     }
     for (const entry of plan.entries) {
+      const targetName=known.get(categoryKey(entry.category))!;
       const path = `/me/messages/${encodeURIComponent(entry.id)}`;
       const current = await graph(`${path}?$select=id,categories`) as { categories?: string[]; "@odata.etag"?: string };
       if (!Array.isArray(current?.categories)) throw new Error("Catégories du message indisponibles.");
-      if (!current.categories.includes(entry.category)) {
+      if (!current.categories.some(name=>categoryKey(name)===categoryKey(targetName))) {
         if (!current["@odata.etag"]) throw new Error("Version du message indisponible : modification suspendue.");
         await progress(`${verified}/${plan.entries.length} message(s) vérifié(s). Modification en cours : ${entry.subject}. En cas d’interruption, vérifier ce message dans Outlook.`);
-        await graph(path, { method: "PATCH", headers: { "If-Match": current["@odata.etag"] }, body: JSON.stringify({ categories: [...current.categories, entry.category] }) });
+        await graph(path, { method: "PATCH", headers: { "If-Match": current["@odata.etag"] }, body: JSON.stringify({ categories: [...current.categories, targetName] }) });
       }
       const confirmed = await graph(`${path}?$select=categories`) as { categories?: string[] };
-      if (!confirmed?.categories?.includes(entry.category) || !current.categories.every(name => confirmed.categories?.includes(name))) throw new Error("Vérification de la modification incomplète.");
+      if (!confirmed?.categories?.some(name=>categoryKey(name)===categoryKey(targetName)) || !current.categories.every(name => confirmed.categories?.includes(name))) throw new Error("Vérification de la modification incomplète.");
       verified++;
       await progress(`${verified}/${plan.entries.length} message(s) classé(s) et relu(s) dans Outlook. Dernier : ${entry.subject} → ${entry.category}.`);
     }
