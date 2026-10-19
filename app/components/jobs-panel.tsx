@@ -14,38 +14,49 @@ export function useJobs(onCompleted: () => void) {
   const [error, setError] = useState("");
   const callback = useRef(onCompleted);
   useEffect(() => { callback.current = onCompleted; }, [onCompleted]);
-  const working = useRef(false);
+  const flight = useRef<AbortController|null>(null);
+  const disposed = useRef(false);
   const refreshAgain = useRef(false);
   const lastDone = useRef("");
   const active = useRef(false);
   const refresh = useCallback(async function refreshJobs() {
-    if (working.current) { refreshAgain.current = true; return; }
-    working.current = true;
+    if(disposed.current)return;
+    if (flight.current) { refreshAgain.current = true; return; }
+    const controller=new AbortController();flight.current=controller;
+    const deadline=window.setTimeout(()=>controller.abort(),35_000);
+    let succeeded=false;
     try {
-      const response = await fetch("/api/jobs", { method: "POST" });
+      const response = await fetch("/api/jobs", { method: "POST",signal:controller.signal,cache:'no-store' });
       if (!response.ok) throw new Error("Le suivi des travaux est momentanément indisponible.");
       const next = await response.json() as QueueData;
+      if(flight.current!==controller||disposed.current)return;
+      if(controller.signal.aborted)throw new Error('Le suivi met trop de temps à répondre. Les derniers résultats restent conservés.');
+      if(!next||!Array.isArray(next.jobs)||!Array.isArray(next.events))throw new Error('Réponse du suivi incomplète. Les derniers résultats restent conservés.');
       active.current = next.jobs.some(job => ["queued", "submitting", "running"].includes(job.status));
       const done = next.jobs.filter(j => j.status === "done").map(j => j.id).join(",");
       if (done !== lastDone.current) { lastDone.current = done; callback.current(); }
-      setData(next); setError("");
-    } catch (e) { setError(e instanceof Error ? e.message : "Suivi indisponible."); }
-    finally { working.current = false; if (refreshAgain.current) { refreshAgain.current = false; void refreshJobs(); } }
+      setData(next); setError("");succeeded=true;
+    } catch (e) { if(flight.current===controller&&!disposed.current)setError(controller.signal.aborted?'Le suivi met trop de temps à répondre. Les derniers résultats restent conservés.':e instanceof Error ? e.message : "Suivi indisponible."); }
+    finally {
+      window.clearTimeout(deadline);
+      if(flight.current===controller){flight.current=null;const again=refreshAgain.current;refreshAgain.current=false;if(again&&succeeded&&!disposed.current)void refreshJobs();}
+    }
   }, []);
   useEffect(() => {
+    disposed.current=false;
     const timeout = window.setTimeout(() => { void refresh(); }, 0);
     const timer = window.setInterval(() => { if (!document.hidden && navigator.onLine && active.current) void refresh(); }, 15_000);
     const visible = () => { if (!document.hidden) void refresh(); };
     document.addEventListener("visibilitychange", visible);
     window.addEventListener("online", visible);
-    return () => { clearTimeout(timeout); clearInterval(timer); document.removeEventListener("visibilitychange", visible); window.removeEventListener("online", visible); };
+    return () => { disposed.current=true;refreshAgain.current=false;flight.current?.abort();flight.current=null;clearTimeout(timeout); clearInterval(timer); document.removeEventListener("visibilitychange", visible); window.removeEventListener("online", visible); };
   }, [refresh]);
   return { data, error, refresh };
 }
 
 export function JobsPanel({ queue, waiting, tasks, onTasks, onApprovals }: { queue: ReturnType<typeof useJobs>; waiting: number; tasks: { id: string; title: string; content: string; status: string }[]; onTasks: () => void; onApprovals: () => void }) {
   return <section className="panel"><p className="eyebrow">EXÉCUTION ET RÉSULTATS</p><h2>Travaux Morice</h2>
-    <p>Les recherches acceptées continuent chez le moteur même si vous quittez cette page. Morice récupère et sauvegarde leur résultat à l’ouverture et toutes les 15 secondes pendant la consultation. L’exécution planifiée de nuit et les rappels restent à raccorder.</p>
+    <p>Les travaux déjà acceptés par un moteur peuvent continuer pendant votre absence. Morice récupère leur résultat à l’ouverture et toutes les 15 secondes pendant une consultation active. Le relais MultipleChat attend une intervention ; la planification serveur et les rappels restent à raccorder. Le suivi ne relance pas une action externe déjà envoyée.</p>
     <button onClick={() => void queue.refresh()}>Actualiser les travaux</button>{queue.error && <p role="alert">{queue.error}</p>}
     <div className="job-groups">{groups.map(([status, label]) => {
       const jobs = queue.data.jobs.filter(j => (j.status === "submitting" ? "running" : j.status === "relay_in_progress" ? "awaiting_relay" : j.status) === status);
