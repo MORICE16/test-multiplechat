@@ -502,7 +502,7 @@ export default function MoriceApp() {
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === 'control' && <ControlCenter onOpen={setView} onPrepare={(text,mode='auto')=>{setMessage(text);setAssistantMode(mode);setView('chat');}} storage={storageStatus} microsoftAuthorized={Boolean(connections?.microsoft.connected)} taskCount={tasks.filter(t=>t.status!=='done').length} waiting={approvals.length} active={assistantBusy||queue.data.jobs.some(j=>['running','submitting'].includes(j.status))} date={dateText} jobs={queue.data.jobs}/>}
-        {view === 'pc' && <PcLocalPanel/>}
+        {view === 'pc' && <PcLocalPanel onChanged={()=>void queue.refresh()}/>}
         {view === 'integrations' && <IntegrationCatalog onOpen={setView} microsoftAuthorized={Boolean(connections?.microsoft.connected)}/>}
 
         {view === "home" && <div className="horizon-home">

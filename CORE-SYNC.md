@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T01:58:36.915Z
-Commit source au moment de la génération : `b99cba4a6871e83ffb401108b8155722f05a9020`
+Généré : 2026-10-19T02:03:29.228Z
+Commit source au moment de la génération : `d2180534b5ea8722b262ec5134e4cf972f51ef5f`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -167,17 +167,14 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 132 tests passent ; TypeScript et lint ciblé sans erreur. Publication et vrai passage navigateur à vérifier séparément.
 - Publication b99cba4 succeeded : appgdep_6ad5772c9870819181061909687dac9b, privé révision 6. Santé du programme réellement reçue par boucle locale ; navigateur intégré refuse explicitement cet accès. Test Chrome personnel reporté au réveil par Alan ; ne pas le redemander pendant la nuit.
 - 135 tests passent après journal explicite des liaisons interrompues et filtre Outlook masquant les propositions déjà appliquées ; aucun nouveau mail modifié.
+- d218053 publié privé révision 6 ; les deux essais navigateur bloqués conservés dans le vrai journal. Actualisation de la file après résultat PC raccordée ; aucune commande renvoyée.
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/pc/journal/route.ts
-- app/components/mail-review.tsx
 - app/components/pc-local-panel.tsx
-- app/lib/mail-triage.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/pc-journal.test.mjs
-- tests/mail-remaining.test.mjs
 
 ## Reprise MultipleChat
 

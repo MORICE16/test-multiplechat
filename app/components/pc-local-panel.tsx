@@ -1,11 +1,11 @@
 'use client';
 import {useRef,useState} from 'react';
 import {PC_ENDPOINT,validPcReceipt,pcResult,type PcAction,type PcReceipt} from '../lib/pc-contract';
-export function PcLocalPanel(){
+export function PcLocalPanel({onChanged}:{onChanged?:()=>void}){
  const locked=useRef(false);
  const [busy,setBusy]=useState(false),[receipt,setReceipt]=useState<PcReceipt|null>(null),[pending,setPending]=useState<PcReceipt|null>(null),[error,setError]=useState(''),[saved,setSaved]=useState(false),[session,setSession]=useState('');
  async function journal(value:object){const r=await fetch('/api/pc/journal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value),signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Journal indisponible.');return r.json() as Promise<{status:string}>;}
- async function save(p:PcReceipt){const stored=await journal({phase:'finish',id:p.requestId,receipt:p});if(stored.status!==(p.status==='done'?'done':'blocked'))throw Error();setPending(null);setSaved(true);setError('');}
+ async function save(p:PcReceipt){const stored=await journal({phase:'finish',id:p.requestId,receipt:p});if(stored.status!==(p.status==='done'?'done':'blocked'))throw Error();setPending(null);setSaved(true);setError('');onChanged?.();}
  async function act(action:PcAction){
   if(locked.current)return;locked.current=true;setBusy(true);setError('');setSaved(false);setReceipt(null);
   const id=crypto.randomUUID();let prepared=false,received=false;
@@ -20,7 +20,7 @@ export function PcLocalPanel(){
    received=true;setReceipt(p);setPending(p);if(action==='health')setSession(p.session);
    await save(p);
   }catch{
-   if(prepared&&!received){try{await journal({phase:'unconfirmed',id});}catch{/* Keep the prepared job for later reconciliation; never repeat the local action. */}}
+   if(prepared&&!received){try{await journal({phase:'unconfirmed',id});onChanged?.();}catch{/* Keep the prepared job for later reconciliation; never repeat the local action. */}}
    if(!received){setSession('');setError(prepared?'Liaison locale inaccessible ou résultat non confirmé. Aucun renvoi automatique. Le service doit être actif sur ce PC ; le navigateur peut demander l’accès au réseau local. Vérifiez le journal avant un nouvel essai.':'Journal indisponible : aucune demande envoyée au PC.');}
    else setError('Résultat reçu sur le PC, mais journal non confirmé. Enregistrez ce résultat sans relancer l’action.');
   }finally{setBusy(false);locked.current=false;}
