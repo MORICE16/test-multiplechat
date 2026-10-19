@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T05:40:28.471Z
-Commit source au moment de la génération : `b71a8456430b620dbe0fed150619bd8240c4cbc4`
+Généré : 2026-10-19T05:44:12.279Z
+Commit source au moment de la génération : `9ab7b220aed23907075dc66d272706dbdd159a21`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -199,12 +199,19 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - 144 tests, TypeScript, lint ciblé et build officiels réussis. Source b633c51 ; publication et preuve runtime à consigner.
 - Publication privée appgdep_6ad59f7d4dc88191b0dfb2388675b8eb succeeded, source b633c51, révision 6. Recherche runtime pdf : dix métadonnées reçues, limite partielle et lecture confirmée affichées ; aucun document ouvert ou modifié.
 
+## Agenda lisible 2026-10-19
+
+- Lecture hebdomadaire en heures de Paris explicitement nommées ; UTC demandé, été/hiver et journées entières pris en compte, événements annulés exclus.
+- Dix événements maximum, suite partielle explicitement signalée ; dates ou fuseau incertains refusés, page vide distincte de semaine vide.
+- GET métadonnées et délai partagé OAuth 25 s ; aucun rendez-vous créé/modifié/annulé.
+- 147 tests, TypeScript, lint ciblé et build officiel réussis. Source 9ab7b22 ; publication et preuve runtime à consigner.
+- Publication privée appgdep_6ad5ad8fc1b88191bcdf115c6cee1ff7 succeeded, source 9ab7b22, révision 6. Runtime : lecture hebdomadaire confirmée, fuseau Paris affiché, aucun rendez-vous actif reçu ; conversion d événement réel non observée, couverte par tests substitués.
+- calendar-day.ts importé dans MultipleChat, dix-neuf fichiers. Aucune donnée privée transmise et aucun événement modifié.
+
 ## Fichiers modifiés lors de la génération
 
-- app/lib/calendar-day.ts
-- app/lib/microsoft.ts
-- tests/backend.test.mjs
-- tests/calendar-day.test.mjs
+- docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 

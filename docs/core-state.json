@@ -176,5 +176,13 @@
     "Panneau annulable, délai 35 s, ancien résultat effacé, mot-clé de réponse conservé et réponse périmée ignorée.",
     "144 tests, TypeScript, lint ciblé et build officiels réussis. Source b633c51 ; publication et preuve runtime à consigner.",
     "Publication privée appgdep_6ad59f7d4dc88191b0dfb2388675b8eb succeeded, source b633c51, révision 6. Recherche runtime pdf : dix métadonnées reçues, limite partielle et lecture confirmée affichées ; aucun document ouvert ou modifié."
+  ],
+  "Agenda lisible 2026-10-19": [
+    "Lecture hebdomadaire en heures de Paris explicitement nommées ; UTC demandé, été/hiver et journées entières pris en compte, événements annulés exclus.",
+    "Dix événements maximum, suite partielle explicitement signalée ; dates ou fuseau incertains refusés, page vide distincte de semaine vide.",
+    "GET métadonnées et délai partagé OAuth 25 s ; aucun rendez-vous créé/modifié/annulé.",
+    "147 tests, TypeScript, lint ciblé et build officiel réussis. Source 9ab7b22 ; publication et preuve runtime à consigner.",
+    "Publication privée appgdep_6ad5ad8fc1b88191bcdf115c6cee1ff7 succeeded, source 9ab7b22, révision 6. Runtime : lecture hebdomadaire confirmée, fuseau Paris affiché, aucun rendez-vous actif reçu ; conversion d événement réel non observée, couverte par tests substitués.",
+    "calendar-day.ts importé dans MultipleChat, dix-neuf fichiers. Aucune donnée privée transmise et aucun événement modifié."
   ]
 }
