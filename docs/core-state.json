@@ -148,6 +148,8 @@
     "132 tests passent ; TypeScript et lint ciblé sans erreur. Publication et vrai passage navigateur à vérifier séparément.",
     "Publication b99cba4 succeeded : appgdep_6ad5772c9870819181061909687dac9b, privé révision 6. Santé du programme réellement reçue par boucle locale ; navigateur intégré refuse explicitement cet accès. Test Chrome personnel reporté au réveil par Alan ; ne pas le redemander pendant la nuit.",
     "135 tests passent après journal explicite des liaisons interrompues et filtre Outlook masquant les propositions déjà appliquées ; aucun nouveau mail modifié.",
-    "d218053 publié privé révision 6 ; les deux essais navigateur bloqués conservés dans le vrai journal. Actualisation de la file après résultat PC raccordée ; aucune commande renvoyée."
+    "d218053 publié privé révision 6 ; les deux essais navigateur bloqués conservés dans le vrai journal. Actualisation de la file après résultat PC raccordée ; aucune commande renvoyée.",
+    "Source c89cbc1 et déploiement appgdep_6ad57ab874248191a22330affff1a1ad succeeded, privé révision 6 ; 135 tests/TypeScript/lint ciblé/build réussis.",
+    "Masque Outlook production : 92 lus, 91 déjà appliqués, un restant ; retour 92/1 et sélection 1/0 vérifiés sans écriture mail. Test Chrome personnel différé au réveil."
   ]
 }

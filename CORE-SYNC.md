@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T02:03:29.228Z
-Commit source au moment de la génération : `d2180534b5ea8722b262ec5134e4cf972f51ef5f`
+Généré : 2026-10-19T02:08:15.433Z
+Commit source au moment de la génération : `c89cbc115a1506771bc25f23e4fd7747df4f9164`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -168,11 +168,11 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Publication b99cba4 succeeded : appgdep_6ad5772c9870819181061909687dac9b, privé révision 6. Santé du programme réellement reçue par boucle locale ; navigateur intégré refuse explicitement cet accès. Test Chrome personnel reporté au réveil par Alan ; ne pas le redemander pendant la nuit.
 - 135 tests passent après journal explicite des liaisons interrompues et filtre Outlook masquant les propositions déjà appliquées ; aucun nouveau mail modifié.
 - d218053 publié privé révision 6 ; les deux essais navigateur bloqués conservés dans le vrai journal. Actualisation de la file après résultat PC raccordée ; aucune commande renvoyée.
+- Source c89cbc1 et déploiement appgdep_6ad57ab874248191a22330affff1a1ad succeeded, privé révision 6 ; 135 tests/TypeScript/lint ciblé/build réussis.
+- Masque Outlook production : 92 lus, 91 déjà appliqués, un restant ; retour 92/1 et sélection 1/0 vérifiés sans écriture mail. Test Chrome personnel différé au réveil.
 
 ## Fichiers modifiés lors de la génération
 
-- app/components/pc-local-panel.tsx
-- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
 
