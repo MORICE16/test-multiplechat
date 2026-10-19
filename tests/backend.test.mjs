@@ -370,3 +370,13 @@ test('fixed category setup requires same owner permission and records an approva
   await assert.rejects(ms.runMicrosoftAction('alice',stored.operation,{categorySetup:{account:'primary@example.invalid',createdAt:'2020-01-01'}}),/expiré/);
  }finally{f.close();}
 });
+
+test('OpenClaw legacy remote diagnostic is blocked without paid consent before any job or provider call',async()=>{
+ const f=await fixture();try{
+  for(const consent of [undefined,'false',true]){
+   f.vars.MORICE_ALLOW_PAID_API=consent;
+   const route=await f.route('app/api/openclaw/diagnostic/route.ts');const r=await route.POST(new Request('https://morice.example/api/openclaw/diagnostic',{method:'POST'}));assert.equal(r.status,403);assert.match((await r.json()).error,/API OpenAI payante/);assert.equal(f.jobRequest,undefined);assert.equal(f.lastInput,undefined);
+   const assistant=await f.route('app/api/assistant/route.ts');const response=await assistant.POST(new Request('https://morice.example/api/assistant',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Vérifie OpenClaw',mode:'auto'})}));assert.equal(response.status,403);assert.equal(f.jobRequest,undefined);assert.equal(f.lastInput,undefined);
+  }
+ }finally{f.close();}
+});

@@ -224,6 +224,7 @@ export async function POST(request: Request) {
   }
 
   if (plan.intent === "openclaw_diagnostic") {
+    if(runtimeValue('MORICE_ALLOW_PAID_API')!=='true')return Response.json({error:'Le diagnostic distant actuel utilise une API payante, désactivée conformément à votre choix. La liaison OpenClaw sans API payante reste à raccorder. Aucun appel IA ni ordre téléphone envoyé.'},{status:403});
     const jobId = await createJob(uid, plan.title, message, plan.intent);
     await transitionJob(uid, jobId, "running", "Diagnostic privé demandé");
     try {

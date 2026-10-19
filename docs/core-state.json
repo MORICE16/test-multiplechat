@@ -136,6 +136,9 @@
     "123 tests passes ; publication/runtime du nouveau lot encore a confirmer.",
     "Production privee source f7bba03 verifiee ; 13 categories relues dans trois boites, 37 creations ; premiers classements reels relus : 101 notaires, 3 avocats, 14 newsletters.",
     "125 tests, TypeScript, lint cible et build passent apres correction des faux positifs avocats/Netflix.",
-    "OpenClaw distant non confirme dans Morice ; aucune commande telephone."
+    "OpenClaw distant non confirme dans Morice ; aucune commande telephone.",
+    "Bilan ecritures relues : 176 classements (102 notaire, 3 avocat, 37 newsletters, 7 gestion, 27 locataires). Aucun tri exhaustif revendique.",
+    "Refus explicite OpenClaw distant sans API payante, bouton et message corriges ; 126 tests passent. Le masque de cle global empechait deja la facturation.",
+    "Apps Sites : outil obligatoire d eligibilite non expose ; aucune connexion deduite de la disponibilite des outils Codex."
   ]
 }

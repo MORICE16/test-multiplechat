@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T01:14:24.504Z
-Commit source au moment de la génération : `f7bba03c4d0437ada5f0be299fb46b1f852b0e20`
+Généré : 2026-10-19T01:26:42.727Z
+Commit source au moment de la génération : `7e87b19d5886705e79b833ad72bb13fa4f3ea6e5`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -155,14 +155,21 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Production privee source f7bba03 verifiee ; 13 categories relues dans trois boites, 37 creations ; premiers classements reels relus : 101 notaires, 3 avocats, 14 newsletters.
 - 125 tests, TypeScript, lint cible et build passent apres correction des faux positifs avocats/Netflix.
 - OpenClaw distant non confirme dans Morice ; aucune commande telephone.
+- Bilan ecritures relues : 176 classements (102 notaire, 3 avocat, 37 newsletters, 7 gestion, 27 locataires). Aucun tri exhaustif revendique.
+- Refus explicite OpenClaw distant sans API payante, bouton et message corriges ; 126 tests passent. Le masque de cle global empechait deja la facturation.
+- Apps Sites : outil obligatoire d eligibilite non expose ; aucune connexion deduite de la disponibilite des outils Codex.
 
 ## Fichiers modifiés lors de la génération
 
 - CORE-SYNC.md
-- app/lib/mail-triage.ts
+- app/api/assistant/route.ts
+- app/api/openclaw/diagnostic/route.ts
+- app/components/openclaw-panel.tsx
+- app/lib/integration-catalog.ts
+- app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/mail-triage.test.mjs
+- tests/backend.test.mjs
 
 ## Reprise MultipleChat
 

@@ -691,7 +691,7 @@ function ConnectionsPanel({ state, refresh, disconnectMicrosoft }: { state: Conn
     <article><GoogleConnections /></article>
     <article><div><b>Automatisations Microsoft To Do</b><span>Exécution directe Microsoft Graph · sans Make. Créez une tâche depuis To Do, puis validez son exécution.</span><small>Ancien webhook Make conservé pour reprise technique; aucune nouvelle automatisation envoyée par la conversation.</small></div></article>
     <article className="disabled-connection"><div><b>HubSpot</b><span>Indisponible · aucun accès supplémentaire</span></div></article>
-    <OpenClawPanel />
+    <OpenClawPanel apiAllowed={state?.openai.apiAllowed===true} />
   </div><button className="secondary refresh-connection" onClick={refresh}>Actualiser les états</button><button disabled={checking || !state?.microsoft.connected} onClick={checkMicrosoft}>{checking ? "Vérification…" : "Vérifier la lecture Microsoft"}</button>{verification && <p role="status">{verification}</p>}</section>;
 }
 

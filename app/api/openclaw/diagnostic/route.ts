@@ -4,6 +4,7 @@ import { createJob, transitionJob } from '@/app/lib/jobs';
 
 export async function POST(request: Request) {
   const uid = userId(request);
+  if(runtimeValue('MORICE_ALLOW_PAID_API')!=='true')return Response.json({error:'Le diagnostic distant actuel utilise une API OpenAI payante. Il est désactivé conformément à votre choix. La liaison privée sans API payante reste à raccorder ; aucun appel IA ni ordre téléphone envoyé.'},{status:403,headers:{'Cache-Control':'no-store'}});
   const id = await createJob(uid, 'Diagnostic privé OpenClaw', 'Lire la santé de la passerelle et l’état des appareils, sans commande téléphone.', 'openclaw_diagnostic');
   await transitionJob(uid, id, 'running', 'Diagnostic privé demandé');
   try {
