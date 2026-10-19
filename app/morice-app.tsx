@@ -23,6 +23,7 @@ import {CorePanel} from './components/core-panel';
 import {OneDrivePanel} from './components/onedrive-panel';
 import {PrivateFilesPanel} from './components/private-files-panel';
 import {ControlCenter} from './components/control-center';
+import {PcLocalPanel} from './components/pc-local-panel';
 import {IntegrationCatalog} from './components/integration-catalog';
 import { type Citation } from "./lib/web-result";
 
@@ -81,6 +82,7 @@ const MORICE_LOGO_SRC = "/morice-3d.png?v=morice-logo-44fce869-20260823";
 const navigation = [
   ["control", "Centre de commande", "◈"],
   ["integrations", "Applications & appareils", "⬡"],
+  ["pc", "Mon ordinateur", "⌘"],
   ["home", "Aujourd’hui", "⌂"],
   ["journal", "Journal d’idées", "✧"],
   ["core", "CORE Morice", "◉"],
@@ -236,7 +238,7 @@ export default function MoriceApp() {
         setDictationState(widgetDraft ? "ready" : "idle");
         history.replaceState({}, "", window.location.pathname + window.location.search);
         if (widgetDraft) setNotice("Votre dictée est prête. Relisez-la, puis touchez Envoyer.");
-      } else if (["chat", "jobs", "improvements", "control", "integrations", "connections", "mail"].includes(params.get("view") || "")) {
+      } else if (["chat", "jobs", "improvements", "control", "integrations", "pc", "connections", "mail"].includes(params.get("view") || "")) {
         setView(params.get("view")!);
       }
       setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
@@ -484,9 +486,9 @@ export default function MoriceApp() {
           <span><b>MORICE</b><small>Assistant privé</small></span>
         </button>
         <nav className="side-navigation" aria-label="Navigation principale">
-          {navigation.filter(([id]) => ["control", "integrations", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
+          {navigation.filter(([id]) => ["control", "integrations", "pc", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={`${view === id ? "active " : ""}nav-${id}`} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span>{id === "tasks" && tasks.filter(item => item.status !== "done").length > 0 && <em>{tasks.filter(item => item.status !== "done").length}</em>}</button>)}
         </nav>
-        <details className="other-spaces"><summary>Mes autres espaces</summary><nav className="side-navigation" aria-label="Autres espaces">{navigation.filter(([id]) => !["control", "integrations", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span></button>)}</nav></details>
+        <details className="other-spaces"><summary>Mes autres espaces</summary><nav className="side-navigation" aria-label="Autres espaces">{navigation.filter(([id]) => !["control", "integrations", "pc", "home", "journal", "chat", "documents", "tasks", "jobs", "mail", "calendar", "approvals", "connections", "settings"].includes(id)).map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><i><NavigationIcon id={id} fallback={icon} /></i><span>{label}</span></button>)}</nav></details>
         <div className="sidebar-footer">
           {installState !== "installed" && <button className="outline-action" onClick={installMorice}>Installer l’application</button>}
           <button className="outline-action" onClick={enableNotifications}>Activer les notifications</button>
@@ -500,6 +502,7 @@ export default function MoriceApp() {
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
         {view === 'control' && <ControlCenter onOpen={setView} onPrepare={(text,mode='auto')=>{setMessage(text);setAssistantMode(mode);setView('chat');}} storage={storageStatus} microsoftAuthorized={Boolean(connections?.microsoft.connected)} taskCount={tasks.filter(t=>t.status!=='done').length} waiting={approvals.length} active={assistantBusy||queue.data.jobs.some(j=>['running','submitting'].includes(j.status))} date={dateText} jobs={queue.data.jobs}/>}
+        {view === 'pc' && <PcLocalPanel/>}
         {view === 'integrations' && <IntegrationCatalog onOpen={setView} microsoftAuthorized={Boolean(connections?.microsoft.connected)}/>}
 
         {view === "home" && <div className="horizon-home">

@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T01:26:42.727Z
-Commit source au moment de la génération : `7e87b19d5886705e79b833ad72bb13fa4f3ea6e5`
+Généré : 2026-10-19T01:48:17.041Z
+Commit source au moment de la génération : `a164ad48ddbfc1849562d13eb47353ac3f23a278`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -159,17 +159,28 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Refus explicite OpenClaw distant sans API payante, bouton et message corriges ; 126 tests passent. Le masque de cle global empechait deja la facturation.
 - Apps Sites : outil obligatoire d eligibilite non expose ; aucune connexion deduite de la disponibilite des outils Codex.
 
+## Liaison PC locale 2026-10-19
+
+- Priorité confirmée : PC utilisable avant compagnon téléphone. Aucun branchement maison nécessaire à ce lot.
+- Service local limité à santé et calculatrice, confirmation Windows obligatoire pour lancement, écoute 127.0.0.1 seulement, aucun tunnel ni API payante.
+- Journal privé : reçu du navigateur explicitement non attesté serveur, refus des commandes libres, déduplication et reprise de journal sans renvoi action.
+- 132 tests passent ; TypeScript et lint ciblé sans erreur. Publication et vrai passage navigateur à vérifier séparément.
+
 ## Fichiers modifiés lors de la génération
 
-- CORE-SYNC.md
-- app/api/assistant/route.ts
-- app/api/openclaw/diagnostic/route.ts
-- app/components/openclaw-panel.tsx
-- app/lib/integration-catalog.ts
+- app/components/control-center.tsx
+- app/control-center.css
 - app/morice-app.tsx
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- tests/backend.test.mjs
+- app/api/pc/journal/route.ts
+- app/components/pc-local-panel.tsx
+- app/lib/pc-contract.ts
+- docs/PC-LOCAL.md
+- scripts/pc-local.mjs
+- scripts/start-pc-local.cmd
+- tests/pc-journal.test.mjs
+- tests/pc-local.test.mjs
 
 ## Reprise MultipleChat
 

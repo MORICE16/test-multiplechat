@@ -30,7 +30,7 @@ const spaces=[
  {id:'documents',label:'Documents',detail:'Photos, PDF & OneDrive',icon:'/brand-icons/onedrive.svg'},
  {id:'integrations',label:'Maison connectée',detail:'Appareils & passerelles',glyph:'⌂'},
  {id:'core',label:'Mémoire',detail:'CORE & idées',glyph:'◉'},
- {id:'integrations',label:'Ordinateur & mobile',detail:'OpenClaw & applications',glyph:'⌘'},
+ {id:'pc',label:'Mon ordinateur',detail:'Liaison locale & actions vérifiables',glyph:'⌘'},
 ];
 type Props={onOpen:(view:string)=>void;onPrepare:(text:string,mode?:string)=>void;storage:'checking'|'online'|'error';microsoftAuthorized:boolean;taskCount:number;waiting:number;active:boolean;date:string;jobs:{id:string;title:string;status:string;updated_at:string}[]};
 export function ControlCenter({onOpen,onPrepare,storage,microsoftAuthorized,taskCount,waiting,active,date,jobs}:Props){
