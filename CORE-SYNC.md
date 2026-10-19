@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T07:53:55.112Z
-Commit source au moment de la génération : `0276d84e6a3d66424cd540d9716c791274fc8902`
+Généré : 2026-10-19T08:46:46.169Z
+Commit source au moment de la génération : `9171958abba230ed52cb2888c452daa0f1cf0cd9`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -225,6 +225,13 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - TypeScript, lint ciblé, build officiel réussis ; suite serveur147 inchangée non rejouée, panne/timeout non provoqués en production. Source 0276d84 ; publication et contrôle normal à consigner.
 - Publication privée appgdep_6ad5cbc13e808191ad32cc00b0b51994 succeeded, source 0276d84, révision6. Runtime normal : vingt-six fiches, zéro alerte, conservées après clic Actualiser ; pas de reçu horodaté attestant cette actualisation ni de panne provoquée.
 - Aucun contenu de fiche transmis, aucune commande ou écriture Microsoft de test ; timeout/annulation contrôlés dans le code seulement.
+
+## Pannes suivi verifiees localement 2026-10-19
+
+- Vrai useJobs publié importé directement dans un navigateur local React StrictMode ; code fonctionnel inchangé, serveur HTTP synthétique sans compte externe.
+- Timeout mesuré35015 ms, maximum une lecture active, clics regroupés, ancien résultat conservé et pas de relance immédiate après échec.
+- Reprise normale, HTTP503, collections absentes, annulation au démontage avec lecture différée et remontage vérifiés ; sept requêtes fictives, deux annulations, cinq réponses achevées dont deux erreurs contrôlées.
+- Aucune panne provoquée en production, aucune donnée utilisateur, aucun nouveau déploiement ou test serveur répété ; source servie0276d84 conservée, banc local arrêté.
 
 ## Fichiers modifiés lors de la génération
 
