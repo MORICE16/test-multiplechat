@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T03:42:23.235Z
-Commit source au moment de la génération : `a5c9e76547d01c44d51067fcc604cd0111204c4b`
+Généré : 2026-10-19T03:46:33.776Z
+Commit source au moment de la génération : `966212132782ceb01b982f44dd1ab298f358c9a6`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -183,11 +183,18 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Runtime : cent métadonnées lot 1, cent lot 2, retour cent lot 1 ; échantillons affichés distincts. Aucune modification de mail et aucun total exhaustif revendiqué.
 - Guide MAIL-LOTS.md importé dans MultipleChat Ready, dix-huit fichiers ; aucune donnée mail ou curseur transmis. Test Chrome PC toujours reporté au réveil.
 
+## Lecture To Do fiable 2026-10-19
+
+- Collections et éléments Graph incomplets refusés ; aucune boîte vide déduite d une réponse malformée.
+- Métadonnées du panneau bornées à cent ; corps et liens fournisseur exclus de la réponse, limite partielle explicite.
+- Délais lecture 25 s serveur / 35 s panneau, annulation et résultat périmé ignoré ; aucune relance ou création automatique.
+- 142 tests, TypeScript, lint ciblé et build officiels réussis. Source 9662121, publication et lecture runtime à confirmer séparément.
+- Publication privée appgdep_6ad591e92cbc8191911ae2cf2572e1bc succeeded, source 9662121, révision 6 ; neuf listes et vingt tâches affichées sur le vrai site sans erreur. Aucune tâche modifiée.
+
 ## Fichiers modifiés lors de la génération
 
-- app/components/todo-panel.tsx
-- app/lib/microsoft.ts
-- tests/backend.test.mjs
+- docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 

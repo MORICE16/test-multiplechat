@@ -162,5 +162,12 @@
     "Correctif e6a5dcf, déploiement appgdep_6ad587ceb0408191836f3af227c4eb9c succeeded, privé révision 6 ; 140 tests, TypeScript/lint ciblé/build réussis.",
     "Runtime : cent métadonnées lot 1, cent lot 2, retour cent lot 1 ; échantillons affichés distincts. Aucune modification de mail et aucun total exhaustif revendiqué.",
     "Guide MAIL-LOTS.md importé dans MultipleChat Ready, dix-huit fichiers ; aucune donnée mail ou curseur transmis. Test Chrome PC toujours reporté au réveil."
+  ],
+  "Lecture To Do fiable 2026-10-19": [
+    "Collections et éléments Graph incomplets refusés ; aucune boîte vide déduite d une réponse malformée.",
+    "Métadonnées du panneau bornées à cent ; corps et liens fournisseur exclus de la réponse, limite partielle explicite.",
+    "Délais lecture 25 s serveur / 35 s panneau, annulation et résultat périmé ignoré ; aucune relance ou création automatique.",
+    "142 tests, TypeScript, lint ciblé et build officiels réussis. Source 9662121, publication et lecture runtime à confirmer séparément.",
+    "Publication privée appgdep_6ad591e92cbc8191911ae2cf2572e1bc succeeded, source 9662121, révision 6 ; neuf listes et vingt tâches affichées sur le vrai site sans erreur. Aucune tâche modifiée."
   ]
 }
