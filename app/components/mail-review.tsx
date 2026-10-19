@@ -115,7 +115,7 @@ export function MailReviewPanel() {
         <p>{message.priority}</p>
         {message.categories.length > 0 && <p>Catégories Outlook existantes : {message.categories.join(", ")}</p>}
       </article>)}
-      {!review.messages.length && <p>Aucun message dans ce périmètre.</p>}
+      {!review.messages.length && <p>Aucun message dans ce lot.</p>}
       {review.messages.length>0&&!shown.length&&<p>Aucun message à afficher avec ces filtres. Décochez le masque pour retrouver les propositions déjà appliquées.</p>}
     </>}
   </section>;

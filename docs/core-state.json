@@ -157,6 +157,7 @@
     "Périmètre tous dossiers sans date de début ; pas de scan automatique ni cumul exhaustif.",
     "Curseurs privés isolés, trente minutes et plafond atomique cent ; réglages réservés non lisibles/modifiables côté client.",
     "Préparation d action relisant le bon lot ; pas de nouvelle permission ni modification mail pendant les contrôles.",
-    "139 tests, TypeScript, lint ciblé réussis ; publication et pagination réseau encore à vérifier."
+    "139 tests, TypeScript, lint ciblé réussis ; publication et pagination réseau encore à vérifier.",
+    "Incompatibilité redirect:error détectée en production, retour privé c89cbc1 succeeded puis correction Worker redirect:manual avec refus 3xx. Un test Node ne prouve pas le runtime Workers."
   ]
 }

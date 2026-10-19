@@ -240,11 +240,21 @@ test('mail triage uses the authenticated mailbox and performs only a Graph GET',
   const f=await fixture();try {
     f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
     const ms=await f.route('app/lib/microsoft.ts');let reads=0;
-    f.fetch=async(url,init)=>{reads++;assert.equal(init.method,undefined);assert.match(url,/graph.microsoft.com\/v1.0\/me\/mailFolders\/inbox\/messages/);return Response.json({value:[{subject:'Facture notaire'}]});};
+    f.fetch=async(url,init)=>{reads++;assert.equal(init.method,undefined);assert.equal(init.redirect,'manual');assert.match(url,/graph.microsoft.com\/v1.0\/me\/mailFolders\/inbox\/messages/);return Response.json({value:[{subject:'Facture notaire'}]});};
     await assert.rejects(()=>ms.reviewMicrosoftMailbox('bob'),/Connecte/);assert.equal(reads,0);
     const result=await ms.reviewMicrosoftMailbox('alice');assert.equal(result.account,'alice@example.invalid');assert.equal(reads,1);
     assert.equal(result.messages[0].suggestions.length,2);
   }finally{f.close();}
+});
+
+test('Graph transport uses Worker-compatible manual redirects and never follows or exposes a destination',async()=>{
+ const f=await fixture();try{
+  f.sql.prepare("INSERT INTO morice_connections VALUES('alice','microsoft','test-access','test-refresh','2099-01-01','alice@example.invalid','','connected','now')").run();
+  const ms=await f.route('app/lib/microsoft.ts');let calls=0;
+  f.fetch=async(url,init)=>{calls++;assert.equal(init.redirect,'manual');assert.equal(init.method,undefined);assert.match(url,/^https:\/\/graph.microsoft.com\/v1.0\//);return new Response(null,{status:302,headers:{Location:'https://untrusted.invalid/private-test-token'}});};
+  await assert.rejects(()=>ms.reviewMicrosoftMailbox('alice'),e=>e instanceof ActionError&&!e.retrySafe&&!e.message.includes('private-test-token')&&!e.message.includes('untrusted'));
+  assert.equal(calls,1);
+ }finally{f.close();}
 });
 
 test('explicit Microsoft reads use Graph without an AI key and retain conversation', async () => {

@@ -68,7 +68,7 @@ async function graph(uid: string, path: string, init?: RequestInit, accountId = 
   catch { throw new ActionError("Microsoft 365 doit être reconnecté dans Connexions. Aucune action n’a été envoyée.", true); }
   const response = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
     ...init,
-    redirect: 'error',
+    redirect: 'manual',
     signal: signal || AbortSignal.timeout(30_000),
     headers: {
       Authorization: `Bearer ${token}`,
@@ -76,6 +76,7 @@ async function graph(uid: string, path: string, init?: RequestInit, accountId = 
       ...(init?.headers || {}),
     },
   });
+  if(response.status>=300&&response.status<400)throw new ActionError('Redirection Microsoft refusée. Aucun suivi automatique de la destination.',false);
   const payload = response.status === 204 ? null : await response.json().catch(() => null) as { error?: { message?: string } } | null;
   if (!response.ok) throw new ActionError(`Microsoft 365 a refusé l’action (${response.status}).`, response.status >= 400 && response.status < 500 && response.status !== 408);
   return payload as Record<string, unknown> | null;

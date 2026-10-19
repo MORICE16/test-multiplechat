@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-10-19T02:54:27.006Z
-Commit source au moment de la génération : `bda2d28916672cffe8db84bb3c59f7352a0c73d2`
+Généré : 2026-10-19T03:00:03.263Z
+Commit source au moment de la génération : `6c905a8d17c7b04cb9e7f69f8b6d7f6675056067`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -178,19 +178,16 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Curseurs privés isolés, trente minutes et plafond atomique cent ; réglages réservés non lisibles/modifiables côté client.
 - Préparation d action relisant le bon lot ; pas de nouvelle permission ni modification mail pendant les contrôles.
 - 139 tests, TypeScript, lint ciblé réussis ; publication et pagination réseau encore à vérifier.
+- Incompatibilité redirect:error détectée en production, retour privé c89cbc1 succeeded puis correction Worker redirect:manual avec refus 3xx. Un test Node ne prouve pas le runtime Workers.
 
 ## Fichiers modifiés lors de la génération
 
-- app/api/microsoft/triage/route.ts
-- app/api/state/route.ts
+- CORE-SYNC.md
 - app/components/mail-review.tsx
-- app/lib/mail-triage.ts
 - app/lib/microsoft.ts
 - docs/MORICE-SYNC.md
 - docs/core-state.json
-- app/lib/mail-pages.ts
-- docs/MAIL-LOTS.md
-- tests/mail-pages.test.mjs
+- tests/backend.test.mjs
 
 ## Reprise MultipleChat
 
