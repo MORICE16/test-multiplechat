@@ -603,6 +603,25 @@ RADAR filtré : aucune nouveauté officielle dédupliquée du 19/10 ne remplace 
 
 Décisions et transmission 02 : CONSERVER Graph direct, les limites par lots, les confirmations humaines et le refus des API payantes. Reprendre seulement après le test Chrome personnel et la continuation Google déjà convenus ; ne pas relancer le suivi nocturne sans progrès vérifiable. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-20 19:50 Europe/Paris — contrôle quotidien et nouvelle application desktop ChatGPT
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `2330b10` ; commits récents LU ; contexte récent accessible PARTIEL ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 20/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `2330b10`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 699 h, version 0.2.51). Les progrès et blocages du 19/10 restent inchangés.
+
+RADAR filtré :
+- OpenAI a publié le guide de migration vers la nouvelle application ChatGPT desktop Windows/macOS. Une mise à jour de Codex transforme l’application en une interface réunissant Chat, Work et Codex. Les historiques et projets Codex doivent rester disponibles ; Codex conserve une vue et un historique séparés. Les conversations Work cloud se synchronisent entre web, mobile et desktop.
+- L’ancienne application peut rester installée sous `ChatGPT Classic` ; aucune migration n’est requise au lancement. Elle continue de recevoir mises à jour de modèles, correctifs et sécurité, mais certaines nouvelles fonctions agentiques peuvent être réservées à la nouvelle application.
+- Les permissions, contrôles de gouvernance et modèle de dépenses existants ne changent pas. Work local peut accéder à des fichiers/applications avec autorisation ; le contexte peut rester stocké dans le cloud même lorsque l’exécution est locale.
+
+Dossier `CHATGPT-DESKTOP-001` — `TESTER / À VALIDER` :
+- Gain potentiel : réunir Work/Codex sur le PC, reprendre des tâches depuis mobile et faciliter le test Chrome/liaison locale sans nouvelle API payante.
+- Risques : double installation Classic/nouvelle app, permissions locales distinctes, stockage cloud du contexte, compatibilité réelle du compte et continuité des projets non vérifiées.
+- Option conserver : garder l’installation actuelle. Aucun téléchargement, mise à jour, migration, permission locale ou changement d’application par défaut autorisé par 04.
+- Test minimal après validation : sauvegarder l’état utile, relever les versions, mettre à jour par le canal officiel, vérifier projets/historiques, Work local, Codex, permissions et retour vers Classic.
+
+Décisions et transmission 02 : CONSERVER l’installation actuelle tant qu’Alan n’a pas validé le test et que le PC n’est pas accessible. `CHATGPT-DESKTOP-001` peut être testé ensuite sans achat ni suppression. Tous les autres dossiers et blocages restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
