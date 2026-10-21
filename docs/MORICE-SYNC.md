@@ -622,6 +622,26 @@ Dossier `CHATGPT-DESKTOP-001` — `TESTER / À VALIDER` :
 
 Décisions et transmission 02 : CONSERVER l’installation actuelle tant qu’Alan n’a pas validé le test et que le PC n’est pas accessible. `CHATGPT-DESKTOP-001` peut être testé ensuite sans achat ni suppression. Tous les autres dossiers et blocages restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-21 19:51 Europe/Paris — contrôle quotidien et conversations verrouillées ChatGPT Business
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `7f9a76b` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 21/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `7f9a76b`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 723 h, version 0.2.51). Les progrès et blocages précédents restent inchangés.
+
+RADAR filtré :
+- OpenAI a annoncé le 20/10 les conversations verrouillées, en déploiement progressif pour ChatGPT Business sur web, iOS, Android et la nouvelle application desktop. Une conversation verrouillée disparaît de l’historique ordinaire, des épingles et de la recherche ; son ouverture requiert le PIN de compte à quatre chiffres ou une authentification d’appareil compatible. Les politiques du workspace et la rétention restent inchangées. Source officielle : https://help.openai.com/en/articles/11391654-chatgpt-business-release-notes .
+- L’accès réel du compte d’Alan, sa disponibilité régionale et les mécanismes d’authentification compatibles ne sont pas prouvés. Cette fonction protège l’accès d’interface ; elle ne remplace ni l’expurgation du dépôt public, ni les contrôles CORE, ni une politique de rétention.
+- L’arrivée annoncée des modèles OpenAI et de Codex dans Google Cloud Model Garden n’est pas retenue comme piste active : disponibilité générale seulement prévue dans les prochaines semaines, achat via Google Cloud Marketplace et aucun besoin GCP établi dans l’architecture actuelle sans API payante. Source officielle : https://openai.com/index/openai-models-google-cloud/ .
+- La nouvelle application desktop déjà suivie par `CHATGPT-DESKTOP-001` est dédupliquée, sans changement de statut.
+
+Dossier `LOCKED-CHATS-001` — `TESTER / À VALIDER` :
+- Gain potentiel : masquer de l’historique courant et protéger localement par PIN/authentification d’appareil quelques conversations sensibles, sans supprimer leur contenu.
+- Limites et risques : ChatGPT Business requis selon l’annonce ; déploiement progressif ; conservation et politiques du workspace inchangées ; récupération, comportement multiappareil et compatibilité du compte non testés.
+- Option conserver : ne rien changer. Aucun abonnement, transfert de conversation, verrouillage, suppression, migration ni modification de politique autorisé par 04.
+- Test minimal après validation et disponibilité constatée : verrouiller une conversation témoin non sensible, vérifier absence de l’historique/recherche/épingles sur web, mobile et desktop, réouverture par authentification, persistance après reconnexion et retour arrière par déverrouillage.
+
+Décisions et transmission 02 : CONSERVER les protections actuelles. `LOCKED-CHATS-001` reste un test facultatif à valider seulement si la fonction est disponible sans changement d’offre non autorisé. Aucun travail applicatif transmis à 02. Tous les autres dossiers et blocages restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
