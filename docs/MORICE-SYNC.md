@@ -642,6 +642,26 @@ Dossier `LOCKED-CHATS-001` — `TESTER / À VALIDER` :
 
 Décisions et transmission 02 : CONSERVER les protections actuelles. `LOCKED-CHATS-001` reste un test facultatif à valider seulement si la fonction est disponible sans changement d’offre non autorisé. Aucun travail applicatif transmis à 02. Tous les autres dossiers et blocages restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-22 19:45 Europe/Paris — contrôle quotidien et confidentialité Codex
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `0fba009` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 22/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, réglages du compte ChatGPT et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `0fba009`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 746 h, version 0.2.51). Les progrès et blocages précédents restent inchangés.
+
+RADAR filtré :
+- La documentation OpenAI actualisée le 22/10 précise que, sur un abonnement ChatGPT personnel, désactiver `Improve the model for everyone` dans ChatGPT ou choisir `Do not train on my content` dans le Privacy Portal suffit pour exclure les nouvelles conversations ChatGPT et tâches Codex de l’entraînement. Le réglage s’applique au compte sur web et mobile. Source officielle : https://help.openai.com/en/articles/7730893-data-controls-in-chatgpt .
+- Codex conserve un réglage distinct `Include environments` pour l’utilisation éventuelle du contexte supplémentaire provenant des environnements Codex. Le choix ChatGPT ou Privacy Portal ne modifie pas ce réglage.
+- Désactiver l’entraînement ne supprime ni ne masque les conversations ; mémoire, historique, rétention et verrouillage restent des contrôles distincts. Un retour explicite pouce haut/bas peut rendre la conversation associée utilisable malgré l’opt-out.
+- Les resets Codex documentés le 22/10 ne sont pas retenus comme brique Morice : ils modifient ponctuellement les quotas disponibles, sans améliorer l’architecture ni les garanties de confidentialité. Les autres nouveautés trouvées sont dédupliquées ou hors périmètre actuel.
+
+Dossier `CODEX-TRAINING-001` — `VÉRIFIER / À VALIDER` :
+- Gain : confirmer qu’aucun nouveau contenu CORE traité dans ChatGPT ou Codex personnel ne sert à l’entraînement, sans changer d’offre ni de fournisseur.
+- Limites : l’état réel des deux réglages du compte n’est pas accessible à 04 ; l’opt-out ne modifie pas l’historique, la rétention ou la mémoire et n’efface aucun contenu déjà conservé.
+- Option conserver : ne rien changer tant que l’état n’est pas contrôlé. Aucun paramètre de compte, environnement Codex, conversation ou donnée n’a été modifié.
+- Test minimal après validation et accès au compte : relever sans données sensibles `Improve the model for everyone` et `Include environments`, désactiver séparément ce qui doit l’être, vérifier la persistance sur web/desktop/mobile et documenter uniquement l’état final expurgé.
+
+Décisions et transmission 02 : CONSERVER les protections et l’architecture actuelles. `CODEX-TRAINING-001` est un contrôle de compte à valider, pas un travail applicatif ; rien n’est transmis à 02 tant que l’accès et l’autorisation ne sont pas confirmés. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
