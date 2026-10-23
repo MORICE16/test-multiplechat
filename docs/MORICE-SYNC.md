@@ -662,6 +662,25 @@ Dossier `CODEX-TRAINING-001` — `VÉRIFIER / À VALIDER` :
 
 Décisions et transmission 02 : CONSERVER les protections et l’architecture actuelles. `CODEX-TRAINING-001` est un contrôle de compte à valider, pas un travail applicatif ; rien n’est transmis à 02 tant que l’accès et l’autorisation ne sont pas confirmés. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-23 20:02 Europe/Paris — confidentialité des conversations d’édition du Site Morice
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `704731b` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 23/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, réglages du compte ChatGPT et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `704731b`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 771 h, version 0.2.51). Les progrès et blocages précédents restent inchangés.
+
+RADAR filtré :
+- La documentation OpenAI de ChatGPT Sites, actualisée le 23/10, précise que pour les comptes Free, Go, Plus et Pro, les conversations utilisées pour créer, concevoir, éditer, gérer ou interroger un Site peuvent servir à l’entraînement si `Improve the model for everyone` est activé. Lors d’une édition ou d’une récupération, des informations pertinentes du Site peuvent être ramenées dans la conversation. Source officielle : https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites .
+- Cette règle concerne les conversations et les informations du Site incluses dans ces conversations ; elle ne prouve pas que tout l’hébergement privé est automatiquement versé à l’entraînement. Les workspaces Business et Enterprise/Edu sont exclus par défaut selon la même source.
+- La documentation confirme aussi que Sites peut contenir prompts, instructions, contexte conversationnel, fichiers, code, stockage, métadonnées et journaux opérationnels. Cela renforce la règle existante : ne jamais envoyer de secret ou contenu CORE privé dans les documents publics ni dans une conversation d’édition non contrôlée.
+- Les nouveautés restantes sont dédupliquées, réservées à d’autres offres ou sans gain concret pour une brique Morice actuelle.
+
+Extension du dossier `CODEX-TRAINING-001` — `VÉRIFIER / À VALIDER` :
+- Le périmètre du contrôle inclut désormais ChatGPT, les tâches Codex, `Include environments` et les conversations de création/édition/interrogation du Site Morice.
+- Test minimal inchangé sur le fond : contrôler les deux réglages du compte avant toute nouvelle manipulation de contenu sensible, puis documenter uniquement l’état final expurgé. Aucun réglage, Site, conversation, permission ou abonnement modifié par 04.
+- Tant que l’état n’est pas prouvé, conserver les données sensibles hors des prompts d’édition du Site et poursuivre l’expurgation stricte du dépôt public.
+
+Décisions et transmission 02 : CONSERVER l’architecture et le Site actuels. Le contrôle `CODEX-TRAINING-001` doit précéder toute prochaine édition contenant du contexte privé, mais ne déclenche aucune refonte ni migration. Aucun travail applicatif nouveau transmis à 02. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
