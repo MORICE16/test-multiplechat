@@ -689,6 +689,26 @@ Aucun changement matériel. Aucun commit postérieur à `7065ed8`, aucune nouvel
 
 `CODEX-TRAINING-001`, `LOCKED-CHATS-001`, `CHATGPT-DESKTOP-001`, `ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. Aucun travail nouveau transmis à 02 et aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-25 19:45 Europe/Paris — GPT-6 Astra inclus dans Work et Codex avec Plus
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `3801f52` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 25/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, réglages du compte et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `3801f52`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 819 h, version 0.2.51). Les progrès et blocages précédents restent inchangés.
+
+RADAR filtré :
+- La documentation OpenAI actualisée le 25/10 indique que ChatGPT Plus inclut désormais GPT-6 Astra dans ChatGPT Work et Codex. Cette disponibilité est distincte de GPT-6 Pro dans Chat, qui reste réservé aux offres éligibles supérieures. Sources officielles : https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt et https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex .
+- Plus comprend un usage Astra limité dans l’allocation Work/Codex ; des crédits peuvent prolonger cet usage, mais aucun achat n’est nécessaire pour le test. Astra peut consommer l’allocation plus vite que GPT-5.6 Sol selon la tâche, le volume, le raisonnement et la vitesse.
+- Ultrafast n’est pas disponible sur Plus au lancement, même via des crédits. Le parcours standard requiert la dernière application ChatGPT desktop ; en CLI, Astra exige Codex CLI 0.153.0 ou plus récent.
+- Le bilan du 08/10 concernait le déploiement GPT-6 dans le Chat, qui ne changeait alors pas les modèles Work/Codex. La disponibilité Astra maintenant documentée est une évolution distincte ; elle ne transfère toujours aucun quota MultipleChat vers Codex et n’ajoute aucune API gratuite.
+
+Dossier `ASTRA-PLUS-001` — `TESTER / À VALIDER` :
+- Gain potentiel : utiliser le modèle OpenAI le plus capable déjà inclus pour les travaux complexes de Morice, sans nouvel abonnement ni API payante.
+- Limites : accès réel du compte non vérifié, quota Plus limité, consommation potentiellement plus rapide, version desktop/CLI minimale et protections `CODEX-TRAINING-001` à contrôler avant contexte sensible.
+- Option conserver : rester sur le modèle actuel. Aucun modèle, application, CLI, réglage, crédit ou abonnement modifié par 04.
+- Test minimal après validation et accès PC : relever versions et quota sans donnée sensible, mettre à jour par le canal officiel si nécessaire, comparer Astra au modèle courant sur une tâche Morice non sensible, mesurer consommation/qualité/temps, puis revenir au modèle précédent si le gain est insuffisant.
+
+Décisions et transmission 02 : `ASTRA-PLUS-001` est un test facultatif à valider ; aucun travail applicatif n’est transmis tant que le PC, le modèle et les réglages de confidentialité ne sont pas accessibles. CONSERVER l’architecture et l’offre Plus actuelles. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
