@@ -709,6 +709,28 @@ Dossier `ASTRA-PLUS-001` — `TESTER / À VALIDER` :
 
 Décisions et transmission 02 : `ASTRA-PLUS-001` est un test facultatif à valider ; aucun travail applicatif n’est transmis tant que le PC, le modèle et les réglages de confidentialité ne sont pas accessibles. CONSERVER l’architecture et l’offre Plus actuelles. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-26 20:23 Europe/Paris — GPT-6.1 Terra et verrouillage des conversations sur Plus
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `c054388` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 26/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, réglages du compte et application desktop réelle INACCESSIBLES.
+
+État technique : aucun commit postérieur à `c054388`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 844 h, version 0.2.51). Les progrès et blocages précédents restent inchangés.
+
+RADAR filtré :
+- OpenAI déploie GPT-6.1 Terra dans ChatGPT Work et Codex pour Plus, Pro, Business, Enterprise et Edu. Terra vise notamment le raisonnement visuel, l’usage d’ordinateur et la rédaction ; il n’est pas disponible dans le Chat. Les limites globales du plan restent inchangées. Sources officielles du 26/10 : https://help.openai.com/en/articles/6825453-chatgpt-release-notes et https://help.openai.com/en/articles/9624314-model-release-notes .
+- Certains comptes Plus/Pro peuvent voir Terra Medium remplacer GPT-6.1 Sol Light dans les préréglages Power par défaut de Work. Cette substitution possible est un changement de routage à surveiller ; sélectionner explicitement un modèle reste préférable pour les comparaisons.
+- L’API Terra est payante et séparée de l’abonnement ChatGPT ; elle n’est pas retenue pour Morice. L’usage inclus dans Work/Codex suffit au test sans nouvel achat.
+- Les conversations verrouillées sont désormais annoncées en déploiement progressif sur Free, Go, Plus et Pro, en plus des parcours précédemment documentés. Le compte Plus d’Alan devient donc éligible sans changement d’offre, mais la présence effective de l’option reste non vérifiée. Rétention et réglage d’entraînement restent inchangés.
+
+Dossier `TERRA-001` — `TESTER / À VALIDER` :
+- Gain potentiel : modèle intermédiaire pour raisonnement visuel, navigation informatique et rédaction, afin de réserver Astra aux tâches les plus difficiles et mieux utiliser le quota Plus.
+- Risques et limites : déploiement progressif, qualité Morice non mesurée, substitution possible dans un préréglage par défaut, consommation exacte inconnue et aucun gain garanti face à Sol/Astra.
+- Option conserver : sélectionner explicitement le modèle actuel. Aucun routage, préréglage, application, API, crédit ou abonnement modifié par 04.
+- Test minimal après validation et accès : comparer Terra, Sol et Astra sur la même tâche Morice non sensible, relever modèle réellement affiché, qualité, temps, usage et stabilité du contrôle ordinateur, puis fixer un routage explicite seulement si le gain est démontré.
+
+Mise à jour `LOCKED-CHATS-001` : statut public `DISPONIBLE EN DÉPLOIEMENT / ACCÈS COMPTE À VÉRIFIER` pour Plus. Le test témoin non sensible reste À VALIDER ; aucun verrouillage, transfert ou suppression effectué.
+
+Décisions et transmission 02 : CONSERVER Astra pour les tâches exigeantes tant que Terra n’est pas comparé ; ne pas laisser un préréglage implicite décider des travaux critiques. `TERRA-001` et le test de verrouillage restent facultatifs et à valider. Aucun travail applicatif transmis à 02. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
