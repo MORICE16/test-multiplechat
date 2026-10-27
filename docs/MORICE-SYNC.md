@@ -731,6 +731,16 @@ Mise à jour `LOCKED-CHATS-001` : statut public `DISPONIBLE EN DÉPLOIEMENT / AC
 
 Décisions et transmission 02 : CONSERVER Astra pour les tâches exigeantes tant que Terra n’est pas comparé ; ne pas laisser un préréglage implicite décider des travaux critiques. `TERRA-001` et le test de verrouillage restent facultatifs et à valider. Aucun travail applicatif transmis à 02. Tous les autres dossiers restent inchangés. Aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-27 20:10 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `10fdac5` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 27/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, réglages du compte et application desktop réelle INACCESSIBLES.
+
+Aucun changement matériel. Aucun commit postérieur à `10fdac5`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 868 h, version 0.2.51).
+
+La nouveauté Outlook/Copilot retrouvée pendant le contrôle (actions de tri en langage naturel avec confirmation au-delà de cinq messages ou pour les règles) appartient aux notes Microsoft du 23/09 et ne constitue pas une annonce du 27/10 ; elle n’est pas retenue comme remplacement de Graph direct sans licence Copilot prouvée ni avantage mesuré.
+
+`TERRA-001`, `ASTRA-PLUS-001`, `CODEX-TRAINING-001`, `LOCKED-CHATS-001`, `CHATGPT-DESKTOP-001`, `ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. Aucun travail nouveau transmis à 02 et aucun code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
