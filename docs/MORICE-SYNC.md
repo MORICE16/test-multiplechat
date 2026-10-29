@@ -751,6 +751,26 @@ RADAR filtré : les résultats les plus récents restent Terra du 26/10, déjà 
 
 `TERRA-001`, `ASTRA-PLUS-001`, `CODEX-TRAINING-001`, `LOCKED-CHATS-001`, `CHATGPT-DESKTOP-001`, `ANDROID-MAPS-001`, `APP-SYNC-001`, `SITES-TUNNEL-001`, Gmail, push réel, sauvegarde Fold, ADB/OpenClaw, `HTTP-SHORTCUTS-001` et autonomie MultipleChat restent dans leurs statuts précédents. Aucun travail nouveau transmis à 02 et aucun code fonctionnel modifié par 04.
 
+
+### 2026-10-29 20:12 Europe/Paris — Copilot Chat Outlook étend son contexte sans licence Copilot dédiée
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `8c1213d` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 29/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, compte Outlook réel et réglages Microsoft INACCESSIBLES.
+
+État technique : aucun commit postérieur à `8c1213d`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 916 h, version 0.2.51). Les preuves Graph et les blocages précédents restent inchangés.
+
+Changement matériel RADAR :
+- Les notes Microsoft 365 Copilot du 27/10 indiquent que Copilot Chat dans Outlook s’étend, pour les utilisateurs concernés, d’un seul fil de messages à l’ensemble de la boîte, au calendrier, aux réunions et aux autres données d’entreprise déjà accessibles. Microsoft précise que cette extension ne requiert pas de licence Microsoft 365 Copilot.
+- Plateformes annoncées : Android, Windows, iOS, macOS et web. Le déploiement est progressif ; l’accès réel du compte, le périmètre exact de la licence Microsoft existante, les contrôles d’organisation, la qualité des réponses et les actions disponibles ne sont pas prouvés.
+- Gain possible pour Morice : lecture et synthèse manuelles croisées boîte/calendrier sans nouveau coût Copilot, utile comme comparaison ou secours. Cela ne fournit ni API Morice, ni orchestration autonome, ni preuve de conservation dans le journal Morice, et ne remplace pas Graph direct déjà testé.
+
+Dossier `OUTLOOK-COPILOT-001` — `TESTER / À VALIDER` :
+- Option conserver : maintenir Graph direct, ses limites bornées, ses validations et ses preuves runtime.
+- Test minimal après validation et accès : vérifier la présence de Copilot Chat dans Outlook sur le compte concerné ; poser trois questions non sensibles identiques sur boîte, calendrier et actions de suivi ; comparer exactitude, sources, périmètre, délais et permissions avec les lectures Morice ; n’exécuter aucune suppression, règle, déplacement, envoi ou création d’événement.
+- Critère de décision : seulement si l’accès inclus est réel et le gain mesuré, conserver Copilot Outlook comme parcours manuel complémentaire. Toute intégration, automatisation ou remplacement de Graph demanderait un nouveau dossier architectural et une preuve d’accès officielle.
+
+RADAR filtré : l’édition directe de documents dans Gemini annoncée le 29/10 est disponible mais non retenue, car elle n’améliore pas une brique Morice prouvée sans nouveau fournisseur actif ni avantage mesuré. Les autres résultats sont antérieurs, dédupliqués ou hors périmètre.
+
+Décisions et transmission 02 : CONSERVER Graph direct. `OUTLOOK-COPILOT-001` reste un test facultatif à valider ; aucun travail applicatif transmis à 02 avant preuve d’accès. Tous les autres dossiers gardent leur statut. Aucun achat, activation, permission, message, événement ou code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
