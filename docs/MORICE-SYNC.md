@@ -771,6 +771,16 @@ RADAR filtré : l’édition directe de documents dans Gemini annoncée le 29/10
 
 Décisions et transmission 02 : CONSERVER Graph direct. `OUTLOOK-COPILOT-001` reste un test facultatif à valider ; aucun travail applicatif transmis à 02 avant preuve d’accès. Tous les autres dossiers gardent leur statut. Aucun achat, activation, permission, message, événement ou code fonctionnel modifié par 04.
 
+
+### 2026-10-30 19:56 Europe/Paris — contrôle sans changement matériel, RADAR partiel
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `a3921fd` ; commits récents LU ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, compte Outlook réel et réglages Microsoft INACCESSIBLES. Recherche officielle OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make PARTIELLE : trois tentatives de collecte ont échoué sans résultat exploitable.
+
+Aucun changement matériel dans les sources accessibles. Aucun commit postérieur à `a3921fd`, aucune nouvelle preuve runtime, contradiction ou décision Alan accessible. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 940 h, version 0.2.51).
+
+RADAR filtré : aucune nouveauté n’est déduite de l’échec de recherche. Le dernier changement retenu reste `OUTLOOK-COPILOT-001` du 29/10. La collecte officielle devra être reprise lors d’une exécution ultérieure ; cet incident transitoire ne modifie aucun dossier ni statut.
+
+Décisions et transmission 02 : CONSERVER Graph direct et tous les statuts précédents. Aucun travail nouveau transmis à 02 ; aucun achat, activation, permission, message, événement ou code fonctionnel modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
