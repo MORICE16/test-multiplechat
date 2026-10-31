@@ -781,6 +781,24 @@ RADAR filtré : aucune nouveauté n’est déduite de l’échec de recherche. L
 
 Décisions et transmission 02 : CONSERVER Graph direct et tous les statuts précédents. Aucun travail nouveau transmis à 02 ; aucun achat, activation, permission, message, événement ou code fonctionnel modifié par 04.
 
+
+### 2026-10-31 20:14 Europe/Paris — qualification du dossier Outlook Copilot
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `df2197e` ; commits récents LU ; RADAR officiel OpenAI/Microsoft/Android/Google/Anthropic/xAI/Make vérifié le 31/10, y compris reprise réussie de la collecte du 30/10 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, OpenClaw Android, MultipleChat, Google, compte Outlook réel et réglages Microsoft INACCESSIBLES.
+
+État technique : aucun commit postérieur à `df2197e`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 964 h, version 0.2.51).
+
+Mise à jour matérielle de `OUTLOOK-COPILOT-001` :
+- La documentation Microsoft Support précise que Copilot Chat dans Outlook sans licence Copilot additionnelle exige une connexion avec un compte professionnel ou scolaire. Il peut alors interroger boîte, calendrier, réunions et autres données limitées, et propose aussi des actions comme brouillon, planification, drapeau ou réponse automatique.
+- Cette précision réduit l’applicabilité immédiate à Morice : les comptes personnels Hotmail déjà testés via Graph ne sont pas couverts par cette preuve. Aucun compte professionnel/scolaire éligible ni bouton Copilot actif n’est attesté.
+- Avec licence additionnelle, Copilot peut croiser davantage de données d’entreprise, notamment chats et documents ; ce périmètre élargi n’est ni requis ni autorisé pour un test initial.
+- Statut révisé : `CONSERVER Graph direct / TESTER SEULEMENT SI COMPTE PROFESSIONNEL OU SCOLAIRE DÉJÀ ÉLIGIBLE / À VALIDER`. Aucun achat, changement de compte ou licence n’est proposé.
+
+Test minimal révisé : vérifier d’abord, en lecture seule, le type de compte et la présence du bouton Copilot. Si le compte est éligible sans achat, comparer trois requêtes non sensibles sur boîte et calendrier avec Morice ; ne déclencher aucun brouillon, drapeau, réponse automatique, réunion, déplacement, suppression ou règle pendant ce premier test.
+
+RADAR filtré : ChatGPT Work/Codex confirme Voice dans Work sur web/mobile et dans Work/Codex sur desktop ; piste déjà couverte par `CHATGPT-DESKTOP-001`, sans intégration runtime Morice ni nouveau dossier. Les mises à jour Make du 30/10 ne sont pas retenues car Make reste volontairement inactif. Les autres résultats sont antérieurs, dédupliqués ou hors périmètre.
+
+Décisions et transmission 02 : CONSERVER Graph direct. Aucun travail applicatif transmis à 02 ; tous les autres dossiers gardent leur statut. Aucun code fonctionnel, compte, permission, message ou événement modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
