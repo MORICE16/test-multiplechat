@@ -799,6 +799,24 @@ RADAR filtré : ChatGPT Work/Codex confirme Voice dans Work sur web/mobile et da
 
 Décisions et transmission 02 : CONSERVER Graph direct. Aucun travail applicatif transmis à 02 ; tous les autres dossiers gardent leur statut. Aucun code fonctionnel, compte, permission, message ou événement modifié par 04.
 
+
+### 2026-11-01 20:20 Europe/Paris — correctifs de sécurité OpenClaw à évaluer
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `d184acd` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 01/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, compte OpenClaw réel, MultipleChat authentifié et réglages fournisseurs INACCESSIBLES.
+
+État technique : aucun commit postérieur à `d184acd`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. CORE-SYNC et core-state restent inchangés. Desktop Commander indique `Alan Offline` (dernière présence indiquée il y a 988 h, version 0.2.51). La dernière preuve OpenClaw de Morice reste la version 2026.8.1 avec un nœud Android connecté et `device.status ok=true`, preuve datée non renouvelée aujourd’hui.
+
+Nouveau dossier `OPENCLAW-UPDATE-001` :
+- OpenClaw 2026.10.9, publié le 29/10 et marqué dernière version stable, apporte des correctifs de sécurité de dépendances, applique `tools.fs.workspaceOnly` aux outils construits par le Gateway, masque des identifiants dans les inspections MCP et les journaux Google OAuth, sécurise les retours arrière de mise à jour et améliore la récupération des bases et index.
+- Compatibilité Morice : potentiellement pertinente pour le relais Android/OpenClaw, mais l’écart depuis 2026.8.1, l’état du nœud, la version Node, les fichiers de configuration et les appairages ne sont pas accessibles. La préversion 2026.10.10-beta.5 est exclue.
+- Options : CONSERVER temporairement 2026.8.1 ; TESTER la stable 2026.10.9 après sauvegarde et contrôle de compatibilité ; REMPLACER seulement après preuve de reprise du nœud Android et retour arrière vérifié.
+- Statut : `TESTER / À VALIDER PAR ALAN`. Recommandation : test borné de la version stable, sans achat connu, avec sauvegarde de l’état/configuration, contrôle Node, diagnostic avant/après, `device.status`, appairage Android, puis retour arrière si régression. Aucune installation ou mise à jour automatique autorisée.
+
+MultipleChat : la documentation officielle confirme Compare Mode manuel et les Projects, mais ne prouve toujours aucun accès automatique API/MCP/CLI/webhook récupérant plusieurs avis identifiables. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT ; aucun avis inventé.
+
+RADAR filtré : GPT-6.1 Sol et sa fenêtre Work/Codex sont déjà couverts par `OAI-ROUTE-001`; Astra, Terra, Voice, Outlook Copilot, Make et les autres résultats sont dédupliqués ou sans changement matériel. Aucun nouveau coût, droit ou remplacement retenu.
+
+Décisions et transmission 02 : CONSERVER l’état actuel tant qu’Alan n’a pas validé `OPENCLAW-UPDATE-001`. Aucun travail transmis à 02. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
