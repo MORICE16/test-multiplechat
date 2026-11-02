@@ -817,6 +817,25 @@ RADAR filtré : GPT-6.1 Sol et sa fenêtre Work/Codex sont déjà couverts par `
 
 Décisions et transmission 02 : CONSERVER l’état actuel tant qu’Alan n’a pas validé `OPENCLAW-UPDATE-001`. Aucun travail transmis à 02. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
+
+### 2026-11-02 20:22 Europe/Paris — futur quota partagé ChatGPT/Codex
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `9c16488` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 02/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié et réglages ChatGPT INACCESSIBLES.
+
+État technique : aucun commit postérieur à `9c16488`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. CORE-SYNC et core-state restent inchangés. Desktop Commander indique `Alan Offline` (dernière présence indiquée il y a 1012 h, version 0.2.51).
+
+Nouveau dossier `OAI-USAGE-POOL-001` :
+- OpenAI annonce qu’à partir de décembre 2026 les forfaits Plus, Pro et Business partageront une même allocation entre ChatGPT et Codex, à mesure que les capacités agentiques de Work rejoignent ChatGPT. L’usage sera mesuré en jetons selon modèle et complexité ; le chat instantané n’entamera pas cette allocation.
+- Le solde combiné et les dates de réinitialisation doivent être visibles dans `Settings → Usage`. En cas de limite, les options officielles sont attendre la réinitialisation, changer d’offre ou acheter des crédits éligibles. Le volume exact du forfait Plus, la date précise de bascule et les taux par modèle ne sont pas encore publiés dans cette source.
+- Impact Morice : les tâches Work/Codex, dont 04 et 02, pourront consommer un même budget agentique. Les conversations instantanées ordinaires restent hors de ce compteur selon l’annonce. Aucun dépassement, ralentissement ou coût réel n’est encore observé.
+- Options : CONSERVER Plus et mesurer ; AMÉLIORER le routage après données réelles en réservant les modèles lourds aux tâches difficiles ; acheter des crédits ou changer d’offre seulement après mesure et validation explicite.
+- Statut : `ANNONCÉ / TESTER À LA BASCULE / À VALIDER PAR ALAN`. Recommandation : aucun achat ni changement maintenant ; relever le solde et les réinitialisations avant/après la bascule, comparer la consommation de Terra/Sol/Astra sur quelques tâches équivalentes, puis choisir le routage minimal. Retour arrière : restaurer les modèles/réglages actuels ; aucun crédit automatique.
+
+Dossiers existants : `OPENCLAW-UPDATE-001` reste à valider sans installation ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT, sans preuve d’accès automatique API/MCP/CLI/webhook ni avis multi-modèles récupéré. Les résultats Outlook Copilot, Astra, Terra, Sol, Voice, Make et autres sont dédupliqués ou inchangés.
+
+Contradictions : aucune nouvelle. L’annonce de quota partagé à partir de décembre complète, sans annuler, les dossiers de modèles et le blocage historique des clés API payantes.
+
+Décisions et transmission 02 : CONSERVER Plus et le routage actuel jusqu’à mesure réelle ; aucun achat, crédit, changement de modèle par défaut ou travail transmis à 02. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
