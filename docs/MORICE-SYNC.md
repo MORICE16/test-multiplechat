@@ -836,6 +836,25 @@ Contradictions : aucune nouvelle. L’annonce de quota partagé à partir de dé
 
 Décisions et transmission 02 : CONSERVER Plus et le routage actuel jusqu’à mesure réelle ; aucun achat, crédit, changement de modèle par défaut ou travail transmis à 02. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
+
+### 2026-11-03 19:35 Europe/Paris — Microsoft Autopilot à surveiller
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `23a6414` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 03/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, comptes Microsoft réels, MultipleChat authentifié et réglages fournisseurs INACCESSIBLES.
+
+État technique : aucun commit postérieur à `23a6414`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. CORE-SYNC et core-state restent inchangés. Desktop Commander indique `Alan Offline` (dernière présence indiquée il y a 1035 h, version 0.2.51).
+
+Nouveau dossier `M365-AUTOPILOT-001` :
+- Microsoft présente Autopilot comme un agent personnel, proactif et persistant, hébergé dans le cloud, avec sa propre identité, mémoire, boîte, fichiers, ordinateur et espace de travail. Il peut poursuivre des responsabilités récurrentes et intervenir dans Teams, Outlook, conversations, canaux et documents.
+- Disponibilité : `BÊTA-PREVIEW / FRONTIER`, déploiement annoncé en novembre 2026. Frontier exige une offre/licence compatible et, pour les organisations, une inscription et un contrôle administrateur ; les droits, coûts d’usage et l’accès réel d’un compte personnel Hotmail de Morice ne sont pas prouvés.
+- Impact possible : recouvrement direct avec l’orchestration continue de Morice, les rappels, Outlook et les tâches planifiées. Mais sa propre identité, boîte et mémoire changeraient authentification, permissions, stockage, gouvernance et potentiellement coût ; aucune migration silencieuse n’est acceptable.
+- Options : CONSERVER Morice avec Graph ; SURVEILLER la disponibilité personnelle ; TESTER ultérieurement dans un périmètre Microsoft isolé et non sensible si l’accès existe sans achat ; REMPLACER seulement après confrontation, mesure et retour arrière.
+- Statut : `CONSERVER MORICE / SURVEILLER AUTOPILOT / À VALIDER PAR ALAN`. Aucun compte agent, licence, inscription Frontier, permission ou test proposé maintenant. Tout essai futur devra vérifier coût, identité créée, permissions minimales, journal d’audit, approbations, suppression/export des données et désactivation complète.
+
+Dossiers existants : `OAI-USAGE-POOL-001` reste annoncé pour décembre sans changement ; `OPENCLAW-UPDATE-001` reste à valider sans installation ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT, sans accès automatique prouvé ni avis multi-modèles récupéré.
+
+RADAR filtré : GPT-6 Rosalind est réservé à la recherche biologique approuvée en entreprise et n’est pas retenu. Les autres résultats OpenAI, Microsoft, Android, Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic, Gemini et xAI sont dédupliqués, antérieurs ou sans gain matériel pour une brique Morice.
+
+Décisions et transmission 02 : CONSERVER Morice, Graph et le routage actuel. Aucun travail transmis à 02 ; toute substitution architecturale par Autopilot exige validation d’Alan et confrontation préalable. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
