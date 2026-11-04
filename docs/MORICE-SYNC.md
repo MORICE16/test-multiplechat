@@ -855,6 +855,23 @@ RADAR filtré : GPT-6 Rosalind est réservé à la recherche biologique approuv�
 
 Décisions et transmission 02 : CONSERVER Morice, Graph et le routage actuel. Aucun travail transmis à 02 ; toute substitution architecturale par Autopilot exige validation d’Alan et confrontation préalable. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
+
+### 2026-11-04 19:51 Europe/Paris — cible OpenClaw stable révisée
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `8a57329` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 04/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, compte OpenClaw réel, MultipleChat authentifié et réglages fournisseurs INACCESSIBLES.
+
+État technique : aucun commit postérieur à `8a57329`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. CORE-SYNC et core-state restent inchangés. Desktop Commander indique `Alan Offline` (dernière présence indiquée il y a 1060 h, version 0.2.51). La dernière preuve Morice reste OpenClaw 2026.8.1 avec nœud Android connecté, non retestée aujourd’hui.
+
+Mise à jour matérielle de `OPENCLAW-UPDATE-001` :
+- OpenClaw 2026.10.10 a été publié le 03/11 et est désormais marqué `Latest`, remplaçant 2026.10.9 comme cible stable. La documentation officielle mentionne Chat Details, un Advisor expérimental, un mode parole scindé et d’autres améliorations/correctifs ; la version cumule aussi les remédiations de sécurité déjà retenues dans 2026.10.9.
+- La préversion 2026.11.5-beta.1 du 04/11 ajoute notamment Knowledge Scribes, état PostgreSQL, exécution multi-appareil et automatisations durables ; elle est explicitement exclue de tout test Morice.
+- Statut révisé : `TESTER 2026.10.10 STABLE / À VALIDER PAR ALAN`. Le plan reste : sauvegarde état/configuration, contrôle Node, diagnostic avant/après, reprise Gateway, `device.status`, appairage Android et retour arrière si régression. Advisor expérimental désactivé pendant le premier test. Aucun téléchargement, mise à jour ou installation automatique.
+
+Dossiers existants : `M365-AUTOPILOT-001` et `OAI-USAGE-POOL-001` restent sans changement ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT, la documentation ne prouvant toujours aucun accès automatique API/MCP/CLI/webhook récupérant plusieurs avis identifiables.
+
+RADAR filtré : l’acquisition annoncée de Pierre par OpenAI ne modifie encore aucun outil disponible de Morice. La fin des anciens runtimes Node HubSpot n’est pas retenue faute de preuve que Morice utilise des fonctions HubSpot concernées. Outlook Copilot, Microsoft Autopilot, modèles OpenAI et autres résultats sont dédupliqués ou sans changement applicable.
+
+Décisions et transmission 02 : CONSERVER l’état actuel ; remplacer seulement la cible du futur test OpenClaw par 2026.10.10 stable. Aucun travail transmis à 02 avant validation d’Alan. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
