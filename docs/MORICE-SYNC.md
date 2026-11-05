@@ -872,6 +872,33 @@ RADAR filtré : l’acquisition annoncée de Pierre par OpenAI ne modifie encore
 
 Décisions et transmission 02 : CONSERVER l’état actuel ; remplacer seulement la cible du futur test OpenClaw par 2026.10.10 stable. Aucun travail transmis à 02 avant validation d’Alan. Aucun code fonctionnel, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
+### 2026-11-05 19:53 Europe/Paris — OpenClaw stable, correctif Android critique et Tasker 6.7
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `66abcba` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 05/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié et réglages réels INACCESSIBLES.
+
+État technique : aucun commit postérieur à `66abcba`, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. CORE-SYNC et core-state restent inchangés. Le dossier de travail courant n’est pas un dépôt Git. Desktop Commander indique `Alan Offline` (dernière présence indiquée il y a 1084 h, version 0.2.51). La dernière preuve Morice reste OpenClaw 2026.8.1 avec nœud Android connecté, non retestée aujourd’hui.
+
+Mise à jour matérielle de `OPENCLAW-UPDATE-001` :
+- OpenClaw 2026.11.1 a été publié le 05/11 et est marqué `Latest`, remplaçant 2026.10.10 comme cible stable. La version renforce la conservation des secrets lors d’un échec de sauvegarde de configuration, la récupération après mise à jour, la continuité des conversations et réponses de canaux, les suivis de sous-agents et le comportement Android End Talk ; elle ajoute aussi plusieurs protections réseau, de restauration et de rédaction des journaux.
+- Statut : `TESTER 2026.11.1 STABLE / À VALIDER PAR ALAN`. Conserver le plan réversible : sauvegarde de l’état/configuration, contrôle Node, diagnostic avant/après, reprise Gateway, `device.status`, appairage Android et retour arrière si régression. Aucun téléchargement ni installation.
+- Source officielle : https://github.com/openclaw/openclaw/releases/tag/v2026.11.1 .
+
+Nouveau dossier `ANDROID-PATCH-001` — `VÉRIFIER / TESTER / À VALIDER` :
+- Le bulletin Android du 02/11 indique que le niveau de correctif 2026-11-05 corrige notamment une vulnérabilité critique du Framework permettant potentiellement une exécution de code à distance sans privilège supplémentaire ni interaction utilisateur.
+- Compatibilité et disponibilité réelles sur le Fold/Samsung ne sont pas prouvées. Vérifier d’abord modèle, version Android, niveau de correctif, sauvegarde et espace libre ; utiliser uniquement la mise à jour officielle Samsung/Android, puis contrôler démarrage, réseau, authentification, Tasker et OpenClaw. Retour arrière : restauration selon le parcours Samsung disponible, sans remise à zéro improvisée.
+- Source officielle : https://source.android.com/docs/security/bulletin/2026/2026-11-01.html .
+
+Nouveau dossier `TASKER-6.7-001` — `TESTER / À VALIDER` :
+- Tasker 6.7.8, publié le 02/11, apporte Scenes V2 avec mises en page responsives, Material 3, adaptation portrait/paysage et écrans connectés, synchronisation JSON, journal d’exécution modernisé, nouvelles tuiles rapides et App Factory ciblant l’API actuelle. Gain possible : interface locale Fold plus adaptée et diagnostic plus lisible sans remplacer Morice.
+- L’interface Tasker 2026 reste explicitement précoce et optionnelle. La version installée, les profils actuels et leur compatibilité ne sont pas accessibles ; aucun remplacement ni migration n’est décidé. Test seulement après sauvegarde/export des profils, sur une scène non sensible isolée, avec retour à l’interface et aux profils existants si régression.
+- Source officielle : https://tasker.joaoapps.com/changes/changes6.7.html .
+
+RADAR filtré : ChatGPT Images 2.6 n’améliore pas une brique Morice prouvée. Les outils MCP de Make restent sans gain face au parcours direct conservé et au scénario Make désactivé. Les nouvelles fonctions MultipleChat de studios/sandboxes ne prouvent toujours aucun accès automatique API/MCP/CLI/webhook récupérant plusieurs avis identifiables ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. HubSpot reste non retenu faute de preuve d’une fonction concernée dans Morice. Les autres résultats sont antérieurs, dédupliqués ou sans gain concret.
+
+Contradictions : aucune nouvelle. Les nouvelles cibles ne prouvent ni version installée ni disponibilité sur les appareils d’Alan.
+
+Décisions et transmission 02 : CONSERVER l’état actuel. Proposer seulement les trois tests réversibles ci-dessus après validation d’Alan et accès aux appareils ; priorité sécurité au contrôle du niveau de correctif Android, puis sauvegardes avant toute mise à jour. Aucun travail transmis à 02, aucune installation, permission, compte, message, événement, appareil ou déploiement modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
