@@ -899,6 +899,16 @@ Contradictions : aucune nouvelle. Les nouvelles cibles ne prouvent ni version in
 Décisions et transmission 02 : CONSERVER l’état actuel. Proposer seulement les trois tests réversibles ci-dessus après validation d’Alan et accès aux appareils ; priorité sécurité au contrôle du niveau de correctif Android, puis sauvegardes avant toute mise à jour. Aucun travail transmis à 02, aucune installation, permission, compte, message, événement, appareil ou déploiement modifié par 04.
 
 
+### 2026-11-06 20:28 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `5042786` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 06/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié et réglages réels INACCESSIBLES.
+
+Aucun changement matériel. Aucun commit postérieur à `5042786`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. Le dossier courant n’est pas un dépôt Git. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 1108 h, version 0.2.51).
+
+RADAR filtré : la documentation OpenAI relue confirme GPT-6.1 Sol dans Work/Codex, son contexte par défaut de 500 000 jetons sans surtaxe longue fenêtre sur l’allocation incluse et son déploiement Plus ; cette piste est déjà couverte par `OAI-ROUTE-001` depuis le 01/10. Dots Enterprise/Edu ne concerne pas l’offre Plus actuelle. OpenClaw 2026.11.1 reste la stable retenue ; le bulletin Android du 05/11 et Tasker 6.7.8 restent dans leurs dossiers du 05/11 sans nouvelle preuve appareil. La mention générique d’un accès API dans les conditions MultipleChat ne fournit ni documentation d’appel, ni authentification, ni preuve de récupération de plusieurs avis : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Les autres résultats sont antérieurs, dédupliqués ou sans gain concret.
+
+Décisions et transmission 02 : CONSERVER l’état actuel et les tests à valider déjà consignés. Aucun travail nouveau transmis à 02 ; aucun code fonctionnel, installation, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
