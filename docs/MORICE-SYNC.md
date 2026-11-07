@@ -909,6 +909,16 @@ RADAR filtré : la documentation OpenAI relue confirme GPT-6.1 Sol dans Work/Cod
 Décisions et transmission 02 : CONSERVER l’état actuel et les tests à valider déjà consignés. Aucun travail nouveau transmis à 02 ; aucun code fonctionnel, installation, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
 
+### 2026-11-07 19:54 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; CORE-SYNC et core-state LU sur GitHub main `3d16452` ; commits récents LU ; RADAR officiel OpenAI, Microsoft, Android/Google/Samsung, MultipleChat, OpenClaw, Make, HubSpot, Tasker, Anthropic et xAI vérifié le 07/11 ; Desktop Commander LU. Git local, runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié et réglages réels INACCESSIBLES.
+
+Aucun changement matériel. Aucun commit postérieur à `3d16452`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. Le dossier courant n’est pas un dépôt Git. Desktop Commander indique toujours `Alan Offline` (dernière présence indiquée il y a 1132 h, version 0.2.51).
+
+RADAR filtré : OpenAI Dots pour Enterprise/Edu/Healthcare et l’extension annoncée aux offres Pro restent hors offre Plus/EEE actuelle et ne remplacent pas Morice. GPT-6.1 Sol reste déjà couvert par `OAI-ROUTE-001`. Les outils Work IQ/SharePoint nécessitent l’écosystème Microsoft professionnel et ne modifient pas la décision de conserver Graph. OpenClaw 2026.11.1 reste la stable retenue. La documentation MultipleChat confirme les parcours web, Android et desktop local/BYOK, mais ne fournit toujours ni mécanisme API/MCP/CLI/webhook documenté, ni preuve d’un appel récupérant plusieurs avis identifiables ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Les autres résultats sont antérieurs, dédupliqués ou sans gain concret.
+
+Dossiers et décisions : `OPENCLAW-UPDATE-001`, `ANDROID-PATCH-001`, `TASKER-6.7-001`, `OAI-USAGE-POOL-001`, `M365-AUTOPILOT-001` et les autres dossiers conservent leurs statuts. CONSERVER l’état actuel ; aucun travail nouveau transmis à 02. Aucun code fonctionnel, installation, compte, permission, message, événement, appareil ou déploiement modifié par 04.
+
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
