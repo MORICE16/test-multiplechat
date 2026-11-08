@@ -919,6 +919,15 @@ RADAR filtré : OpenAI Dots pour Enterprise/Edu/Healthcare et l’extension anno
 Dossiers et décisions : `OPENCLAW-UPDATE-001`, `ANDROID-PATCH-001`, `TASKER-6.7-001`, `OAI-USAGE-POOL-001`, `M365-AUTOPILOT-001` et les autres dossiers conservent leurs statuts. CONSERVER l’état actuel ; aucun travail nouveau transmis à 02. Aucun code fonctionnel, installation, compte, permission, message, événement, appareil ou déploiement modifié par 04.
 
 
+### 2026-11-08 19:53 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; GitHub main `a483122`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 08/11 ; Desktop Commander LU. Git local PARTIEL (le dossier courant n'est pas un dépôt) ; runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES.
+
+Aucun changement matériel. Aucun commit postérieur à `a483122`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. Desktop Commander indique toujours `Alan Offline` (dernière présence 1156 h, version 0.2.51).
+
+RADAR filtré : OpenClaw stable reste `2026.11.1` (la `2026.11.5-beta.1` demeure une préversion) ; Tasker reste `6.7.8` ; les nouveautés OpenAI du 4–5/11 et SharePoint/Work IQ du 3–6/11 ont déjà été confrontées et ne remplacent pas les briques actuelles dans le périmètre vérifié. Aucun mécanisme officiel MultipleChat API/MCP/CLI/webhook permettant de récupérer plusieurs avis identifiables n'a été trouvé : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT.
+
+Dossiers et décisions inchangés : CONSERVER l'architecture courante ; `OPENCLAW-UPDATE-001`, `ANDROID-PATCH-001` et `TASKER-6.7-001` restent À TESTER après validation/accès approprié ; aucun achat, installation, migration, déploiement ou travail nouveau transmis à 02. Aucun code fonctionnel modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
