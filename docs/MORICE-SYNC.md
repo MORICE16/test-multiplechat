@@ -928,6 +928,17 @@ RADAR filtré : OpenClaw stable reste `2026.11.1` (la `2026.11.5-beta.1` demeure
 
 Dossiers et décisions inchangés : CONSERVER l'architecture courante ; `OPENCLAW-UPDATE-001`, `ANDROID-PATCH-001` et `TASKER-6.7-001` restent À TESTER après validation/accès approprié ; aucun achat, installation, migration, déploiement ou travail nouveau transmis à 02. Aucun code fonctionnel modifié.
 
+### 2026-11-09 19:40 Europe/Paris — OpenClaw 2026.11.2 stable à qualifier
+Couverture : protocole commun et dernier bilan LU ; GitHub main `7ce8e12`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 09/11 ; Desktop Commander LU. Environnement local INACCESSIBLE ; runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1179 h, version 0.2.51).
+
+Changement matériel — `OPENCLAW-UPDATE-001` : OpenClaw `2026.11.2` est DISPONIBLE/stable depuis le 08/11 à 19:31, tag signé `v2026.11.2`, source `b556fdf457b026574bf0f1e7b4914b15f3f179ce`. Correctif sans nouvelle fonctionnalité : fiabilité des mises à jour et bases SQLite, rappels/automatisations, mémoire, sessions Codex, routage Gemini et réduction de données sensibles dans les journaux. Gain concret pour Morice : corriger notamment les rappels dont le texte mentionne des réveils/heartbeats, empêcher une automatisation de supprimer son propre calendrier pendant son exécution et fiabiliser la conservation des tâches cron actives.
+
+Confrontation du dossier : l'état runtime attesté reste OpenClaw `2026.8.1` et n'a pas été retesté. Options : CONSERVER `2026.8.1` tant que le poste est hors ligne ; ou TESTER `2026.11.2` sur sauvegarde/copie avec inventaire, vérification des rappels, automatisations, mémoire, connecteurs et retour arrière. Risques : saut de versions important ; le rapport officiel signale ClawHub différé et APK Android non aligné, et un ticket du dépôt indique que le paquet `2026.11.2` conserve un risque de délai du contrôle SQLite sur très gros états. Coût logiciel non identifié ; temps de qualification inconnu. Décision : TESTER, À VALIDER PAR ALAN ; aucune installation, migration ou modification de configuration effectuée. Aucun travail transmis à 02 avant validation et accès runtime.
+
+MultipleChat : ses conditions mentionnent désormais un « accès API » programmatique, mais aucune documentation publique exploitable d'endpoint, authentification ou appel récupérant plusieurs avis identifiables n'a été trouvée. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT ; aucun avis inventé. Aucun autre changement RADAR dédupliqué, contradiction nouvelle ou décision à valider. `ANDROID-PATCH-001` et `TASKER-6.7-001` restent inchangés. Aucun code fonctionnel modifié.
+
+Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.2 ; https://docs.openclaw.ai/releases/2026.11.2 ; https://raw.githubusercontent.com/openclaw/openclaw/main/CHANGELOG/2026.11.2.md ; https://github.com/openclaw/openclaw/issues/193962 ; https://multiplechat.ai/terms .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
