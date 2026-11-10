@@ -939,6 +939,17 @@ MultipleChat : ses conditions mentionnent désormais un « accès API » program
 
 Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.2 ; https://docs.openclaw.ai/releases/2026.11.2 ; https://raw.githubusercontent.com/openclaw/openclaw/main/CHANGELOG/2026.11.2.md ; https://github.com/openclaw/openclaw/issues/193962 ; https://multiplechat.ai/terms .
 
+### 2026-11-10 20:22 Europe/Paris — tâches Work déclenchées par événements à garder en option
+Couverture : protocole commun et dernier bilan LU ; GitHub main `2ccb7d1`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 10/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1204 h, version 0.2.51).
+
+Changement matériel identifié — `OAI-EVENT-TRIGGERS-001` : la documentation OpenAI, mise à jour le 05/11 et vérifiée le 10/11, décrit des tâches ChatGPT Work déclenchées par webhook pour les nouveaux messages Gmail, les nouveaux messages de canaux Slack et l'activité des pull requests GitHub. Statut DISPONIBLE pour les comptes Plus et autres forfaits payants éligibles, sous réserve des connexions, permissions, contrôles d'espace et validations. Création/édition sur web ou mobile ; l'application de bureau peut seulement afficher les déclencheurs existants. L'usage suit le quota partagé Work/Codex ; coût précis d'un déclenchement inconnu.
+
+Confrontation : gain possible pour Morice uniquement si le dépôt adopte réellement un flux par pull requests, afin de déclencher une lecture ciblée sans attendre le contrôle quotidien. Limites : aucun événement Outlook, To Do ou HubSpot documenté ; Gmail automatique n'est pas retenu au regard de la demande d'Alan d'arrêter les mails automatiques ; les commits directs actuels ne sont pas couverts par le déclencheur GitHub annoncé. Options : CONSERVER la synchronisation quotidienne actuelle ; ou TESTER ultérieurement un déclencheur GitHub borné, lecture seule, sur une PR témoin, sans partage de secrets et avec suppression/retour arrière documentés. Décision : CONSERVER l'existant ; TESTER seulement si Alan valide un futur flux PR. Aucun changement d'architecture transmis à 02, aucune tâche ou connexion créée.
+
+RADAR filtré : OpenClaw reste stable `2026.11.2` et `OPENCLAW-UPDATE-001` demeure À TESTER après validation ; Tasker reste `6.7.8` ; le bulletin Android du 5/11 et les autres dossiers sont inchangés. Le benchmark Gemini MKA publié le 10/11 ne remplace aucune brique actuelle. MultipleChat ne fournit toujours aucune documentation publique exploitable d'endpoint/authentification ni preuve d'un appel récupérant plusieurs avis identifiables : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun code fonctionnel modifié.
+
+Sources : https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.2 ; https://multiplechat.ai/terms .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
