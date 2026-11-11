@@ -950,6 +950,19 @@ RADAR filtré : OpenClaw reste stable `2026.11.2` et `OPENCLAW-UPDATE-001` demeu
 
 Sources : https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.2 ; https://multiplechat.ai/terms .
 
+### 2026-11-11 19:36 Europe/Paris — OpenClaw 2026.11.3 devient la cible stable
+Couverture : protocole commun et dernier bilan LU ; GitHub main `11227d0`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 11/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1227 h, version 0.2.51).
+
+Changement matériel — `OPENCLAW-UPDATE-001` : OpenClaw `2026.11.3` est DISPONIBLE/stable depuis le 10/11 à 18:53, tag signé `v2026.11.3`, source `847611dcaa3bf0e2783335f961dd1fd0580e4d9f`. C'est une version de sécurité sans nouvelle fonctionnalité. Elle corrige la vérification des certificats lors des transferts entre nœuds, l'isolation et la réduction d'exposition des identifiants, les aperçus d'images en sandbox, les échecs silencieux d'outils, des pannes de tâches cron et plusieurs blocages de sauvegarde/mise à jour sur les gros états SQLite.
+
+Confrontation : `2026.11.3` remplace `2026.11.2` comme cible de qualification et corrige précisément le risque de délai SQLite relevé le 09/11. L'état runtime attesté de Morice reste `2026.8.1`, non retesté. Le saut de versions et la logique d'updater ancien imposent une sauvegarde vérifiée, un inventaire des connecteurs/tâches/mémoire, le chemin officiel de récupération et un retour arrière avant tout essai ; ne pas supposer qu'un simple choix de version répare un updater installé trop ancien. Android APK reste à qualifier/publication dans le rapport de release. Coût logiciel non identifié ; temps de qualification inconnu.
+
+Décision : TESTER `2026.11.3`, À VALIDER PAR ALAN, sur copie/sauvegarde avec contrôles des rappels, automatisations, mémoire, certificats de nœuds, secrets, connecteurs et redémarrage Gateway. CONSERVER `2026.8.1` tant que le poste reste hors ligne. Aucune installation, migration, modification de configuration ni travail transmis à 02.
+
+RADAR filtré : Work IQ expose un chemin MCP généralement disponible pour Microsoft 365, mais exige Azure/Foundry, Entra administrateur et facturation Copilot Credits ; il ne remplace pas Graph pour les comptes Hotmail Morice. Le Pixel Drop est hors périmètre Samsung. Tasker reste `6.7.8`. MultipleChat ne fournit toujours aucune documentation publique exploitable d'endpoint/authentification ni preuve d'un appel récupérant plusieurs avis identifiables : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun autre changement matériel, contradiction ou décision nouvelle. Aucun code fonctionnel modifié.
+
+Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://docs.openclaw.ai/releases/2026.11.3 ; https://learn.microsoft.com/azure/foundry/agents/how-to/tools/work-iq ; https://multiplechat.ai/terms .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
