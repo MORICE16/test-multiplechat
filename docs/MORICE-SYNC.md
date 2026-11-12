@@ -963,6 +963,18 @@ RADAR filtré : Work IQ expose un chemin MCP généralement disponible pour Micr
 
 Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://docs.openclaw.ai/releases/2026.11.3 ; https://learn.microsoft.com/azure/foundry/agents/how-to/tools/work-iq ; https://multiplechat.ai/terms .
 
+
+### 2026-11-12 19:51 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; GitHub main `2bd25e2`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 12/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1252 h, version 0.2.51).
+
+Aucun changement matériel. Aucun commit postérieur à `2bd25e2`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. `CORE-SYNC.md` et `docs/core-state.json` restent inchangés ; aucun fait de veille n'y est recopié.
+
+RADAR filtré : OpenClaw stable reste `2026.11.3`, cible de qualification déjà couverte par `OPENCLAW-UPDATE-001` ; Tasker reste `6.7.8` ; le bulletin Android du 05/11 et Work IQ restent dans leurs dossiers précédents. Claude Fable/Mythos 5.2 du 09/11, Gemini 4 Carbon du 10/11, Gemini Decisions API du 11/11 et Grok Bot 1.0.1 du 11/11 exigeraient un fournisseur, une offre, une API ou des droits non prouvés et ne remplacent aucune brique Morice sans benchmark ni coût validé ; ils ne sont pas retenus. La mise à jour de politique Anthropic applicable le 12/11 ne fournit aucun gain architectural pour Morice. MultipleChat ne documente toujours aucun transport API/MCP/CLI/webhook exploitable ni appel prouvé récupérant plusieurs avis identifiables : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT.
+
+Décisions et transmission 02 : CONSERVER l'architecture et les dossiers actuels. Aucun travail nouveau transmis à 02 ; aucune installation, migration, connexion, permission, message, événement, appareil, déploiement ou code fonctionnel modifié par 04.
+
+Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html ; https://www.anthropic.com/claude-fable-and-mythos-5-2 ; https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/ ; https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/ ; https://x.ai/changelog/bot ; https://multiplechat.ai/help-guide .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
