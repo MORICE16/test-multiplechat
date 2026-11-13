@@ -975,6 +975,24 @@ Décisions et transmission 02 : CONSERVER l'architecture et les dossiers actuels
 
 Sources : https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html ; https://www.anthropic.com/claude-fable-and-mythos-5-2 ; https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/ ; https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/ ; https://x.ai/changelog/bot ; https://multiplechat.ai/help-guide .
 
+
+### 2026-11-13 19:59 Europe/Paris — événements MCP OpenAI à conserver comme option
+Couverture : protocole commun et dernier bilan LU ; GitHub main `975c9a6`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 13/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1276 h, version 0.2.51).
+
+État technique : aucun commit postérieur à `975c9a6` avant ce bilan, aucune nouvelle preuve runtime et aucun code fonctionnel modifié. `CORE-SYNC.md` et `docs/core-state.json` restent inchangés, car le changement relevé est une possibilité externe et non un fait runtime Morice.
+
+Changement matériel RADAR — dossier `OAI-MCP-EVENTS-001`, statut `DISPONIBLE / À VALIDER` :
+- OpenAI documente MCP Events dans les chats Work sur le web, dans l'application desktop avec Work + Cloud et avec dots. Un serveur MCP peut publier des événements filtrés ; ChatGPT crée l'abonnement puis reçoit chaque événement par webhook signé et exécute les instructions du chat.
+- Gain possible : dépasser la liste native Gmail/Slack/pull requests de `OAI-EVENT-TRIGGERS-001` et déclencher un contrôle Morice depuis une source maîtrisée, par exemple un changement de document ou d'état technique, sans scrutation périodique.
+- Ce n'est pas un raccordement prêt à l'emploi : il faut un endpoint MCP distant authentifié, une connexion plugin autorisée, un stockage persistant des abonnements, des sorties HTTPS, la vérification des callbacks et signatures, l'idempotence, les expirations/renouvellements et la prévention des boucles. Polling, streaming et notifications `gap`/`terminated` ne sont pas pris en charge par cette intégration. Hébergement et exploitation créeraient un coût récurrent inconnu.
+- Options : CONSERVER la synchronisation quotidienne actuelle ; ou TESTER plus tard un seul événement en lecture seule, non sensible, avec déduplication, expiration, arrêt et retour arrière démontrés. Toute mise en œuvre serait un changement d'infrastructure et d'authentification : validation Alan et confrontation préalable requises.
+
+Décision : CONSERVER la tâche quotidienne et les déclencheurs natifs actuels. `OAI-MCP-EVENTS-001` reste TESTER / À VALIDER ; aucun travail transmis à 02, aucun serveur, plugin, webhook, tâche ou permission créé. Dots demeure indisponible au compte Plus en EEE selon la documentation publique, mais cette limite n'empêche pas le parcours Work + Cloud annoncé ; l'accès réel du compte reste non vérifié.
+
+RADAR filtré : OpenClaw stable reste `2026.11.3`, Tasker reste `6.7.8`, et les dossiers Android, Work IQ, HubSpot et fournisseurs IA restent inchangés. MultipleChat ne documente toujours aucun transport API/MCP/CLI/webhook permettant un appel prouvé récupérant plusieurs avis identifiables : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun autre changement matériel ou contradiction nouvelle.
+
+Sources : https://developers.openai.com/plugins/build/mcp-events ; https://developers.openai.com/api/docs/guides/custom-mcp-server ; https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex ; https://help.openai.com/en/articles/20001530-getting-started-with-your-dot ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://multiplechat.ai/help-guide .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
