@@ -993,6 +993,18 @@ RADAR filtré : OpenClaw stable reste `2026.11.3`, Tasker reste `6.7.8`, et les 
 
 Sources : https://developers.openai.com/plugins/build/mcp-events ; https://developers.openai.com/api/docs/guides/custom-mcp-server ; https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex ; https://help.openai.com/en/articles/20001530-getting-started-with-your-dot ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://multiplechat.ai/help-guide .
 
+
+### 2026-11-14 19:48 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; GitHub main `1b95e03`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 14/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1300 h, version 0.2.51).
+
+Aucun changement matériel. Aucun commit postérieur à `1b95e03`, aucune nouvelle preuve runtime, contradiction, décision à valider ou nouveauté RADAR dédupliquée à retenir. `CORE-SYNC.md` et `docs/core-state.json` restent inchangés ; aucun fait de veille n'y est recopié.
+
+RADAR filtré : `OAI-MCP-EVENTS-001` reste DISPONIBLE / À VALIDER, sans serveur, plugin, webhook ni preuve de compte ; la synchronisation quotidienne reste conservée. Microsoft Copilot Cowork/Code et les connecteurs fédérés prolongent les pistes professionnelles déjà couvertes par `M365-AUTOPILOT-001` et Work IQ ; ils exigent environnement professionnel, droits administrés et/ou facturation non prouvés et ne remplacent pas Graph pour les comptes Hotmail Morice. OpenClaw stable reste `2026.11.3`, Tasker reste `6.7.8`, et les dossiers Android et fournisseurs IA sont inchangés. MultipleChat ne documente toujours aucun transport API/MCP/CLI/webhook permettant un appel prouvé récupérant plusieurs avis identifiables : `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT.
+
+Décisions et transmission 02 : CONSERVER l'architecture, la tâche quotidienne et les dossiers actuels. Aucun travail nouveau transmis à 02 ; aucune installation, migration, connexion, permission, message, événement, appareil, déploiement ou code fonctionnel modifié par 04.
+
+Sources : https://developers.openai.com/plugins/build/mcp-events ; https://learn.microsoft.com/en-us/copilot/plan/copilot-overview ; https://learn.microsoft.com/en-us/microsoft-365/copilot/release-notes ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html ; https://multiplechat.ai/help-guide .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
