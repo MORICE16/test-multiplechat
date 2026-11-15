@@ -342,21 +342,28 @@ export default function MoriceApp() {
     setNotice("");
   }
 
-  async function askMorice(confirmedText?: string) {
+  async function askMorice(confirmedText?: string, dailyBrief = false) {
     const textToSend = (confirmedText ?? message).trim();
-    if (!textToSend || sendingRef.current || (!confirmedText && (voiceActive || recordedAudio || dictationState === "stopping"))) return;
+    if (!textToSend || sendingRef.current || ((!confirmedText || dailyBrief) && (voiceActive || recordedAudio || dictationState === "stopping"))) return;
     if (textToSend.length > 1200) { setNotice("Votre demande dépasse 1 200 caractères. Raccourcissez-la avant de l’envoyer."); return; }
     sendingRef.current = true;
+    const mode = dailyBrief ? "auto" : assistantMode;
+    if (dailyBrief) {
+      setNotice("");
+      setView("chat");
+    }
     setMessages(previous => [...previous, { id: crypto.randomUUID(), role: "user", text: textToSend }]);
     setAssistantBusy(true);
     try {
-      if (assistantMode === 'multiplechat' && relayRequest.current?.question !== textToSend) relayRequest.current={question:textToSend,id:crypto.randomUUID()};
-      const result = await api(assistantMode === 'multiplechat' ? '/api/multiplechat/relay' : '/api/assistant', { method: "POST", body: JSON.stringify(assistantMode === 'multiplechat' ? {operation:'prepare',id:relayRequest.current!.id,question:textToSend} : { message: textToSend, mode: assistantMode }) }) as AssistantResult;
-      if (assistantMode === 'multiplechat') relayRequest.current=null;
+      if (mode === 'multiplechat' && relayRequest.current?.question !== textToSend) relayRequest.current={question:textToSend,id:crypto.randomUUID()};
+      const result = await api(mode === 'multiplechat' ? '/api/multiplechat/relay' : '/api/assistant', { method: "POST", body: JSON.stringify(mode === 'multiplechat' ? {operation:'prepare',id:relayRequest.current!.id,question:textToSend} : { message: textToSend, mode }) }) as AssistantResult;
+      if (mode === 'multiplechat') relayRequest.current=null;
       setMessages(previous => [...previous, { id: crypto.randomUUID(), role: "assistant", text: result.reply, action: result.action }]);
       if (result.warning) setNotice(result.warning);
-      setMessage("");
-      setDictationState("idle");
+      if (!dailyBrief) {
+        setMessage("");
+        setDictationState("idle");
+      }
       await refresh();
       if (result.action?.jobId) await queue.refresh();
     } catch (error) {
@@ -501,7 +508,7 @@ export default function MoriceApp() {
         <label className="mobile-sections">Ouvrir un espace<select aria-label="Choisir un espace" value={view} onChange={event => setView(event.target.value)}>{navigation.map(([id, title]) => <option key={id} value={id}>{title}</option>)}<option value="hubspot">HubSpot</option></select></label>
         {notice && <button className="notice" onClick={() => setNotice("")}>{notice}<span>×</span></button>}
 
-        {view === 'control' && <ControlCenter onOpen={setView} onPrepare={(text,mode='auto')=>{setMessage(text);setAssistantMode(mode);setView('chat');}} storage={storageStatus} microsoftAuthorized={Boolean(connections?.microsoft.connected)} taskCount={tasks.filter(t=>t.status!=='done').length} waiting={approvals.length} active={assistantBusy||queue.data.jobs.some(j=>['running','submitting'].includes(j.status))} date={dateText} jobs={queue.data.jobs}/>}
+        {view === 'control' && <ControlCenter onOpen={setView} onDailyBrief={()=>void askMorice("Mon point quotidien", true)} briefDisabled={assistantBusy||voiceActive||Boolean(recordedAudio)||dictationState==="stopping"} storage={storageStatus} microsoftAuthorized={Boolean(connections?.microsoft.connected)} taskCount={tasks.filter(t=>t.status!=='done').length} waiting={approvals.length} active={assistantBusy||queue.data.jobs.some(j=>['running','submitting'].includes(j.status))} date={dateText} jobs={queue.data.jobs}/>}
         {view === 'pc' && <PcLocalPanel onChanged={()=>void queue.refresh()}/>}
         {view === 'integrations' && <IntegrationCatalog onOpen={setView} microsoftAuthorized={Boolean(connections?.microsoft.connected)}/>}
 
