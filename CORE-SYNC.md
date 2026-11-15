@@ -1,7 +1,7 @@
 # CORE-SYNC — MORICE
 
-Généré : 2026-11-15T09:02:39.367Z
-Commit source au moment de la génération : `d3c096789d9f3da01c703778f5fe5c391421221a`
+Généré : 2026-11-15T09:10:35.622Z
+Commit source au moment de la génération : `bf2d96191153bbb7056e1cd212d6a231f9fd5a24`
 
 Ce fichier est un instantané technique publiable. Il exclut les messages, fichiers privés, comptes et secrets. Le commit qui contient cet instantané peut être ultérieur au commit source indiqué.
 
@@ -240,10 +240,17 @@ Ce fichier est un instantané technique publiable. Il exclut les messages, fichi
 - Suivi automatique à mettre en pause conformément au mandat pour éviter des réveils sans progrès vérifiable ; site reste disponible, projet global non déclaré terminé.
 - Pause confirmée par l outil natif : morice-widget-et-finition-de-nuit PAUSED ; le site et les données restent disponibles.
 
+## Point quotidien en un clic 2026-11-15
+
+- Bouton publié : lecture Microsoft existante en un clic, résultat dans Conversation et Travaux, brouillon conservé, sans envoi ni appel IA.
+- Quatre tests ciblés, TypeScript et build réussis. Production Chrome personnel : trois rubriques sur trois affichées.
+- Source bf2d961, déploiement privé appgdep_6af9759eadd48191889039aaa1f078d3 succeeded, variables révision 6.
+- Liaison PC attend le démarrage du programme local dans Windows ; contrôle automatique de lancement bloqué. Aucun changement de permission.
+
 ## Fichiers modifiés lors de la génération
 
-- app/components/control-center.tsx
-- app/morice-app.tsx
+- docs/MORICE-SYNC.md
+- docs/core-state.json
 
 ## Reprise MultipleChat
 
