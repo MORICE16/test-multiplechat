@@ -1005,6 +1005,22 @@ Décisions et transmission 02 : CONSERVER l'architecture, la tâche quotidienne 
 
 Sources : https://developers.openai.com/plugins/build/mcp-events ; https://learn.microsoft.com/en-us/copilot/plan/copilot-overview ; https://learn.microsoft.com/en-us/microsoft-365/copilot/release-notes ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html ; https://multiplechat.ai/help-guide .
 
+
+### 2026-11-15 19:37 Europe/Paris — point quotidien en un clic confirmé
+Couverture : protocole commun et dernier bilan LU ; GitHub main `3c8f207`, `CORE-SYNC.md` et `docs/core-state.json` LU ; comparaison `d3c0967…3c8f207` et deux commits LU ; contexte récent accessible PARTIEL ; RADAR officiel OpenAI/ChatGPT/Work/Codex/dots, MultipleChat, OpenClaw, Make/MCP, Microsoft 365/Work IQ/Outlook/To Do, HubSpot, Android/Samsung/ARTEMIS, Tasker, Claude, Gemini et Grok vérifié le 15/11 ; Desktop Commander LU. Git local PARTIEL : le dossier courant n'est pas un dépôt. Runtime privé directement interrogé par 04, téléphone/Fold, ADB, comptes fournisseurs, MultipleChat authentifié, réglages réels et historique conversationnel exhaustif INACCESSIBLES. Desktop Commander indique `Alan Offline` (dernière présence 1323 h, version 0.2.51).
+
+Changement matériel technique :
+- Le commit Sites `bf2d961` modifie `app/components/control-center.tsx` et `app/morice-app.tsx` : le bouton « Mon point quotidien » lance directement le mode automatique, ouvre Conversation, empêche les doubles lancements pendant une activité et ne remplace pas le brouillon saisi.
+- Les preuves consignées au commit `3c8f207` indiquent quatre tests ciblés, TypeScript et build réussis, puis un déploiement privé `appgdep_6af9759eadd48191889039aaa1f078d3` `succeeded`, variables révision 6. Le contrôle Chrome personnel a affiché les trois rubriques attendues et le lien Travaux en un clic. Cette exécution n'a pas été rejouée par 04 ; la preuve datée du journal et du déploiement est conservée comme source technique.
+- Le parcours réutilise la lecture Microsoft existante et les garde-fous documentés : aucun envoi de mail, aucune modification Microsoft, aucun appel IA et aucun brouillon conversationnel écrasé selon la preuve publiée. `CORE-SYNC.md` et `docs/core-state.json` ont été régénérés pour ce fait runtime.
+- Liaison PC séparée : aucun service local n'était observé sur le port prévu et le lancement automatique Windows a été bloqué par la politique de l'outil. Le démarrage manuel du lanceur existant a été demandé dans la session concernée ; aucune réussite ultérieure n'est prouvée. Le contexte récent montre encore une tentative de connexion HTTPS, sans preuve suffisante pour déclarer la liaison opérationnelle.
+
+Décision : CONSERVER ce parcours comme `OPÉRATIONNEL / TESTÉ` dans le périmètre prouvé du point quotidien. Aucun nouveau travail transmis à 02 : l'implémentation et sa preuve sont déjà consignées. Ne pas confondre ce bouton avec la tâche quotidienne 04, une autonomie MultipleChat ou une liaison PC fonctionnelle. Aucun code fonctionnel modifié par 04.
+
+RADAR filtré : aucun changement externe supplémentaire ne remplace une brique Morice. OpenClaw stable reste `2026.11.3`, Tasker reste `6.7.8` et `OAI-MCP-EVENTS-001` demeure une option à valider. La documentation officielle MultipleChat Desktop signale une documentation API interactive locale à `/api/docs`, mais l'application locale n'est pas accessible ici et aucun appel récupérant plusieurs avis identifiables n'est prouvé ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Les autres nouveautés sont antérieures, dédupliquées ou hors périmètre.
+
+Sources : https://github.com/MORICE16/test-multiplechat/commit/bf2d96191153bbb7056e1cd212d6a231f9fd5a24 ; https://github.com/MORICE16/test-multiplechat/commit/3c8f207c24d542e440c5f7261089bb897c36d464 ; https://tools.multiple.chat/desktop-app/docs ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html .
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
