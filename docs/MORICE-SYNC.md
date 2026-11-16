@@ -1021,6 +1021,15 @@ RADAR filtré : aucun changement externe supplémentaire ne remplace une brique 
 
 Sources : https://github.com/MORICE16/test-multiplechat/commit/bf2d96191153bbb7056e1cd212d6a231f9fd5a24 ; https://github.com/MORICE16/test-multiplechat/commit/3c8f207c24d542e440c5f7261089bb897c36d464 ; https://tools.multiple.chat/desktop-app/docs ; https://github.com/openclaw/openclaw/releases/tag/v2026.11.3 ; https://tasker.joaoapps.com/changes/changes6.7.html .
 
+### 2026-11-16 — contrôle sans changement matériel
+Couverture : protocole commun et dernier bilan LU ; GitHub main `19a85ca`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; contexte accessible PARTIEL ; Git local PARTIEL (le dossier courant n’est pas un dépôt) ; runtime privé, comptes, Fold/ADB, MultipleChat authentifié et historique exhaustif INACCESSIBLES. Desktop Commander LU : appareil Alan hors ligne, version 0.2.51, dernière présence signalée il y a 1348 h.
+
+Aucun changement matériel depuis le bilan du 15 novembre : aucun commit ultérieur à `19a85ca`, aucune nouvelle preuve runtime, contradiction, décision ou modification de périmètre. Le point quotidien en un clic reste OPÉRATIONNEL/TESTÉ uniquement dans le périmètre prouvé le 15 novembre ; il n’a pas été rejoué par 04. La liaison PC reste sans succès plus récent. `MC-SYNC-001` demeure EN ATTENTE MULTIPLECHAT ; aucun avis inventé ni transport de substitution.
+
+RADAR officiel vérifié le 16/11 : les publications OpenAI/Work/Codex, OpenClaw, Tasker 6.7.8, Make, Microsoft/Android/Samsung, Claude, Gemini, Grok et la documentation publique MultipleChat ne produisent aucune nouveauté dédupliquée imposant remplacement, migration, dépense ou validation. Les mises à jour Make publiées jusqu’au 13/11 sont sans impact prouvé sur les briques actuelles. Sources principales : https://help.openai.com/en/articles/6825453-chatgpt-release-notes ; https://github.com/openclaw/openclaw/releases ; https://tasker.joaoapps.com/changes/changes6.7.html ; https://help.make.com/2026 ; https://multiplechat.ai/help-guide .
+
+Décisions : CONSERVER l’état et les garde-fous ; aucun travail nouveau transmis à 02. Aucun code fonctionnel, compte, permission, service, message ou déploiement modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
