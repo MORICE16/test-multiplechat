@@ -1030,6 +1030,15 @@ RADAR officiel vérifié le 16/11 : les publications OpenAI/Work/Codex, OpenClaw
 
 Décisions : CONSERVER l’état et les garde-fous ; aucun travail nouveau transmis à 02. Aucun code fonctionnel, compte, permission, service, message ou déploiement modifié.
 
+### 2026-11-17 20:23 Europe/Paris — OpenClaw 2026.11.5 et GPT-6.2 à évaluer
+Couverture : protocole commun et bilan du 16/11 LU ; GitHub main `6f73be1`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; Git local PARTIEL (dossier courant hors dépôt) ; runtime privé, comptes, Fold/ADB, MultipleChat authentifié et historique exhaustif INACCESSIBLES. Desktop Commander LU : Alan hors ligne, version 0.2.51, dernière présence signalée il y a 1372 h. Aucun commit applicatif postérieur au lot du 15/11 et aucune nouvelle preuve runtime.
+
+Changements matériels RADAR :
+- OpenClaw `2026.11.5`, publié stable le 17/11, remplace la cible `2026.11.3`. Gains pertinents : conversations et files conservées après redémarrage, mises à jour avec retour arrière, récupération mémoire plus fiable, fallback de modèles, correctifs cron/automatisations et reprise Gateway. Risque : changement cassant pour les harness/plugins tiers sur la gestion des sessions et appels RPC. Classification : DISPONIBLE ; TESTER/À VALIDER avant toute mise à niveau, avec sauvegarde, contrôle des plugins Morice, cron, mémoire, Android et retour arrière. Aucun coût nouveau identifié ; compatibilité réelle du runtime actuel INCONNUE. Source officielle : https://github.com/openclaw/openclaw/releases/tag/v2026.11.5 .
+- OpenAI publie dans l’API `gpt-6.2-astra` et `gpt-6.2-sol` via Responses ou Chat Completions, avec fonctions, recherche web/fichiers et computer use. Sol : 2 $/million de tokens en entrée et 10 $ en sortie ; Astra : 8 $/million en entrée et 40 $ en sortie ; fenêtre 1,05 M, sortie maximale 128 k. Classification : DISPONIBLE API ; TESTER sur un petit jeu de tâches Morice avant tout changement de routage. Sol est le candidat économique pour le travail courant ; Astra seulement pour les cas complexes où le gain est mesuré. Les abonnements ChatGPT ne couvrent pas ces coûts API. Sources officielles : https://help.openai.com/en/articles/9624314-model-release-notes et https://developers.openai.com/api/docs/models .
+
+Décisions : CONSERVER la production actuelle ; ouvrir deux tests bornés à validation Alan, sans migration : `OC-2026.11.5` (compatibilité/retour arrière) et `OAI-GPT62` (qualité, latence, coût face au routage actuel). `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun travail transmis à 02 tant que ces tests ne sont pas validés. Aucun code fonctionnel, compte, permission, service ou déploiement modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
