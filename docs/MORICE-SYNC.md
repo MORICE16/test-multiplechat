@@ -1039,6 +1039,15 @@ Changements matériels RADAR :
 
 Décisions : CONSERVER la production actuelle ; ouvrir deux tests bornés à validation Alan, sans migration : `OC-2026.11.5` (compatibilité/retour arrière) et `OAI-GPT62` (qualité, latence, coût face au routage actuel). `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Aucun travail transmis à 02 tant que ces tests ne sont pas validés. Aucun code fonctionnel, compte, permission, service ou déploiement modifié.
 
+### 2026-11-18 19:56 Europe/Paris — GPT-6.2 étendu à Work et Codex
+Couverture : protocole commun et bilan du 17/11 LU ; GitHub main `dd03f5e`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; Git local PARTIEL (dossier courant hors dépôt) ; runtime privé, comptes, Fold/ADB, MultipleChat authentifié et historique exhaustif INACCESSIBLES. Desktop Commander LU : Alan hors ligne, version 0.2.51, dernière présence signalée il y a 1396 h. Aucun commit applicatif, preuve runtime ou contradiction technique nouveau.
+
+Changement matériel RADAR : OpenAI annonce le déploiement de GPT-6.2 Astra et GPT-6.2 Sol dans ChatGPT Work et Codex pour Plus, Pro, Business, Enterprise, Edu et Healthcare, selon plan, permissions et progression du déploiement. Ils ne sont pas ajoutés au Chat normal. Une connexion Codex avec le compte ChatGPT utilise l’allocation Work/Codex du forfait ; une clé API reste facturée séparément. L’accès réel du compte n’a pas été observé dans cette exécution. Source officielle vérifiée le 18/11 : https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex .
+
+Impact sur `OAI-GPT62` : AMÉLIORER le plan de test. Tester d’abord Sol puis Astra directement dans Work/Codex sur un petit corpus Morice, avec l’allocation incluse si le sélecteur les propose ; comparer qualité, latence et consommation d’allocation. Ne tester l’API payante qu’ensuite si un besoin d’intégration applicative est validé. Cela réduit le risque de coût et n’exige ni clé API ni modification du routage actuel.
+
+OpenClaw reste à `2026.11.5` ; aucun élément nouveau ne change le dossier `OC-2026.11.5`. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Production conservée, aucun travail transmis à 02 avant validation, aucun code fonctionnel, compte, permission, service ou déploiement modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
