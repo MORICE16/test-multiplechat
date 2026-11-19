@@ -1048,6 +1048,15 @@ Impact sur `OAI-GPT62` : AMÉLIORER le plan de test. Tester d’abord Sol puis A
 
 OpenClaw reste à `2026.11.5` ; aucun élément nouveau ne change le dossier `OC-2026.11.5`. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. Production conservée, aucun travail transmis à 02 avant validation, aucun code fonctionnel, compte, permission, service ou déploiement modifié.
 
+### 2026-11-19 19:56 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et bilan du 18/11 LU ; GitHub main `bcbc735`, `CORE-SYNC.md` et `docs/core-state.json` LU ; commits récents LU ; Git local PARTIEL (dossier courant hors dépôt) ; runtime privé, comptes, Fold/ADB, MultipleChat authentifié et historique exhaustif INACCESSIBLES. Desktop Commander LU : Alan hors ligne, version 0.2.51, dernière présence signalée il y a 1420 h. Aucun commit applicatif, preuve runtime ou contradiction technique nouveau.
+
+Aucun changement matériel. OpenClaw reste à `2026.11.5` et le dossier `OC-2026.11.5` reste À VALIDER. Le déploiement GPT-6.2 dans Work/Codex et le plan `OAI-GPT62` restent inchangés : tester Sol en premier avec l’allocation du forfait si le modèle apparaît dans le sélecteur, puis Astra seulement si nécessaire.
+
+RADAR officiel vérifié le 19/11 : les crédits API liés à ChatGPT concernent les offres Pro 100/200/500 et certains espaces Business ; Plus est explicitement exclu. Ils ne remplacent donc pas le test Work/Codex prévu et ne justifient aucune activation ou dépense. La publication OpenAI « Performance Factory » décrit une architecture interne Codex, sans composant public identifié remplaçant une brique de Morice. Aucune nouveauté dédupliquée retenue pour MultipleChat, Make, Microsoft 365, Android/Samsung, Tasker, Claude, Gemini ou Grok. Sources : https://help.openai.com/fr-fr/articles/20001626-api-credits-benefit-for-eligible-chatgpt-subscriptions ; https://openai.com/index/how-openai-performance-factory-keeps-chatgpt-fast/ ; https://github.com/openclaw/openclaw/releases .
+
+Décisions : CONSERVER l’état et les garde-fous ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT ; aucun travail nouveau transmis à 02. Aucun code fonctionnel, compte, permission, service ou déploiement modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
