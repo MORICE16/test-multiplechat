@@ -1081,6 +1081,13 @@ Changements matériels :
 
 MultipleChat : aucune documentation officielle nouvelle d’API/MCP/CLI/webhook ou collecte automatique multi-avis n’a été trouvée ; `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT. `OAI-GPT62` et `OC-HOST-001` restent À VALIDER. Aucun code fonctionnel, compte, permission, service, automatisation ou déploiement modifié.
 
+### 2026-11-22 20:13 Europe/Paris — contrôle sans changement matériel
+Couverture : protocole commun et bilan du 21/11 LU ; GitHub main `03b3a817`, `CORE-SYNC.md` (blob `00c1e3e`) et `docs/core-state.json` (blob `6021b4c`) LU ; commits récents LU ; Git local PARTIEL (dossier courant hors dépôt) ; runtime privé, comptes, Fold/ADB, MultipleChat authentifié et historique exhaustif INACCESSIBLES. Desktop Commander LU : Alan hors ligne, version 0.2.51, dernière présence signalée il y a 1492 h. Aucun commit applicatif postérieur à `bf2d961` ni nouvelle preuve runtime après le déploiement privé `appgdep_6af9759eadd48191889039aaa1f078d3`.
+
+Aucun changement matériel. Le RADAR officiel des dernières vingt-quatre heures ne montre pas de version stable OpenClaw postérieure à `2026.11.6`, ni de préversion postérieure à `2026.11.10-beta.1`, ni de nouvelle annonce OpenAI/Make/Microsoft dédupliquée modifiant une brique actuelle. La documentation OpenAI relue précise que les dots disposent d’un ordinateur cloud et que l’accès local est optionnel ; l’annonce déjà suivie reste limitée à des plans et régions éligibles, sans preuve d’accès au compte d’Alan et sans remplacement de `OC-HOST-001`. La documentation Work/Codex précise Codex CLI 0.166.0 minimum pour GPT-6.2, sans incidence sur le test Desktop déjà proposé. Sources : https://help.openai.com/en/articles/20001530-getting-started-with-your-dot ; https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex ; https://github.com/openclaw/openclaw/releases .
+
+Décisions inchangées : `OAI-SPACE-001`, `OAI-GPT62` et `OC-HOST-001` restent TESTER/À VALIDER ; cible OpenClaw stable `2026.11.6` conservée, bêta non recommandée pour l’hôte envisagé. `MC-SYNC-001` reste EN ATTENTE MULTIPLECHAT : aucune documentation officielle nouvelle d’API/MCP/CLI/webhook ou collecte multi-avis n’a été trouvée. Aucun travail nouveau transmis à 02. Aucun code fonctionnel, compte, permission, service, automatisation ou déploiement modifié.
+
 ## Reprise 02 — MORICE DEV
 
 1. Lire ce protocole et CORE-SYNC ; vérifier HEAD local/main et les changements non commités avant toute mise à jour du checkout.
